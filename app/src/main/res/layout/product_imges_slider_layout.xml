@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:custom="http://schemas.android.com/tools"
+    android:background="@color/white">
+
+    <com.daimajia.slider.library.SliderLayout
+        android:id="@+id/slider_layout_id"
+        android:layout_width="300dp"
+        android:layout_height="400dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:indicator_visibility="visible"
+        android:scrollIndicators="bottom"
+        app:auto_cycle="true"/>
+
+
+        <com.daimajia.slider.library.Indicators.PagerIndicator
+            android:id="@+id/custom_indicator"
+            android:layout_width="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/slider_layout_id"
+            android:layout_height="40dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="bottom"
+            custom:selected_color="#0095BF"
+            custom:unselected_color="#55333333"
+            app:selected_drawable="@drawable/oval_gold"
+            app:unselected_drawable="@drawable/oval_gold_white"
+            custom:shape="oval"
+            custom:selected_padding_left="6dp"
+            custom:selected_padding_right="6dp"
+            custom:unselected_padding_left="2dp"
+            custom:unselected_padding_right="2dp"
+            custom:selected_width="10dp"
+            custom:selected_height="10dp"
+            custom:unselected_width="10dp"
+            custom:unselected_height="10dp" />
+
+
+
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

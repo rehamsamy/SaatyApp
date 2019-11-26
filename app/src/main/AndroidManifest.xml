@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
+    package="com.saaty">
+
+    <dist:module dist:instant="true" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".sideMenuScreen.ContactUsActivity"></activity>
+        <activity android:name=".sideMenuScreen.AboutUsActivity">
+
+        </activity>
+        <activity android:name=".sideMenuScreen.AboutAppActivity"></activity>
+        <activity android:name=".sideMenuScreen.wishlist.WishlistActivity" />
+        <activity android:name=".sideMenuScreen.SettingActivity" />
+        <activity android:name=".sideMenuScreen.ChangePasswordActivity" />
+        <activity android:name=".sideMenuScreen.EditProfileActivity" />
+        <activity android:name=".sideMenuScreen.ProfileActivity" />
+        <activity android:name=".productDetails.SendMessageActivity" />
+        <activity android:name=".productDetails.ProductDetailsActivity" />
+        <activity android:name=".home.StoresProduct.StoresProductsActivity" />
+        <activity android:name=".splash.SplashActivity" />
+        <activity android:name=".home.StoresActivity" />
+        <activity android:name=".home.HomeActivity" />
+        <activity android:name=".loginAndRegister.RegisterActivity" />
+        <activity android:name=".password.ResetPasswordActivity" />
+        <activity android:name=".password.VerificationCodeActivity" />
+        <activity android:name=".password.ForgetPasswordActivity" />
+        <activity android:name=".loginAndRegister.LoginTraderUserActivity" >
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".splash.SplashLanguageActivity" />
+        <activity android:name=".MainActivity" />
+    </application>
+
+</manifest>
