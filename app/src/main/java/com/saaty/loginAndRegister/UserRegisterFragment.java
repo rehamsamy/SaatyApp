@@ -97,15 +97,15 @@ public class UserRegisterFragment extends Fragment {
                     public void onResponse(Call<RegisterModel> call, Response<RegisterModel> response) {
 
                         Log.v("TraderRegisterFragment", "dddddddddddd" + response.body().toString());
-//                    if (response.body().getSuccess()==true) {
-//                        Log.v(TAG,"valid error1 ");
-//                        Toast.makeText(mContext, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-//                    }
-//                    else if(response.body().getSuccess()==false){
-//                        Log.v(TAG,"valid error2 ");
-//                        Toast.makeText(getContext(), response.body().getMessage()+response.body().getData().getEmail() + "\n" +
-//                                response.body().getData().getEmail() + "\n" , Toast.LENGTH_SHORT).show();
-//                    }
+                    if (response.body().getSuccess()==true) {
+                        Log.v(TAG,"valid error1 ");
+                        Toast.makeText(mContext, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                    else if(response.body().getSuccess()==false){
+                        Log.v(TAG,"valid error2 ");
+                        Toast.makeText(getContext(), response.body().getMessage()+response.body().getData().getEmail() + "\n" +
+                                response.body().getData().getEmail() + "\n" , Toast.LENGTH_SHORT).show();
+                    }
                     }
 
                     @Override

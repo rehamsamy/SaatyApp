@@ -6,42 +6,37 @@
     xmlns:custom="http://schemas.android.com/tools"
     android:background="@color/white">
 
-    <com.daimajia.slider.library.SliderLayout
-        android:id="@+id/slider_layout_id"
-        android:layout_width="300dp"
-        android:layout_height="400dp"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager_id"
+        android:layout_width="0dp"
+        android:layout_height="300dp"
+        android:padding="15dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/spring_dots_indicator"
+
+        />
+    <com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
+        android:id="@+id/spring_dots_indicator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/view_pager_id"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:indicator_visibility="visible"
-        android:scrollIndicators="bottom"
-        app:auto_cycle="true"/>
+        android:layout_marginBottom="40dp"
+        app:dampingRatio=".5"
+        app:dotsColor="@color/blue"
+        app:dotsStrokeColor="@color/gold"
+        app:dotsCornerRadius="9dp"
+        app:dotsSize="16dp"
+        app:dotsSpacing="6dp"
+        app:dotsStrokeWidth="3dp"
+        app:stiffness="300"
 
-
-        <com.daimajia.slider.library.Indicators.PagerIndicator
-            android:id="@+id/custom_indicator"
-            android:layout_width="0dp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/slider_layout_id"
-            android:layout_height="40dp"
-            android:layout_marginBottom="20dp"
-            android:layout_gravity="bottom"
-            custom:selected_color="#0095BF"
-            custom:unselected_color="#55333333"
-            app:selected_drawable="@drawable/oval_gold"
-            app:unselected_drawable="@drawable/oval_gold_white"
-            custom:shape="oval"
-            custom:selected_padding_left="6dp"
-            custom:selected_padding_right="6dp"
-            custom:unselected_padding_left="2dp"
-            custom:unselected_padding_right="2dp"
-            custom:selected_width="10dp"
-            custom:selected_height="10dp"
-            custom:unselected_width="10dp"
-            custom:unselected_height="10dp" />
+        />
 
 
 

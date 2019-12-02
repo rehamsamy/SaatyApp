@@ -29,7 +29,6 @@ public class LoginModel{
 	@SerializedName("message")
 	private String message;
 
-
 	@SerializedName("user")
 	private List<UserModel> userModel;
 

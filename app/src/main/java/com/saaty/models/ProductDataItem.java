@@ -9,6 +9,8 @@ import com.google.gson.annotations.SerializedName;
 
 public class ProductDataItem implements Parcelable {
 
+	@SerializedName("category_id")
+	private int categoryId;
 
 	@SerializedName("id")
 	private  int id;
@@ -40,8 +42,6 @@ public class ProductDataItem implements Parcelable {
 	@SerializedName("contact_type")
 	private String contactType;
 
-	@SerializedName("category_id")
-	private int categoryId;
 
 	@SerializedName("updated_at")
 	private String updatedAt;
@@ -60,6 +60,28 @@ public class ProductDataItem implements Parcelable {
 
 	@SerializedName("contact_mobile")
 	private String contactMobile;
+
+
+	@SerializedName("image_id")
+	private int imageId;
+
+	@SerializedName("image_link")
+	private String imageLink;
+
+	@SerializedName("image-ref_link")
+	private String imageRefLink;
+
+	public int getImageId() {
+		return imageId;
+	}
+
+	public String getImageLink() {
+		return imageLink;
+	}
+
+	public String getImageRefLink() {
+		return imageRefLink;
+	}
 
 	protected ProductDataItem(Parcel in) {
 		id = in.readInt();

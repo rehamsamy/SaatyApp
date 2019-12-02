@@ -11,41 +11,47 @@
 
     <ImageView
         android:id="@+id/logo_img_id"
-        android:layout_width="200dp"
-        android:layout_height="120dp"
+        android:layout_width="180dp"
+        android:layout_height="100dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="10dp"
         android:src="@drawable/color" />
 
-    <com.daimajia.slider.library.SliderLayout
-        android:id="@+id/slider_layout_id"
-        android:layout_width="match_parent"
+    <androidx.viewpager.widget.ViewPager
+        android:id="@+id/view_pager_id"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:indicator_visibility="visible"
-        app:layout_constraintTop_toBottomOf="@id/logo_img_id"
+        android:padding="15dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="20dp"
-        app:auto_cycle="true"
-        android:padding="20dp"
-        >
+        app:layout_constraintTop_toBottomOf="@id/logo_img_id"
+        app:layout_constraintBottom_toTopOf="@id/spring_dots_indicator"
 
-
-        <TextView
-            android:id="@+id/splash_msg"
+       />
+        <com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator
+            android:id="@+id/spring_dots_indicator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-          android:gravity="center_horizontal|bottom"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:layout_marginBottom="10dp"
+            android:layout_marginTop="10dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/view_pager_id"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="40dp"
+            app:dampingRatio=".5"
+            app:dotsColor="@color/blue"
+            app:dotsStrokeColor="@color/gold"
+            app:dotsCornerRadius="9dp"
+            app:dotsSize="16dp"
+            app:dotsSpacing="6dp"
+            app:dotsStrokeWidth="3dp"
+            app:stiffness="300"
 
             />
 
-    </com.daimajia.slider.library.SliderLayout>
+
 
 
 

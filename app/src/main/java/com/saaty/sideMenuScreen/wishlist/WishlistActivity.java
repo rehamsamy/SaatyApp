@@ -1,8 +1,11 @@
 package com.saaty.sideMenuScreen.wishlist;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -17,20 +20,31 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.saaty.PaginationScrollListener;
 import com.saaty.R;
+import com.saaty.home.StoresActivity;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
+import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.ProductDataModel;
+import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class WishlistActivity extends AppCompatActivity implements OnItemClickInterface {
 
@@ -38,11 +52,28 @@ public class WishlistActivity extends AppCompatActivity implements OnItemClickIn
     @BindView(R.id.progress_id) ProgressBar progressBar;
     @BindView(R.id.empty_data_txt_id) TextView emptyData;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;
+    @BindView(R.id.homeSearch_ed_id) SearchView searchEditTxt;
     Dialog mDialog;
-    List<ProductDataItem> wishlistProducts;
+    List<DataArrayModel> wishlistProducts;
     WishlistAdapter wishlistAdapter;
     ApiServiceInterface apiServiceInterface;
+    int current_page;
     NetworkAvailable networkAvailable;
+
+    private GridLayoutManager layoutManager;
+
+    // Indicates if footer ProgressBar is shown (i.e. next page is loading)
+    private boolean isLoading = false;
+
+    // If current page is the last page (Pagination will stop after this page load)
+    private boolean isLastPage = false;
+
+    // total no. of pages to load. Initial load is page 0, after which 2 more pages will load.
+    private int TOTAL_PAGES;
+
+    // indicates the current page which Pagination is fetching.
+    private int currentPage = 1;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +82,12 @@ public class WishlistActivity extends AppCompatActivity implements OnItemClickIn
         ButterKnife.bind(this);
         networkAvailable=new NetworkAvailable(getApplicationContext());
         toolbarTxt.setText(getString(R.string.wishlist));
+        searchEditTxt.clearFocus();
+        wishlistProducts=new ArrayList<>();
+        initializeComponents();
+       // buildWishlisrRecycler();
         getWishList();
+
 
     }
 
@@ -59,32 +95,45 @@ public class WishlistActivity extends AppCompatActivity implements OnItemClickIn
         if(networkAvailable.isNetworkAvailable()){
             apiServiceInterface= ApiClient.getClientService();
             progressBar.setVisibility(View.VISIBLE);
-            Call<ProductDataModel> call=apiServiceInterface.getWishlist("application/json","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjI3ZDg2MjYyZjE4MDU1Y2FlNGMzNmU5YTcxZDg3ZTc3MThmMjdlOTI2NmE1ZjFkNDE4ZWI5ODNlY2RhMGZmOWNmMDkwMzkxYzdjNzVjYTQzIn0.eyJhdWQiOiIyIiwianRpIjoiMjdkODYyNjJmMTgwNTVjYWU0YzM2ZTlhNzFkODdlNzcxOGYyN2U5MjY2YTVmMWQ0MThlYjk4M2VjZGEwZmY5Y2YwOTAzOTFjN2M3NWNhNDMiLCJpYXQiOjE1NzQyNDgzMzEsIm5iZiI6MTU3NDI0ODMzMSwiZXhwIjoxNjA1ODcwNzMxLCJzdWIiOiI0Iiwic2NvcGVzIjpbXX0.AOzPvH32Mc4Nq_ierPEy2W2zGqMBWxkSwxpGu3Uigs324eInnQ5DvjssxOyCMxHX8JDaxJ3GQSKTTwjGSz7xp99SKNf43hrCv1sLd3d4EiCC_pHsHceiAzK1I3Veg0wj_YPRh_DBbreycpmdw9pz8TAjmJp47L1JUbS90uVc-WjHZIPQ2xAWkurSblxcP8fryAdkJ8e3S7P9iTU9-pFGQ5DqllO0ORJZGF76dMxJIWuW7VcWxYUtWd-z5c27S_HGVmzee_ZVt3MpL1-1H947FmEb30ZR7FCT3uSbY4VgDMg0ttem_IWqUQJKJirxdO4fWxXwyKcxpxEHkGE9LCcONjKpTLbqVnyeNrpGFuNOSvTOHtjLaf8N0IM4d_jFNrOLcNEOQvtCDaDIG-Q81PhF9aYWHMw86fXJWXRWCWcbgV-5MPOmcYnvfM6GQaLHKM25HOoJ8RS2VYikGeCZaVFPQrMe4bS07ybJFQtD5WfmsMm26mZZpGGNexMa9qbN_77BJB49NtSTZKMgrRiEwYWwT9_FwURo-m483J-8q5DpBR_CfQXjuBD_H08VjuL3DbC63r3RHnJICKh4HIVgeBYyw-Xua-7q-DBfXdyva8G9oAs6enuEnzg9pKi3leLAE9NINzQBk_NGRw0LzD7VPqQkUEVDrJpfr94F2phov23wQPA");
-            call.enqueue(new Callback<ProductDataModel>() {
+            Map<String,Object> map=new HashMap<>();
+          String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+            map.put("page",currentPage);
+            map.put("limit",10);
+            Call<StoreListModel> call=apiServiceInterface.getWishlist(map,"application/json",token);
+                    call.enqueue(new Callback<StoreListModel>() {
                 @Override
-                public void onResponse(Call<ProductDataModel> call, Response<ProductDataModel> response) {
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if(response.body().isSuccess()){
-                        if(response.body().getProductDataModels().size()>0){
+                        if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
+                            wishlistProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                            wishlistAdapter.notifyDataSetChanged();
+
+
+
+
                             Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                            wishlistProducts=response.body().getProductDataModels();
-                            wishlistAdapter=new WishlistAdapter(WishlistActivity.this,wishlistProducts,WishlistActivity.this);
-                            recyclerView.setLayoutManager(new GridLayoutManager(WishlistActivity.this,2));
-                            recyclerView.setAdapter(wishlistAdapter);
-                            progressBar.setVisibility(View.GONE);
+                           // wishlistProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+//                            wishlistAdapter.notifyItemRangeInserted(wishlistAdapter.getItemCount(),wishlistProducts.size()-1);
+//
+                           if(wishlistProducts.size()>0) {
+                                          progressBar.setVisibility(View.GONE);
+                            }
                         }else {
                             recyclerView.setVisibility(View.GONE);
                             emptyData.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
+                       // }
                         }
+//
 
-
-                    }else {
-                        Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                       else {
+                       Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
 
                 @Override
-                public void onFailure(Call<ProductDataModel> call, Throwable t) {
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
 
                 }
             });
@@ -92,6 +141,67 @@ public class WishlistActivity extends AppCompatActivity implements OnItemClickIn
         }else {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private void buildWishlisrRecycler() {
+        GridLayoutManager layoutManager=new GridLayoutManager(getApplicationContext(),2);
+         recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setItemAnimator(new DefaultItemAnimator());
+        recyclerView.setHasFixedSize(true);
+        wishlistAdapter=new WishlistAdapter(WishlistActivity.this,wishlistProducts,WishlistActivity.this);
+        recyclerView.setAdapter(wishlistAdapter);
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                current_page=current_page+1;
+                if(wishlistProducts.size()<10){
+                    getWishList();
+                }else {
+                    getWishList();
+                }
+
+            }
+        });
+
+    }
+
+
+    protected void initializeComponents() {
+
+
+        layoutManager = new GridLayoutManager(getApplicationContext(), 2);
+        recyclerView.setLayoutManager(layoutManager);
+        wishlistAdapter= new WishlistAdapter(getApplicationContext(),wishlistProducts,WishlistActivity.this);
+        recyclerView.setAdapter(wishlistAdapter);
+        recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+            @Override
+            protected void loadMoreItems() {
+                isLoading = true;
+                currentPage += 1;
+                getWishList();
+            }
+
+
+            @Override
+            public boolean isLastPage() {
+                return isLastPage;
+            }
+
+            @Override
+            public boolean isLoading() {
+                return isLoading;
+            }
+        });
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        currentPage=1;
+        getWishList();
     }
 
     @OnClick(R.id.nav_filter_id)
@@ -107,8 +217,8 @@ public class WishlistActivity extends AppCompatActivity implements OnItemClickIn
     @Override
     public void onItemClick(int position) {
         Intent intent=new Intent(WishlistActivity.this, ProductDetailsActivity.class);
-       ProductDataItem item= wishlistProducts.get(position);
-        intent.putExtra("wishlist_model",item);
+       DataArrayModel item= wishlistProducts.get(position);
+        intent.putExtra(ProductDetailsActivity.WISHLIST_PRODUCTS_DETAILS,item);
         startActivity(intent);
     }
 }

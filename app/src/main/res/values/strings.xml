@@ -89,4 +89,25 @@
     <string name="website">Website:</string>
     <string name="website_value">www.company.com</string>
     <string name="email_value">company@gmail.com</string>
+    <string name="sort_by_type">Sort By Type:</string>
+    <string name="filter_by_status">Filter By Status:</string>
+    <string name="watch">Watch</string>
+    <string name="bracletes">Bracletes</string>
+    <string name="delete_ads">Delete Ads</string>
+    <string name="delete_ads_msg">Are you sure delete this ads?</string>
+    <string name="type">Type:</string>
+    <string name="status">Status:</string>
+    <string name="producer_price">Product Price:</string>
+    <string name="price_type">reyal seody</string>
+    <string name="phone_number_contact">Phone Number To Contact:</string>
+    <string name="email_contact">Email To Contact:</string>
+    <string name="contact_way">Contact Way:</string>
+    <string name="private_message">Private Message</string>
+    <string name="all">All</string>
+    <string name="product_details">Product Details Information:</string>
+    <string name="product_details_info">write here product information</string>
+    <string name="attatch_images">Attatch product images:</string>
+    <string name="producet_name">Product Name:</string>
+    <string name="used_products">Used Products</string>
+    <string name="watches">Watches</string>
 </resources>

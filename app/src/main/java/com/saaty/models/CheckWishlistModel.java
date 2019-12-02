@@ -1,13 +1,10 @@
 package com.saaty.models;
 
-import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
 
-public class CategoryModel{
-
-	@SerializedName("data")
-	private List<DataItem> data;
+public class CheckWishlistModel{
 
 	@SerializedName("success")
 	private boolean success;
@@ -15,13 +12,18 @@ public class CategoryModel{
 	@SerializedName("message")
 	private String message;
 
+	@SerializedName("data")
+  private DataObjectModel dataObjectModel;
 
-	public void setData(List<DataItem> data){
-		this.data = data;
-	}
+//	@SerializedName("data")
+//	private String dataMsg;
+////
+//	public String getDataMsg() {
+//		return dataMsg;
+//	}
 
-	public List<DataItem> getData(){
-		return data;
+	public DataObjectModel getDataObjectModel() {
+		return dataObjectModel;
 	}
 
 	public void setSuccess(boolean success){
@@ -43,9 +45,8 @@ public class CategoryModel{
 	@Override
  	public String toString(){
 		return 
-			"CategoryModel{" + 
-			"data = '" + data + '\'' + 
-			",success = '" + success + '\'' + 
+			"CheckWishlistModel{" + 
+			"success = '" + success + '\'' + 
 			",message = '" + message + '\'' + 
 			"}";
 		}

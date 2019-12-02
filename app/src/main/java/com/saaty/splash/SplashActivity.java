@@ -5,6 +5,7 @@ import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.TextView;
@@ -14,14 +15,24 @@ import com.daimajia.slider.library.SliderLayout;
 import com.daimajia.slider.library.SliderTypes.BaseSliderView;
 import com.daimajia.slider.library.SliderTypes.TextSliderView;
 import com.daimajia.slider.library.Tricks.ViewPagerEx;
+import com.saaty.CustomPagerAdapter;
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
+import com.tbuonomo.viewpagerdotsindicator.BaseDotsIndicator;
+import com.tbuonomo.viewpagerdotsindicator.DotsIndicator;
+import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 
-public class SplashActivity extends AppCompatActivity implements ViewPagerEx.OnPageChangeListener, BaseSliderView.OnSliderClickListener {
+import java.util.ArrayList;
+import java.util.List;
+
+public class SplashActivity extends AppCompatActivity {
 
 
-    @BindView(R.id.slider_layout_id) SliderLayout sliderLayout;
-    @BindView(R.id.splash_msg) TextView splashMsg;
+   // @BindView(R.id.slider_layout_id) SliderLayout sliderLayout;
+    @BindView(R.id.view_pager_id) ViewPager viewPager;
+    @BindView(R.id.spring_dots_indicator)
+    BaseDotsIndicator springDotsIndicator;
+    CustomPagerAdapter adapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -29,67 +40,48 @@ public class SplashActivity extends AppCompatActivity implements ViewPagerEx.OnP
         ButterKnife.bind(this);
 
 
-        int []x={R.drawable.splash_photo_1,R.drawable.splash_photo_2,R.drawable.splash_photo_3};
+        List<Integer> x=new ArrayList<>();
+        x.add(R.drawable.splash_photo_1);
+        x.add(R.drawable.splash_photo_2);
+        x.add(R.drawable.splash_photo_3);
 
-        for(int i=0;i<x.length;i++){
-            TextSliderView textSliderView=new TextSliderView(this);
-            textSliderView.image(x[i])
-            .setScaleType(BaseSliderView.ScaleType.CenterInside)
-            .setOnSliderClickListener(this);
-            textSliderView.bundle(new Bundle())
-            ;
-            sliderLayout.addSlider(textSliderView);
-        }
-        sliderLayout.setPresetTransformer(SliderLayout.Transformer.Accordion);
-        sliderLayout.setDuration(5000);
-        sliderLayout.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-        sliderLayout.addOnPageChangeListener(this);
-        sliderLayout.setCustomAnimation(new DescriptionAnimation());
+        List<String> y=new ArrayList<>();
+        y.add(getString(R.string.splash_message1));
+        y.add(getString(R.string.splash_message2));
+        y.add(getString(R.string.splash_message3));
 
 
-        startActivity(new Intent(this,SplashLanguageActivity.class));
 
-    }
 
-    @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+        adapter=new CustomPagerAdapter(SplashActivity.this,x,y);
+        viewPager.setAdapter(adapter);
+        springDotsIndicator.setViewPager(viewPager);
 
-        switch (position){
-            case 0:
-                splashMsg.setText(R.string.splash_message1);
-            case 1:
-                splashMsg.setText(R.string.splash_message2);
-            case 2:
-                splashMsg.setText(R.string.splash_message3);
-            default:
-                return;
 
-        }
-    }
+        viewPager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                if(position==2){
 
-    @Override
-    public void onPageSelected(int position) {
-        switch (position){
-            case 0:
-                splashMsg.setText(R.string.splash_message1);
-            case 1:
-                splashMsg.setText(R.string.splash_message2);
-            case 2:
-                splashMsg.setText(R.string.splash_message3);
-                default:
-                    return;
+                    startActivity(new Intent(getApplicationContext(),SplashLanguageActivity.class));
 
-        }
+                }
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+
 
     }
 
-    @Override
-    public void onPageScrollStateChanged(int state) {
 
-    }
-
-    @Override
-    public void onSliderClick(BaseSliderView slider) {
-
-    }
 }

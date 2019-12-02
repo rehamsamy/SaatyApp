@@ -1,14 +1,12 @@
 package com.saaty.models;
 
-import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
 
-public class StoresListModel{
 
-	@SerializedName("data")
-	private List<DataItem> data;
+public class GetProductImagesModel{
 
 	@SerializedName("success")
 	private boolean success;
@@ -16,12 +14,11 @@ public class StoresListModel{
 	@SerializedName("message")
 	private String message;
 
-	public void setData(List<DataItem> data){
-		this.data = data;
-	}
+	@SerializedName("data")
+	private List<ProductimagesItem> productimagesItems;
 
-	public List<DataItem> getData(){
-		return data;
+	public List<ProductimagesItem> getProductimagesItems() {
+		return productimagesItems;
 	}
 
 	public void setSuccess(boolean success){
@@ -43,9 +40,8 @@ public class StoresListModel{
 	@Override
  	public String toString(){
 		return 
-			"StoresListModel{" + 
-			"data = '" + data + '\'' + 
-			",success = '" + success + '\'' + 
+			"GetProductImagesModel{" + 
+			"success = '" + success + '\'' + 
 			",message = '" + message + '\'' + 
 			"}";
 		}

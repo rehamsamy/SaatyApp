@@ -17,7 +17,14 @@ public class ProductDataModel{
 	@SerializedName("data")
     private List<ProductDataItem> productDataModels;
 
-    public List<ProductDataItem> getProductDataModels() {
+//	@SerializedName("data")
+//	private ProductDataItem productDataItem;
+
+//	public ProductDataItem getProductDataItem() {
+//		return productDataItem;
+//	}
+
+	public List<ProductDataItem> getProductDataModels() {
         return productDataModels;
     }
 

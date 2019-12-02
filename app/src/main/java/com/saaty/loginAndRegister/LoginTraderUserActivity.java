@@ -46,6 +46,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
     public static UserModel userModel;
+    public static  LoginModel loginModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,7 +74,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     @OnClick(R.id.login_visitor_btn_id)
     void loginVistor(){
         Intent intent=new Intent(getApplicationContext(), HomeActivity.class);
-        intent.setAction("login_user");
+        intent.setAction("login_visitor");
         startActivity(intent);
     }
 
@@ -109,6 +110,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
                         if(response.body().getTokenType().equals("Bearer")){
                             Log.v(TAG,"login sucess1");
                             userModel=response.body().getUserModel().get(0);
+                            loginModel=response.body();
                             Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
                             intent.putExtra("user_model",userModel);
                             startActivity(intent);

@@ -8,6 +8,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.saaty.R;
+import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.util.OnItemClickInterface;
 
@@ -18,9 +19,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class WishlistAdapter  extends RecyclerView.Adapter<WishlistAdapter.Holder> {
     Context mContext;
-    List<ProductDataItem> wishlistProducts;
+    List<DataArrayModel> wishlistProducts;
     OnItemClickInterface mOnItemInterface;
-    public WishlistAdapter(Context mContext,  List<ProductDataItem> wishlistProducts,OnItemClickInterface mOnItemInterface) {
+    public WishlistAdapter(Context mContext,  List<DataArrayModel> wishlistProducts,OnItemClickInterface mOnItemInterface) {
         this.mContext = mContext;
         this.wishlistProducts=wishlistProducts;
         this.mOnItemInterface=mOnItemInterface;
@@ -35,7 +36,7 @@ public class WishlistAdapter  extends RecyclerView.Adapter<WishlistAdapter.Holde
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-        ProductDataItem item=wishlistProducts.get(position);
+        DataArrayModel item=wishlistProducts.get(position);
         ImageView heartImage=holder.itemView.findViewById(R.id.wish_list_img);
         heartImage.setImageResource(R.drawable.wishlist_select);
         TextView wishlistPrice=holder.itemView.findViewById(R.id.product_price_id);

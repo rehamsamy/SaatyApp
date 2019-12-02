@@ -29,13 +29,13 @@
         android:layout_gravity="center"
         android:text="@string/forget_pass"
         android:textColor="@android:color/darker_gray"
-        android:textSize="17sp"
+        android:textSize="18sp"
         android:textStyle="bold" />
 
     <ImageView
         android:id="@+id/toolbar_back_left_btn_id"
-        android:layout_width="28dp"
-        android:layout_height="28dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="left|center_vertical"
         android:layout_marginLeft="10dp"
         android:background="@drawable/ic_arrow_back_black_24dp" />
