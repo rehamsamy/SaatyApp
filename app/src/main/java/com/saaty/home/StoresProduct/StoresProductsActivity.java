@@ -22,11 +22,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.material.tabs.TabLayout;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.StoreListModel;
@@ -58,6 +61,7 @@ public class StoresProductsActivity extends AppCompatActivity {
     @BindView(R.id.store_img_id) CircleImageView storeImgId;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.empty_data_txt_id)TextView emptyData;
+    @BindView(R.id.homeSearch_ed_id) SearchView searchView;
     int tab_selected;
     @BindView(R.id.progress_id)
     ProgressBar progressBar;
@@ -68,21 +72,31 @@ public class StoresProductsActivity extends AppCompatActivity {
     ApiServiceInterface apiServiceInterface;
     List<DataArrayModel> storeProductsList=new ArrayList<>();
     List<DataArrayModel> newProducts=new ArrayList<>();
+    List<DataArrayModel> products=new ArrayList<>();
+    List<DataArrayModel> wishlistProducts=new ArrayList<>();
+    List<Integer> ids=new ArrayList<>();
     NetworkAvailable networkAvailable;
     StoreProductAdapter adapter;
     Dialog mDialog;
     String store_name;
+    int id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stores_products);
         ButterKnife.bind(this);
-        //tabLayout.setupWithViewPager(viewPager);
         networkAvailable=new NetworkAvailable(this);
-       // pagerAdaper=new StoreProductsPagerAdaper(getSupportFragmentManager());
-       // viewPager.setAdapter(pagerAdaper);
         dealingWithWishList=new DealingWithWishList(this);
         mDialog=new Dialog(this);
+
+        if(networkAvailable.isNetworkAvailable()){
+            if(HomeActivity.user_id !=0){
+                getWishList();
+            }
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+
         Intent intent=getIntent();
         if (intent.getAction().equals("store_products_details")) {
           if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")) {
@@ -94,15 +108,15 @@ public class StoresProductsActivity extends AppCompatActivity {
               toolbarName.setText(store_name);
               storeName.setText(store_name);
           }
-            Picasso.with(getApplicationContext()).load(urls.base_url+"/"+intent.getStringExtra("store_img")).into(storeImgId);
+          id=intent.getIntExtra("store_id",1);
+            Picasso.with(getApplicationContext()).load(urls.base_url+"/"+intent.getStringExtra("store_img"))
+                    .error(R.drawable.store1).into(storeImgId);
         }
        if(networkAvailable.isNetworkAvailable()){
            tabLayout.addTab(tabLayout.newTab().setText("         New       "),0);
-           //newProducts=new ArrayList<>();
-          // storeProductsList=new ArrayList<>();
            newProducts.clear();
-           buildRecyclerViewForCategory();
-           getStoreProducts(1,"New");
+           emptyData.setVisibility(View.GONE);
+           getStoreProducts(current_page,"New");
            tabLayout.addTab(tabLayout.newTab().setText("          Used      "),1);
 
        }else {
@@ -122,10 +136,15 @@ public class StoresProductsActivity extends AppCompatActivity {
                    shape_type="Used";
                    Log.v(TAG,"shape selected"+tab.getPosition());
                }
-               newProducts.clear();
-               current_page=1;
-               buildRecyclerViewForCategory();
-               getStoreProducts(current_page,shape_type);
+               //buildRecyclerViewForCategory();
+               if(networkAvailable.isNetworkAvailable()) {
+                   emptyData.setVisibility(View.GONE);
+                   newProducts.clear();
+                   current_page=1;
+                   getStoreProducts(current_page, shape_type);
+               }else {
+                   Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+               }
            }
 
            @Override
@@ -138,7 +157,6 @@ public class StoresProductsActivity extends AppCompatActivity {
 
            }
        });
-
 
 
 
@@ -157,45 +175,65 @@ public class StoresProductsActivity extends AppCompatActivity {
 
 
 
-    private void getStoreProducts(int current_page,String shape_type) {
+    private void getStoreProducts(int current_pag,String shape_type) {
         if(networkAvailable.isNetworkAvailable()){
-            // ProgressDialog progressDialog=dailogUtil.showProgressDialog(getActivity(),getString(R.string.logging),false);
             progressBar.setVisibility(View.VISIBLE);
             apiServiceInterface= ApiClient.getClientService();
             Map<String,Object> map=new HashMap<>();
-            map.put("page",1);
+            map.put("page",current_pag);
             map.put("limit",10);
-            Call<StoreListModel> call=apiServiceInterface.gerStoreProducts(1,map);
+            Log.v(TAG,"posss"+id);
+            Call<StoreListModel> call=apiServiceInterface.gerStoreProducts(id,map);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if(response.body().isSuccess()){
                         storeProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                         //adapter.notifyDataSetChanged();
+                         products=response.body().getDataObjectModel().getDataArrayModelList();
 
-                        for(int i=0;i<storeProductsList.size();i++) {
-                            Log.v(TAG,"not matchhhhh \n"+storeProductsList.get(i).getShape());
+                         if(products.size()>0) {
+                             Log.v(TAG, "all product" + storeProductsList.size());
 
-                            if(storeProductsList.get(i).getShape().equals("New")&&shape_type.equals("New")){
-                                newProducts.add(storeProductsList.get(i));
-                                adapter.notifyDataSetChanged();
-                                Log.v(TAG,"new list"+newProducts.size());
+                             Log.v(TAG, "oooooooo " + storeProductsList.size());
+                             for (int i = 0; i < products.size(); i++) {
+                                 if (products.get(i).getShape().equals("New")&&shape_type.equals("New")) {
+                                     newProducts.add(storeProductsList.get(i));
+                                     Log.v(TAG, "new list " + newProducts.size());
+                                 } else if (products.get(i).getShape().equals("Used")&&shape_type.equals("Used")) {
+                                     newProducts.add(storeProductsList.get(i));
+                                     Log.v(TAG, "old list " + newProducts.size());
+                                 }else {
+                                     emptyData.setVisibility(View.VISIBLE);
+                                 }
+                             }
 
-                            }else if(storeProductsList.get(i).getShape().equals("Used")&&shape_type.equals("Used")){
-                                newProducts.add(storeProductsList.get(i));
-                                adapter.notifyDataSetChanged();
-                            }else {
-                                emptyData.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                            }
+                             GridLayoutManager layoutManager = new GridLayoutManager(StoresProductsActivity.this, 2);
+                             recyclerView.setHasFixedSize(true);
+                             recyclerView.setLayoutManager(layoutManager);
+                             adapter = new StoreProductAdapter(StoresProductsActivity.this, newProducts);
+                             if(ids.size()>0){
+                             adapter.setIds(ids);
+                             }
+                             recyclerView.setAdapter(adapter);
+                             buildOnClickListener();
 
-                        }
+                             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+                                 @Override
+                                 public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                                     current_page++;
+                                     getStoreProducts(current_page, shape_type);
+                                 }
+                             });
+                             progressBar.setVisibility(View.GONE);
 
+                             Log.v(TAG, "dddddddddd" + storeProductsList.size());
+                             Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                         } else {
+                             emptyData.setVisibility(View.VISIBLE);
+                             progressBar.setVisibility(View.GONE);
 
-                        //emptyData.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.GONE);
-
-                        Log.v(TAG,"dddddddddd"+storeProductsList.size());
-                        Toast.makeText(StoresProductsActivity.this,response.body().getMessage(), Toast.LENGTH_LONG).show();
+                         }
                     }else {
                         Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
@@ -222,25 +260,25 @@ public class StoresProductsActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(layoutManager);
         adapter =new StoreProductAdapter(StoresProductsActivity.this,newProducts);
         recyclerView.setAdapter(adapter);
-
         buildOnClickListener();
 
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                if(tab_selected==0){
+               // if(tab_selected==0){
                     current_page++;
-                    getStoreProducts(current_page,shape_type);
-                }
+                    searchStoreProduct(current_page,shape_type);
+               // }
                  }
         });
+
     }
 
         private void buildOnClickListener() {
         adapter.setOnItemClickListenerRecyclerView(new OnItemClickRecyclerViewInterface() {
             @Override
             public void OnWishListClick(int position, ImageView wishlist_image) {
-         dealingWithWishList.addToWishList(newProducts.get(position),progressBar,wishlist_image);
+            dealingWithWishList.addToWishList(newProducts.get(position),progressBar,wishlist_image);
             }
 
             @Override
@@ -252,6 +290,106 @@ public class StoresProductsActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void getWishList() {
+        if(networkAvailable.isNetworkAvailable()){
+            apiServiceInterface= ApiClient.getClientService();
+            progressBar.setVisibility(View.VISIBLE);
+            Map<String,Object> map=new HashMap<>();
+            String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+//            map.put("page",currentPage);
+            map.put("page",1);
+            map.put("limit",100);
+            Call<StoreListModel> call=apiServiceInterface.getWishlist(map,"application/json",token);
+            call.enqueue(new Callback<StoreListModel>() {
+                @Override
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
+                    if(response.body().isSuccess()){
+                        if(response.body().isSuccess()) {
+                            wishlistProducts=response.body().getDataObjectModel().getDataArrayModelList();
+                            if(wishlistProducts.size()>0) {
+                                Log.v("TAG","ssss"+wishlistProducts.size());
+                                for(int i=0;i<wishlistProducts.size();i++){
+                                    ids.add(wishlistProducts.get(i).getProductId());
+                                    Log.v("TAG","iddddddddd"+ids.size());
+                                }
+
+                            }
+                        }else if(wishlistProducts.size()==0) {
+                            recyclerView.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                            // }
+                        }
+
+                    }
+                    else {
+                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    private void searchStoreProduct(int current_page,String shape_type){
+        if(networkAvailable.isNetworkAvailable()){
+            apiServiceInterface= ApiClient.getClientService();
+            progressBar.setVisibility(View.VISIBLE);
+            Map<String,Object> map=new HashMap<>();
+            map.put("product_name",searchView.getQuery().toString());
+            map.put("product_shape",shape_type);
+            map.put("store_id",id);
+            map.put("page",current_page);
+            map.put("limit",10);
+            Call<StoreListModel> call=apiServiceInterface.searchforStoreProduct(map);
+            call.enqueue(new Callback<StoreListModel>() {
+                @Override
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
+                    if(response.body().isSuccess()){
+                        if(response.body().isSuccess()) {
+                            newProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+
+                            if(wishlistProducts.size()>0) {
+                                adapter.notifyDataSetChanged();
+                            }
+                        }else if(wishlistProducts.size()==0) {
+                            recyclerView.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                            // }
+                        }
+
+                    }
+                    else {
+                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+    @OnClick(R.id.homeSearch_ed_id)
+    void seachClick(){
+        buildRecyclerViewForCategory();
+        searchStoreProduct(current_page,shape_type);
     }
 
 

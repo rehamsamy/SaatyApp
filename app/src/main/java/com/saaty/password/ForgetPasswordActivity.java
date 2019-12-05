@@ -78,6 +78,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                  public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
                      Log.v(TAG,"sucess");
                      if(response.body().isSuccess()){
+
                          Log.v(TAG,"sucess1");
                          Toast.makeText(ForgetPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                          Intent intent=new Intent(getApplicationContext(),VerificationCodeActivity.class);

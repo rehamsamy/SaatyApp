@@ -43,26 +43,24 @@
 
         <ImageView
             android:id="@+id/toolbar_home_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/nav_home"
             android:layout_gravity="right|center_vertical"
             android:layout_marginRight="10dp"
-            android:layout_marginLeft="15dp"
-            android:padding="10dp"
-            tools:ignore="MissingPrefix" />
+             />
 
 
         <ImageView
             android:id="@+id/toolbar_edit_id"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:src="@drawable/nav_edit"
             android:layout_gravity="right|center_vertical"
-           android:layout_marginStart="30dp"
-            android:layout_marginRight="30dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginLeft="20dp"
             tools:ignore="MissingPrefix"
-            android:visibility="gone"/>
+            android:visibility="gone" />
 
 
     </androidx.appcompat.widget.Toolbar>

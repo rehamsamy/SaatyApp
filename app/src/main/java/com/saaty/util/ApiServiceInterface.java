@@ -4,12 +4,16 @@ import com.saaty.models.AdsProductsModel;
 import com.saaty.models.CategoryModel;
 import com.saaty.models.CheckWishlistModel;
 import com.saaty.models.DataObjectModel;
+import com.saaty.models.DeleteAdsModel;
+import com.saaty.models.EditAdsModel;
 import com.saaty.models.GetProductImagesModel;
 import com.saaty.models.LoginModel;
 import com.saaty.models.ProductDataModel;
 import com.saaty.models.RegisterModel;
 import com.saaty.models.SendCodeModel;
 import com.saaty.models.StoreListModel;
+import com.saaty.models.UpdateProfileModel;
+import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 
 import java.util.List;
 import java.util.Map;
@@ -34,63 +38,64 @@ public interface ApiServiceInterface {
 
 
     @POST("/oauth/token")
-    Call<LoginModel> loginUser(@Body Map<String,Object> map);
+    Call<LoginModel> loginUser(@Body Map<String, Object> map);
 
     @POST("/api/register")
     Call<RegisterModel> registerUser(@Body Map<String, Object> map);
 
 
-
     @GET("/api/SendMobileResetCode/{id}")
-    Call<SendCodeModel> sendMobileCode(@Path("id")String email);
+    Call<SendCodeModel> sendMobileCode(@Path("id") String email);
 
-   @POST("/api/CheckResetCode")
-    Call<SendCodeModel> checkResetCode(@Body Map<String,Object> map);
+    @POST("/api/CheckResetCode")
+    Call<SendCodeModel> checkResetCode(@Body Map<String, Object> map);
 
-   @POST("/api/ResetPassword")
-    Call<SendCodeModel> resetPassword(@Body Map<String,Object> map);
+    @POST("/api/ResetPassword")
+    Call<SendCodeModel> resetPassword(@Body Map<String, Object> map);
 
 
-   @GET("/api/categories")
+    @GET("/api/categories")
     Call<CategoryModel> getCatogory();
 
-   /////////////////stores//////////////////////////////
-   @GET("/api/stores")
-    Call<StoreListModel> getStoresList(@QueryMap Map<String,Object> map);
+    /////////////////stores//////////////////////////////
+    @GET("/api/stores")
+    Call<StoreListModel> getStoresList(@QueryMap Map<String, Object> map);
 
 //////////////////////////////   get category product list  watchets or brackletes////////////////
 
     @GET("/api/products")
-    Call<StoreListModel> getCategoryProductsList(@QueryMap Map<String,Object> map);
+    Call<StoreListModel> getCategoryProductsList(@QueryMap Map<String, Object> map);
 
 /////////////////////////////////////////
 
 
-
-   @GET("/api/storeproducts/{id}")
-    Call<StoreListModel> gerStoreProducts(@Path("id") int id,@QueryMap Map<String,Object> map);
-
+    @GET("/api/storeproducts/{id}")
+    Call<StoreListModel> gerStoreProducts(@Path("id") int id, @QueryMap Map<String, Object> map);
 
 
-//   get wish list????////////////////
+    //   get wish list????////////////////
     @GET("/api/wishproducts")
-    Call<StoreListModel> getWishlist(@QueryMap Map<String,Object> map, @Header("Accept") String accept, @Header("Authorization") String token);
+    Call<StoreListModel> getWishlist(@QueryMap Map<String, Object> map
+            , @Header("Accept") String accept
+            , @Header("Authorization") String token);
 
     /////////////////////add product to wish list///////////////
 
 
     @POST("/api/addtowishlist")
-    Call<AdsProductsModel> addProuctToWishlist(@Header("Accept")String accept,@Header("Authorization") String token,@Query("product_id") int product_id);
+    Call<AdsProductsModel> addProuctToWishlist(@Header("Accept") String accept
+            , @Header("Authorization") String token
+            , @Query("product_id") int product_id);
 
 
     /////// about app /////////////////
     @POST("/api/getscreen")
-    Call<ProductDataModel>  getAboutAppData(@Body Map<String,Object> map);
+    Call<ProductDataModel> getAboutAppData(@Body Map<String, Object> map);
 
 
     //////////////////////////// contact details///////////////
     @GET("/api/getContactDetails")
-    Call<ProductDataModel> getContactDetails(@Query ("key") String key);
+    Call<ProductDataModel> getContactDetails(@Query("key") String key);
 
 //////////////////////////////////add ads//////////////////////////
 
@@ -99,10 +104,7 @@ public interface ApiServiceInterface {
     Call<AdsProductsModel> addAdsProduct(@Header("Accept") String accept
             , @Header("Authorization") String token
             , @QueryMap Map<String, Object> map
-             ,@Part  MultipartBody.Part[] images);
-//             , @Part("photos[]") RequestBody requestBody
-//            , @Part  MultipartBody.Part[] images
-
+            , @Part MultipartBody.Part[] parts);
 
 
     ///////////////////////////get slider images////////////////
@@ -116,10 +118,82 @@ public interface ApiServiceInterface {
     ////////////////////check wishlist product/////////////
 
     @GET("/api/wishlist/")
-    Call<CheckWishlistModel> checkWishlistProduct(@Query("product_id") int id,@Header("Accept")String accept,@Header("Authorization") String auth);
+    Call<CheckWishlistModel> checkWishlistProduct(@Query("product_id") int id
+            , @Header("Accept") String accept
+            , @Header("Authorization") String auth);
 
     //////////////  delete from wishlist////////////
 
     @DELETE("/api/wishlist?")
-    Call<CheckWishlistModel> deleteItemFromWishlist(@Header("Accept")String accept,@Header("Authorization") String auth,@Query("product_id")int id);
+    Call<SendCodeModel> deleteItemFromWishlist(
+              @Query("product_id") int id
+            , @Header("Accept") String accept
+            , @Header("Authorization") String auth);
+
+////////////////////////// update profile for user/////////////
+
+    @POST("/api/UpdateProfile")
+    Call<UpdateProfileModel> updateProfile(@Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
+    /////////////////////////////// update profile for store////////////////////////
+    @Multipart
+    @POST("/api/UpdateProfile")
+    Call<UpdateProfileModel> updateStoreProfile(@Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map
+//            , @Part MultipartBody.Part image
+            ,@PartMap Map<String,Object> map1);
+
+
+    /////////////////////////  get Profile //////////////
+
+    @GET("/api/GetProfile")
+    Call<UpdateProfileModel> getProfile(@Header("Accept") String accept
+            , @Header("Authorization") String auth);
+
+
+    ///////////////////////////  change password////////////////////////
+
+    @POST("/api/ChangePassword")
+    Call<SendCodeModel> changePassword(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
+
+    //-----------------------  my Ads Product ----------------------------------
+    @GET("/api/myproducts")
+    Call<StoreListModel> getAdsProducts(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
+
+    //------------------- delete ads Product ----------------------------------
+
+    @DELETE("/api/products/{id}")
+    Call<DeleteAdsModel> deleteAdsProduct(
+            @Path("id") int id
+            , @Header("Accept") String accept
+            , @Header("Authorization") String auth);
+
+
+    ///------------------------- edit ads product -------------------------------
+    @Multipart
+    @POST("/api/products/{id}")
+   Call<EditAdsModel> editAdsProduct(
+           @Path("id") int id
+            , @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map
+            , @Part MultipartBody.Part[] parts);
+
+
+    ////---------------------------------search for store product --------------------
+
+    @GET("/api/storeproduct/search")
+    Call<StoreListModel> searchforStoreProduct(@QueryMap Map<String, Object> map);
+
 }

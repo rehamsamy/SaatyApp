@@ -110,4 +110,6 @@
     <string name="producet_name">Product Name:</string>
     <string name="used_products">Used Products</string>
     <string name="watches">Watches</string>
+    <string name="store_desc">Write description of store</string>
+    <string name="edit_ads">Edit Ads</string>
 </resources>

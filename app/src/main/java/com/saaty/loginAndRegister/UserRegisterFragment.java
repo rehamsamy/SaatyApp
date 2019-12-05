@@ -1,6 +1,8 @@
 package com.saaty.loginAndRegister;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,9 +14,11 @@ import com.fourhcode.forhutils.FUtilsValidation;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.models.RegisterModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 
 import java.util.HashMap;
@@ -30,28 +34,27 @@ import retrofit2.Response;
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
 public class UserRegisterFragment extends Fragment {
-    Context mContext;
+
 
     ApiServiceInterface serviceInterface;
     NetworkAvailable networkAvailable;
     TextInputEditText nameInput, phoneInput, emailInput, password, confirmPssword;
     MaterialButton registerBtn;
+    DailogUtil dailogUtil;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=LayoutInflater.from(getContext()).inflate(R.layout.register_user_fragment_layout,container,false);
-
-
         nameInput = view.findViewById(R.id.user_name_input_id);
         phoneInput = view.findViewById(R.id.phone_input_id);
         emailInput = view.findViewById(R.id.email_input_id);
         password = view.findViewById(R.id.password_input_id);
         confirmPssword = view.findViewById(R.id.confirm_password_input_id);
-
+        dailogUtil=new DailogUtil();
 
         registerBtn = view.findViewById(R.id.confirm_btn_id);
-        networkAvailable=new NetworkAvailable(mContext);
+        networkAvailable=new NetworkAvailable(getContext());
 
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,7 +82,7 @@ public class UserRegisterFragment extends Fragment {
                     return;
                 }
 
-
+                ProgressDialog progressDialog=DailogUtil.showProgressDialog(getContext(),getString(R.string.logging),false);
                 Map<String, Object> map = new HashMap<>();
                 map.put("fullname", nameInput.getText().toString());
                 map.put("email", emailInput.getText().toString());
@@ -96,23 +99,30 @@ public class UserRegisterFragment extends Fragment {
                     @Override
                     public void onResponse(Call<RegisterModel> call, Response<RegisterModel> response) {
 
-                        Log.v("TraderRegisterFragment", "dddddddddddd" + response.body().toString());
                     if (response.body().getSuccess()==true) {
                         Log.v(TAG,"valid error1 ");
-                        Toast.makeText(mContext, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        Intent intent=new Intent(getActivity(), HomeActivity.class);
+                        intent.putExtra("register_user_model",response.body().getUserDataRegisterObject());
+                        startActivity(intent);
+                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                     else if(response.body().getSuccess()==false){
                         Log.v(TAG,"valid error2 ");
                         Toast.makeText(getContext(), response.body().getMessage()+response.body().getData().getEmail() + "\n" +
                                 response.body().getData().getEmail() + "\n" , Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
+                    }else if(String.valueOf(response.code()).equals("404 Not Found")||response.body().getSuccess()==false){
+                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
                     }
                     }
 
                     @Override
                     public void onFailure(Call<RegisterModel> call, Throwable t) {
                         Log.v(TAG, "fail fail");
-                        Toast.makeText(mContext, t.getMessage().toString(), Toast.LENGTH_SHORT).show();
-
+                        Toast.makeText(getContext(), t.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                        progressDialog.dismiss();
                     }
                 });
 

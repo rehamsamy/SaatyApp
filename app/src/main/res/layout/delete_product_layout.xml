@@ -23,8 +23,9 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/text_title_id"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:textColor="@color/black"
+        android:textSize="17sp"
         android:text="@string/remove_wishlist_item"/>
 
 
@@ -38,7 +39,7 @@
         android:textAllCaps="false"
         android:text="@string/delete"
         android:textColor="@color/white"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="25dp"
         />
 
     <com.google.android.material.button.MaterialButton
@@ -49,11 +50,21 @@
         app:layout_constraintTop_toBottomOf="@id/text_msg_id"
         app:layout_constraintStart_toEndOf="@id/delete_btn_id"
         android:layout_marginStart="5dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="25dp"
         android:textAllCaps="false"
         android:text="@string/cancel"
         android:textColor="@color/white"
         />
 
+    <ProgressBar
+        android:id="@+id/progress_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:visibility="gone"
+/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

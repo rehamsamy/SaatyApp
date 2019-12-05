@@ -4,7 +4,7 @@ package com.saaty.models;
 import com.google.gson.annotations.SerializedName;
 
 
-public class DataItem{
+public class UpdateProfileDataArrayModel{
 
 	@SerializedName("store_id")
 	private Object storeId;
@@ -53,35 +53,6 @@ public class DataItem{
 
 	@SerializedName("email")
 	private String email;
-
-	@SerializedName("category_ar_name")
-	private String categoryArName;
-
-	@SerializedName("category_en_name")
-	private String categoryEnName;
-
-	@SerializedName("category_id")
-	private int categoryId;
-
-	@SerializedName("category_icon_link")
-	private String categoryIconLink;
-
-
-	public String getCategoryIconLink() {
-		return categoryIconLink;
-	}
-
-	public String getCategoryArName() {
-		return categoryArName;
-	}
-
-	public String getCategoryEnName() {
-		return categoryEnName;
-	}
-
-	public int getCategoryId() {
-		return categoryId;
-	}
 
 	public void setStoreId(Object storeId){
 		this.storeId = storeId;
@@ -214,7 +185,7 @@ public class DataItem{
 	@Override
  	public String toString(){
 		return 
-			"DataItem{" + 
+			"UpdateProfileDataArrayModel{" + 
 			"store_id = '" + storeId + '\'' + 
 			",store_ar_name = '" + storeArName + '\'' + 
 			",store_en_name = '" + storeEnName + '\'' + 

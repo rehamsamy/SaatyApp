@@ -2,6 +2,7 @@ package com.saaty.loginAndRegister;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +16,7 @@ import com.fourhcode.forhutils.Futils;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.models.RegisterModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
@@ -56,7 +58,7 @@ public class TraderRegisterFragment extends Fragment {
         confirmPssword = view.findViewById(R.id.confirm_password_input_id);
 
         registerBtn = view.findViewById(R.id.confirm_btn_id);
-        networkAvailable=new NetworkAvailable(getContext());
+        networkAvailable=new NetworkAvailable(getActivity());
         dailogUtil=new DailogUtil();
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -110,6 +112,9 @@ public class TraderRegisterFragment extends Fragment {
                     if (response.body().getSuccess()==true) {
                         Log.v(TAG,"valid error1 ");
                         Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                        Intent intent=new Intent(getActivity(), HomeActivity.class);
+                        intent.putExtra("register_store_model",response.body().getUserDataRegisterObject());
+                        startActivity(intent);
                         progressDialog.dismiss();
                     }
                     else if(response.body().getSuccess()==false){
@@ -117,6 +122,9 @@ public class TraderRegisterFragment extends Fragment {
                         Toast.makeText(getContext(), response.body().getMessage()+response.body().getData().getEmail() + "\n" +
                                 response.body().getData().getEmail() + "\n" , Toast.LENGTH_SHORT).show();
                         progressDialog.dismiss();
+                    }else if(response.code()==404) {
+                        Toast.makeText(getContext(), response.body().getMessage() + response.body().getData().getEmail() + "\n" +
+                                response.body().getData().getEmail() + "\n", Toast.LENGTH_SHORT).show();
                     }
                     }
 

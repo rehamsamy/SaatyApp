@@ -16,27 +16,42 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.saaty.R;
+import com.saaty.home.StoresProduct.StoreProductAdapter;
+import com.saaty.home.StoresProduct.StoresProductsActivity;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
+import com.saaty.models.CheckWishlistModel;
+import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.ProductDataModel;
+import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
+import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
+import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
+import com.saaty.util.OnItemClickRecyclerViewInterface;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class MyAdsActivity extends AppCompatActivity implements OnItemClickInterface {
+public class MyAdsActivity extends AppCompatActivity  {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
     @BindView(R.id.progress_id)
@@ -45,10 +60,14 @@ public class MyAdsActivity extends AppCompatActivity implements OnItemClickInter
     TextView emptyData;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;
     Dialog mDialog;
-    List<ProductDataItem> wishlistProducts;
+    List<DataArrayModel> adsProducts;
     WishlistAdapter wishlistAdapter;
     ApiServiceInterface apiServiceInterface;
     NetworkAvailable networkAvailable;
+    DealingWithWishList dealingWithWishList;
+    int selected_product_id;
+    int current_page=1;
+    int checkMsg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -57,59 +76,16 @@ public class MyAdsActivity extends AppCompatActivity implements OnItemClickInter
         ButterKnife.bind(this);
         networkAvailable=new NetworkAvailable(getApplicationContext());
         toolbarTxt.setText(getString(R.string.my_ads));
-      //  getMyAdsProducts();
+        dealingWithWishList=new DealingWithWishList(getApplicationContext());
+        adsProducts=new ArrayList<>();
+        adsProducts.clear();
+       // buildRecyclerViewForCategory();
+        getAdsroductList(1);
     }
 
-//    private void getMyAdsProducts() {
-//        if(networkAvailable.isNetworkAvailable()){
-//            apiServiceInterface= ApiClient.getClientService();
-//            progressBar.setVisibility(View.VISIBLE);
-//            //Map<String,Ob>
-//
-//            Call<ProductDataModel> call=apiServiceInterface.getWishlist("application/json","Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjI3ZDg2MjYyZjE4MDU1Y2FlNGMzNmU5YTcxZDg3ZTc3MThmMjdlOTI2NmE1ZjFkNDE4ZWI5ODNlY2RhMGZmOWNmMDkwMzkxYzdjNzVjYTQzIn0.eyJhdWQiOiIyIiwianRpIjoiMjdkODYyNjJmMTgwNTVjYWU0YzM2ZTlhNzFkODdlNzcxOGYyN2U5MjY2YTVmMWQ0MThlYjk4M2VjZGEwZmY5Y2YwOTAzOTFjN2M3NWNhNDMiLCJpYXQiOjE1NzQyNDgzMzEsIm5iZiI6MTU3NDI0ODMzMSwiZXhwIjoxNjA1ODcwNzMxLCJzdWIiOiI0Iiwic2NvcGVzIjpbXX0.AOzPvH32Mc4Nq_ierPEy2W2zGqMBWxkSwxpGu3Uigs324eInnQ5DvjssxOyCMxHX8JDaxJ3GQSKTTwjGSz7xp99SKNf43hrCv1sLd3d4EiCC_pHsHceiAzK1I3Veg0wj_YPRh_DBbreycpmdw9pz8TAjmJp47L1JUbS90uVc-WjHZIPQ2xAWkurSblxcP8fryAdkJ8e3S7P9iTU9-pFGQ5DqllO0ORJZGF76dMxJIWuW7VcWxYUtWd-z5c27S_HGVmzee_ZVt3MpL1-1H947FmEb30ZR7FCT3uSbY4VgDMg0ttem_IWqUQJKJirxdO4fWxXwyKcxpxEHkGE9LCcONjKpTLbqVnyeNrpGFuNOSvTOHtjLaf8N0IM4d_jFNrOLcNEOQvtCDaDIG-Q81PhF9aYWHMw86fXJWXRWCWcbgV-5MPOmcYnvfM6GQaLHKM25HOoJ8RS2VYikGeCZaVFPQrMe4bS07ybJFQtD5WfmsMm26mZZpGGNexMa9qbN_77BJB49NtSTZKMgrRiEwYWwT9_FwURo-m483J-8q5DpBR_CfQXjuBD_H08VjuL3DbC63r3RHnJICKh4HIVgeBYyw-Xua-7q-DBfXdyva8G9oAs6enuEnzg9pKi3leLAE9NINzQBk_NGRw0LzD7VPqQkUEVDrJpfr94F2phov23wQPA");
-//            call.enqueue(new Callback<ProductDataModel>() {
-//                @Override
-//                public void onResponse(Call<ProductDataModel> call, Response<ProductDataModel> response) {
-//                    if(response.body().isSuccess()){
-//                        if(response.body().getProductDataModels().size()>0){
-//                            Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-//                            wishlistProducts=response.body().getProductDataModels();
-//                            wishlistAdapter=new WishlistAdapter(MyAdsActivity.this,wishlistProducts,MyAdsActivity.this);
-//                            recyclerView.setLayoutManager(new GridLayoutManager(MyAdsActivity.this,2));
-//                            recyclerView.setAdapter(wishlistAdapter);
-//                            progressBar.setVisibility(View.GONE);
-//                        }else {
-//                            recyclerView.setVisibility(View.GONE);
-//                            emptyData.setVisibility(View.VISIBLE);
-//                            progressBar.setVisibility(View.GONE);
-//                        }
-//
-//
-//                    }else {
-//                        Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-//                    }
-//                }
-//
-//                @Override
-//                public void onFailure(Call<ProductDataModel> call, Throwable t) {
-//
-//                }
-//            });
-//
-//        }else {
-//            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
-//        }
-//
-//    }
 
-    @Override
-    public void onItemClick(int position) {
 
-        Intent intent=new Intent(MyAdsActivity.this, ProductDetailsActivity.class);
-        ProductDataItem item= wishlistProducts.get(position);
-        intent.putExtra("myads_model",item);
-        startActivity(intent);
-    }
+
 
 
     @OnClick(R.id.nav_filter_id)
@@ -143,6 +119,144 @@ public class MyAdsActivity extends AppCompatActivity implements OnItemClickInter
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.show();
 
+    }
+
+
+
+    private void getAdsroductList(int current_page) {
+        if(networkAvailable.isNetworkAvailable()){
+            apiServiceInterface= ApiClient.getClientService();
+            progressBar.setVisibility(View.VISIBLE);
+            Map<String,Object> map=new HashMap<>();
+            String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+            map.put("page",current_page);
+            map.put("limit",100);
+            Call<StoreListModel> call=apiServiceInterface.getAdsProducts("application/json",token,map);
+            call.enqueue(new Callback<StoreListModel>() {
+                @Override
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
+                    if (response.code() == 200) {
+                        if (response.body().isSuccess()) {
+                            if (response.body().getDataObjectModel().getDataArrayModelList().size() > 0) {
+                               // adsProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                                //wishlistAdapter.notifyDataSetChanged();
+                               adsProducts=response.body().getDataObjectModel().getDataArrayModelList();
+                                Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                                if (adsProducts.size() > 0) {
+                                    GridLayoutManager layoutManager=new GridLayoutManager(MyAdsActivity.this,2);
+                                    recyclerView.setHasFixedSize(true);
+                                    recyclerView.setLayoutManager(layoutManager);
+                                    wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,adsProducts);
+                                    recyclerView.setAdapter(wishlistAdapter);
+                                    for(int i=0;i<adsProducts.size();i++){
+                                        selected_product_id=adsProducts.get(i).getProductId();
+                                        checkProductInWishlist(selected_product_id);
+                                    }
+
+
+                                    buildOnClickListener();
+                                    progressBar.setVisibility(View.GONE);
+                                    
+                                }
+                            } else {
+                                recyclerView.setVisibility(View.GONE);
+                                emptyData.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                            }
+//
+
+                        } else {
+                            Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                            progressBar.setVisibility(View.GONE);
+                        }
+                    }else if(response.code()==405){
+                        Toast.makeText(MyAdsActivity.this, "error", Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+
+                }
+                @Override
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
+               progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+    }
+
+    void buildRecyclerViewForCategory() {
+        GridLayoutManager layoutManager=new GridLayoutManager(MyAdsActivity.this,2);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,adsProducts);
+        for(int i=0;i<adsProducts.size();i++){
+            selected_product_id=adsProducts.get(i).getProductId();
+            checkProductInWishlist(selected_product_id);
+        }
+
+        recyclerView.setAdapter(wishlistAdapter);
+
+
+        buildOnClickListener();
+
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                    current_page++;
+                    getAdsroductList(current_page);
+
+            }
+        });
+    }
+
+    private void buildOnClickListener() {
+        wishlistAdapter.setOnItemClickListenerRecyclerView(new OnItemClickRecyclerViewInterface() {
+            @Override
+            public void OnWishListClick(int position, ImageView wishlist_image) {
+                dealingWithWishList.addToWishList(adsProducts.get(position),progressBar,wishlist_image);
+            }
+
+            @Override
+            public void OnItemClick(int position) {
+                DataArrayModel item=adsProducts.get(position);
+                Intent intent=new Intent(getApplicationContext(), ProductDetailsActivity.class);
+                intent.putExtra(ProductDetailsActivity.ADS_PRODUCTS_DETAILS,item);
+                startActivity(intent);
+            }
+        });
+
+    }
+
+
+    void checkProductInWishlist(int selected_product_idd){
+        apiServiceInterface=ApiClient.getClientService();
+       
+        Call<CheckWishlistModel> call=apiServiceInterface.checkWishlistProduct(selected_product_idd,"application/json", LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken());
+        call.enqueue(new Callback<CheckWishlistModel>() {
+            @Override
+            public void onResponse(Call<CheckWishlistModel> call, Response<CheckWishlistModel> response) {
+                ImageView img = null;
+                img=wishlistAdapter.getWishlistImg();
+                if(response.body().getMessage().equals("Product not found.")){
+                   // Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                    Log.v("TAG","product not foundddd  "+selected_product_idd);
+                    img.setImageResource(R.drawable.wishlist_not_select);
+                    checkMsg=0;
+                }else if(response.body().getMessage().equals("Products retrieved successfully.")){
+                    img.setImageResource(R.drawable.wishlist_select);
+                    //Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                    Log.v("TAG","product  foundddd  "+selected_product_idd);
+                    checkMsg=1;
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CheckWishlistModel> call, Throwable t) {
+
+            }
+        });
     }
 
 }

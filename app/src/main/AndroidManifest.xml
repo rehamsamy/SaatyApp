@@ -17,59 +17,65 @@
         android:roundIcon="@mipmap/ic_launcher"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".sideMenuScreen.myAds.EditAdsActivity">
-
+        <activity android:name=".sideMenuScreen.myAds.EditAdsActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".sideMenuScreen.myAds.MyAdsActivity">
+        <activity android:name=".sideMenuScreen.myAds.MyAdsActivity"
+            android:screenOrientation="portrait">
         </activity>
-        <activity android:name=".sideMenuScreen.ContactUsActivity" />
-        <activity android:name=".sideMenuScreen.AboutUsActivity" />
-        <activity android:name=".sideMenuScreen.AboutAppActivity" />
-        <activity android:name=".sideMenuScreen.wishlist.WishlistActivity" >
+        <activity android:name=".sideMenuScreen.ContactUsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.AboutUsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.AboutAppActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.wishlist.WishlistActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.SettingActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.ChangePasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.EditProfileActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.ProfileActivity"
+            android:screenOrientation="portrait"/>
 
-        </activity>
-        <activity android:name=".sideMenuScreen.SettingActivity" />
-        <activity android:name=".sideMenuScreen.ChangePasswordActivity" />
-        <activity android:name=".sideMenuScreen.EditProfileActivity" />
-        <activity android:name=".sideMenuScreen.ProfileActivity" />
-        <activity android:name=".productDetails.SendMessageActivity" />
-        <activity android:name=".productDetails.ProductDetailsActivity">
+        <activity android:name=".productDetails.SendMessageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".productDetails.ProductDetailsActivity"
+            android:screenOrientation="portrait"/>
 
-
-        </activity>
-        <activity android:name=".home.StoresProduct.StoresProductsActivity" >
-
-
-
+        <activity android:name=".home.StoresProduct.StoresProductsActivity"
+            android:screenOrientation="portrait">
         </activity>
         <activity android:name=".splash.SplashActivity"
-          >
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".home.StoresActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".home.HomeActivity"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
         </activity>
-        <activity android:name=".home.StoresActivity" >
+        <activity android:name=".loginAndRegister.RegisterActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".password.ResetPasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".password.VerificationCodeActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".password.ForgetPasswordActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".loginAndRegister.LoginTraderUserActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".splash.SplashLanguageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".MainActivity"
+            android:screenOrientation="portrait"/>
 
-
-
-        </activity>
-        <activity android:name=".home.HomeActivity" >
-
-
-        </activity>
-        <activity android:name=".loginAndRegister.RegisterActivity" />
-        <activity android:name=".password.ResetPasswordActivity" />
-        <activity android:name=".password.VerificationCodeActivity" />
-        <activity android:name=".password.ForgetPasswordActivity" />
-        <activity android:name=".loginAndRegister.LoginTraderUserActivity" >
-
-        </activity>
-        <activity android:name=".splash.SplashLanguageActivity" />
-        <activity android:name=".MainActivity" />
     </application>
 
 </manifest>

@@ -80,6 +80,10 @@ public class DataArrayModel implements Parcelable {
 	private String contactMobile;
 
 
+	public void setProductimages(List<ProductimagesItem> productimages) {
+		this.productimages = productimages;
+	}
+
 	protected DataArrayModel(Parcel in) {
 		storeId = in.readInt();
 		storeArName = in.readString();

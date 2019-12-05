@@ -12,6 +12,7 @@ import androidx.viewpager.widget.ViewPager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -39,6 +40,7 @@ import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.saaty.R;
+import com.saaty.home.StoresProduct.StoresProductsActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.CategoryModel;
 import com.saaty.models.DataItem;
@@ -50,6 +52,7 @@ import com.saaty.sideMenuScreen.AboutUsActivity;
 import com.saaty.sideMenuScreen.ContactUsActivity;
 import com.saaty.sideMenuScreen.ProfileActivity;
 import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
+import com.saaty.sideMenuScreen.myAds.MyAdsActivity;
 import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
@@ -71,7 +74,6 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
      @BindView(R.id.drawer_layout_id) DrawerLayout drawerLayout;
      @BindView(R.id.toolbar_id) Toolbar toolbar;
      @BindView(R.id.toolbar_txt_id) TextView toolbarText;
-     @BindView(R.id.store_id) CardView cardView;
      @BindView(R.id.slider_layout_id) SliderLayout sliderLayout;
      @BindView(R.id.constraint_root) ConstraintLayout root;
       @BindView(R.id.english_arrow_id) ImageView englishArrowId;
@@ -84,6 +86,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     @BindView(R.id.watches_name_id)TextView watchNameId;
     @BindView(R.id.bracletes_name_id)TextView bracletesNameId;
     @BindView(R.id.toolbar_back_left_btn_id) ImageView toolbarBackImg;
+    CircleImageView userImg;
+    MenuItem logoutItem;
+
    ApiServiceInterface apiServiceInterface;
    NetworkAvailable networkAvailable;
    UserModel userModel;
@@ -119,28 +124,39 @@ public static int user_id;
            user_id=userModel.getId();
        }else if(intent.getAction().equals("login_visitor")){
            hideNavigationItems();
-
+           if (user_id == 0) {
+               logoutItem.setTitle(getString(R.string.login_btn));
+           } else {
+               logoutItem.setTitle(getString(R.string.sign_out));
+           }
            ConstraintLayout layout=(ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.visitor_header_layout,null);
            navigationView.addHeaderView(layout);
+       }else if(intent.hasExtra("register_user_model")){
+           userModel=intent.getParcelableExtra("register_user_model");
+          userImg= navigationView.getHeaderView(0).findViewById(R.id.user_img_id);
+          userImg.setImageResource(R.drawable.sidemenu_photo);
+           user_id=userModel.getId();
+
+       }else if(intent.hasExtra("register_store_model")){
+           userModel=intent.getParcelableExtra("register_store_model");
+           user_id=userModel.getId();
+           userImg= navigationView.getHeaderView(0).findViewById(R.id.user_img_id);
+           userImg.setImageResource(R.drawable.sidemenu_photo2);
        }
+
+
 
        addAdsBtn.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {
                Intent intent1=new Intent(new Intent(HomeActivity.this, EditAdsActivity.class));
+               //intent1.putExtra("ads_model",da)
                intent1.setAction("add_new_ads");
                startActivity(intent1);
            }
        });
 
        getCateogries();
-       cardView.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               Intent intent1=new Intent(getApplicationContext(),StoresActivity.class);
-               startActivity(intent1);
-           }
-       });
 
 
        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -148,15 +164,12 @@ public static int user_id;
            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
                int id=menuItem.getItemId();
                if(id==R.id.nav_home_page){
-                  // if(user_id !=0){
                        startActivity(new Intent(HomeActivity.this,HomeActivity.class));
-                  // }
-//                   else {
-//                       startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
-//                   }
+
                }else if(id==R.id.nav_my_account){
                    if(user_id!=0){
-                       startActivity(new Intent(HomeActivity.this, ProfileActivity.class));
+                       Intent intent1=new Intent(HomeActivity.this, ProfileActivity.class);
+                       startActivity(intent1);
                        Log.v(TAG,"my account");
                    }else {
                        startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
@@ -170,7 +183,7 @@ public static int user_id;
                    }
                }else if(id==R.id.nav_my_ads){
                    if(user_id!=0){
-                       // startActivity(new Intent(HomeActivity.this, WishlistActivity.class));
+                        startActivity(new Intent(HomeActivity.this, MyAdsActivity.class));
                    }else {
                        startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
                    }
@@ -181,16 +194,12 @@ public static int user_id;
                        startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
                    }
                }else if(id==R.id.nav_setting){
-                   if(user_id!=0){
-                       // startActivity(new Intent(HomeActivity.this, WishlistActivity.class));
-                   }else {
                        startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
-                   }
+
 
                }else if(id==R.id.nav_about_app){
 
                    startActivity(new Intent(HomeActivity.this, AboutAppActivity.class));
-
 
                }else if(id==R.id.nav_about_us){
                    startActivity(new Intent(HomeActivity.this, AboutUsActivity.class));
@@ -250,8 +259,8 @@ public static int user_id;
                         categoryItem=response.body().getData();
 
                          if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
-                             watchNameId.setText(categoryItem.get(0).getCateogryEnName());
-                             bracletesNameId.setText(categoryItem.get(1).getCateogryEnName());
+                             watchNameId.setText(categoryItem.get(0).getCategoryEnName());
+                             bracletesNameId.setText(categoryItem.get(1).getCategoryEnName());
                          }else if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
                              watchNameId.setText(categoryItem.get(0).getCategoryArName());
                              bracletesNameId.setText(categoryItem.get(1).getCategoryArName());
@@ -373,6 +382,7 @@ public static int user_id;
         menu.findItem(R.id.nav_my_ads).setVisible(false);
         menu.findItem(R.id.nav_messages).setVisible(false);
         navigationView.getHeaderView(0).setVisibility(View.GONE);
+       logoutItem=menu.findItem(R.id.nav_logout);
 
     }
 
@@ -414,4 +424,25 @@ public static int user_id;
         });
     }
 
+    @OnClick(R.id.watches_id)
+    void watchesClick() {
+        Intent intent1=new Intent(getApplicationContext(), StoresActivity.class);
+        intent1.putExtra("category_id1",1);
+        startActivity(intent1);
+    }
+
+    @OnClick(R.id.bracletes_id)
+    void bracletesClick() {
+        Intent intent1=new Intent(getApplicationContext(),StoresActivity.class);
+        intent1.putExtra("category_id2",2);
+        startActivity(intent1);
+    }
+
+    @OnClick(R.id.store_id)
+    void storesClick(){
+        Intent intent1=new Intent(getApplicationContext(),StoresActivity.class);
+        startActivity(intent1);
+    }
+
 }
+

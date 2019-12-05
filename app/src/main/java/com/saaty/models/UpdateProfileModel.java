@@ -1,12 +1,13 @@
 package com.saaty.models;
 
+import java.util.List;
+
 import com.google.gson.annotations.SerializedName;
 
-
-public class RegisterModel{
+public class UpdateProfileModel{
 
 	@SerializedName("data")
-	private Data data;
+	private List<UpdateProfileDataArrayModel> dataArrayModels;
 
 	@SerializedName("success")
 	private boolean success;
@@ -14,26 +15,15 @@ public class RegisterModel{
 	@SerializedName("message")
 	private String message;
 
-	@SerializedName("user_data")
-	private UserDataRegisterObject userDataRegisterObject;
-
-	public UserDataRegisterObject getUserDataRegisterObject() {
-		return userDataRegisterObject;
-	}
-
-	public void setData(Data data){
-		this.data = data;
-	}
-
-	public Data getData(){
-		return data;
+	public List<UpdateProfileDataArrayModel> getDataArrayModels() {
+		return dataArrayModels;
 	}
 
 	public void setSuccess(boolean success){
 		this.success = success;
 	}
 
-	public boolean getSuccess(){
+	public boolean isSuccess(){
 		return success;
 	}
 
@@ -48,8 +38,7 @@ public class RegisterModel{
 	@Override
  	public String toString(){
 		return 
-			"RegisterModel{" + 
-			"data = '" + data + '\'' + 
+			"UpdateProfileModel{" +
 			",success = '" + success + '\'' + 
 			",message = '" + message + '\'' + 
 			"}";

@@ -5,6 +5,7 @@ import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
@@ -32,11 +33,16 @@ import com.google.android.material.tabs.TabLayout;
 import com.saaty.R;
 import com.saaty.home.StoresProduct.StoreProductAdapter;
 import com.saaty.home.StoresProduct.StoresProductsActivity;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.CategoryModel;
+import com.saaty.models.CheckWishlistModel;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.DataItem;
 import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
+import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
+import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
+import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
@@ -69,6 +75,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
     StoreAdapter adapter;
     NetworkAvailable networkAvailable;
     DailogUtil dailogUtil;
+    int flag;
     ApiServiceInterface apiServiceInterface;
     List<DataItem> categoryItem = new ArrayList();
     List<DataArrayModel> storesList=new ArrayList<>();
@@ -81,6 +88,10 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
    private int tab_category_pos;
    StoreProductAdapter storeProductAdapter;
    List<DataArrayModel> categoryProductsList=new ArrayList<>();
+   DealingWithWishList dealingWithWishList;
+   Intent intent;
+   List<DataArrayModel> wishlistProducts;
+   List<Integer> ids=new ArrayList<>();
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -98,7 +109,20 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
         toggle.syncState();
         dailogUtil = new DailogUtil();
         networkAvailable = new NetworkAvailable(this);
+        dealingWithWishList=new DealingWithWishList(getApplicationContext());
         toolbarTxt.setText(getString(R.string.stores_toolbar));
+
+        //ids=new ArrayList<>();
+
+        intent=getIntent();
+        if(intent.hasExtra("category_id1")){
+            //TabLayout.Tab tab = tabLayout.getTabAt(1);
+            flag=1;
+
+        }else if(intent.hasExtra("category_id2")){
+            flag=2;
+        }
+
 
         if(networkAvailable.isNetworkAvailable()){
 
@@ -109,10 +133,22 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             getStoreList(current_page);
             getCateogry();
 
+
         }else {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+        if(HomeActivity.user_id!=0){
+            getWishList();
+        }else if(HomeActivity.user_id==0){
+            return;
+        }
 
+
+
+
+//       // TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+//        TabLayout.Tab tab = tabLayout.getTabAt(someIndex);
+//        tab.select();
 
 
 
@@ -150,10 +186,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             }
         });
 
-
     }
-
-
 
 
     private void getStoreList(int current_page) {
@@ -229,10 +262,10 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                         for(int i=0;i<categoryItem.size();i++){
                             if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
                                 tabLayout.addTab(tabLayout.newTab().setText("          " +response.body().getData().get(i).getCategoryArName().toString()+"         "));
-
+                              flag=1;
                             }else if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
-                                tabLayout.addTab(tabLayout.newTab().setText("          " +response.body().getData().get(i).getCateogryEnName().toString()+"         "));
-
+                                tabLayout.addTab(tabLayout.newTab().setText("          " +response.body().getData().get(i).getCategoryEnName().toString()+"         "));
+                                flag=2;
                             }
 
                         }
@@ -301,11 +334,18 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
     }
 
     void buildRecyclerViewForCategory() {
+
        GridLayoutManager layoutManager=new GridLayoutManager(this,2);
-      storeProductAdapter =new StoreProductAdapter(this,categoryProductsList);
+        storeProductAdapter =new StoreProductAdapter(this,categoryProductsList);
+
+      if(wishlistProducts.size()>0) {
+          storeProductAdapter.setIds(ids);
+      }
+
        recyclerView.setHasFixedSize(true);
        recyclerView.setLayoutManager(layoutManager);
        recyclerView.setAdapter(storeProductAdapter);
+
        buildOnClickListener();
        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
            @Override
@@ -336,7 +376,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
         storeProductAdapter.setOnItemClickListenerRecyclerView(new OnItemClickRecyclerViewInterface() {
             @Override
             public void OnWishListClick(int position, ImageView wishlist_image) {
-                //dealingWithWishList.addToWishList(newProducts.get(position),progressBar,wishlist_image);
+                Log.v(TAG,"pos"+categoryProductsList.get(position).getArName());
+                dealingWithWishList.addToWishList(categoryProductsList.get(position),progressBar,wishlist_image);
             }
 
             @Override
@@ -344,15 +385,67 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                 DataArrayModel item=categoryProductsList.get(position);
                 Intent intent=new Intent(getApplicationContext(), ProductDetailsActivity.class);
                 intent.putExtra(ProductDetailsActivity.CATEGORY_PRODUCTS_DETAILS,item);
-                intent.putExtra(ProductDetailsActivity.POSITION,position);
                 startActivity(intent);
             }
         });
-
     }
 
     @OnClick(R.id.toolbar_back_left_btn_id)
     void toolbarbackClick(){
-        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+        finish();
     }
+
+    private void getWishList() {
+        if(networkAvailable.isNetworkAvailable()){
+            apiServiceInterface= ApiClient.getClientService();
+            progressBar.setVisibility(View.VISIBLE);
+            Map<String,Object> map=new HashMap<>();
+            String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+//            map.put("page",currentPage);
+            map.put("page",1);
+            map.put("limit",100);
+            Call<StoreListModel> call=apiServiceInterface.getWishlist(map,"application/json",token);
+            call.enqueue(new Callback<StoreListModel>() {
+                @Override
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
+                    if(response.body().isSuccess()){
+                        if(response.body().isSuccess()) {
+                            wishlistProducts=response.body().getDataObjectModel().getDataArrayModelList();
+                            if(wishlistProducts.size()>0) {
+                                Log.v("TAG","ssss"+wishlistProducts.size());
+
+                                for(int i=0;i<wishlistProducts.size();i++){
+                                    ids.add(wishlistProducts.get(i).getProductId());
+                                    Log.v("TAG","iddddddddd"+ids.size());
+
+                                }
+
+
+                            }
+                        }else if(wishlistProducts.size()==0) {
+                            recyclerView.setVisibility(View.GONE);
+                            //emptyData.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
+                            // }
+                        }
+//
+
+                    }
+                    else {
+                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+    }
+
 }

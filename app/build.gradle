@@ -51,13 +51,12 @@ dependencies {
     implementation 'com.nineoldandroids:library:2.4.0'
     implementation 'com.squareup.picasso:picasso:2.3.2'  //  Picasso Library
 
-    implementation 'com.github.bumptech.glide:glide:3.7.0'
+   // implementation 'com.github.bumptech.glide:glide:3.7.0'
     implementation 'com.google.android.gms:play-services-maps:15.0.1'
-//    annotationProcessor 'com.github.bumptech.glide:compiler:4.7.1'
-    // Butter Knife
 
-//    implementation 'com.jakewharton:butterknife:10.0.0'
-//    annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
+
+    implementation 'com.github.bumptech.glide:glide:4.9.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.9.0'
 
     implementation 'com.jakewharton:butterknife:10.0.0'
     annotationProcessor 'com.jakewharton:butterknife-compiler:10.0.0'
@@ -88,6 +87,7 @@ dependencies {
 
     implementation 'com.tbuonomo.andrui:viewpagerdotsindicator:4.1.2'
     implementation 'com.android.support:multidex:1.0.3'
+
 
 
 

@@ -44,8 +44,13 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.saaty.R;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.AdsProductsModel;
+import com.saaty.models.DataArrayModel;
+import com.saaty.models.EditAdsModel;
 import com.saaty.models.ProductDataModel;
+import com.saaty.models.SendCodeModel;
+import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.productDetails.ProductImagesListAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
@@ -58,6 +63,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +71,7 @@ import java.util.Map;
 
 public class EditAdsActivity extends AppCompatActivity {
 
+    public static final String EDIT_ADS_PRODUCT ="edit_ads_product";
     private static final String TAG =EditAdsActivity.class.getSimpleName() ;
     @BindView(R.id.progress_id) ProgressBar progressBar;
     @BindView(R.id.upload_images_img) ImageView uploadImg;
@@ -86,8 +93,10 @@ public class EditAdsActivity extends AppCompatActivity {
     @BindView(R.id.phone_number_input_id)TextInputEditText phoneNumberInput;
     @BindView(R.id.email_input_id)TextInputEditText emailInput;
     @BindView(R.id.product_details_input_id)TextInputEditText productDescriptionInput;
-
+    String userName;
     UploadImageAdapter adapter;
+    DataArrayModel dataArrayModel;
+   InputStream inputStream ;
     private static final int CHOOSER=1;
     String imageEncoded;
     List<String> imagesEncodedList;
@@ -96,6 +105,7 @@ public class EditAdsActivity extends AppCompatActivity {
     ApiServiceInterface apiServiceInterface;
     NetworkAvailable networkAvailable;
     private int category_id;
+    Intent intent;
     private String productNameAr,productNameEn,productDesc,phone,email,price,productShape,contactType;
     DailogUtil dailogUtil;
     @Override
@@ -103,88 +113,61 @@ public class EditAdsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_ads);
         ButterKnife.bind(this);
+        intent=getIntent();
+        if(intent.getAction().equals("add_new_ads")){
+            toolbarTxt.setText(getString(R.string.add_ads));
+        }else if(intent.getAction().equals(EditAdsActivity.EDIT_ADS_PRODUCT)){
+            toolbarTxt.setText(getString(R.string.edit_ads));
+            dataArrayModel=intent.getParcelableExtra(ProductDetailsActivity.ADS_PRODUCTS_DETAILS);
+        }
         networkAvailable=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
-        Intent intent=getIntent();
-        if(intent.getAction().equals("add_new_ads")){
-           toolbarTxt.setText(getString(R.string.add_ads));
-        }
-
-
-
 
     }
 
     @OnClick(R.id.add_ads_btn_id)
     void addAdsBtn(){
         inializeFields();
-        for(int i=0;i<selectedUriList.size();i++){
-            try {
-                InputStream inputStream=getContentResolver().openInputStream(selectedUriList.get(i));
+
+        Log.v(TAG,"product type"+productShape+"  contact type  "+contactType+"desc ar   "+productDesc+"product name  "+productNameAr);
+
+        try {
+            for (int i = 0; i < selectedUriList.size(); i++) {
+                inputStream = getContentResolver().openInputStream(selectedUriList.get(i));
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            if(intent.getAction().equals("add_new_ads")){
                 addAdsProducts(getByte(inputStream));
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
+            }else if(intent.getAction().equals(EditAdsActivity.EDIT_ADS_PRODUCT)){
+                editAdsProducts(getByte(inputStream));
+
             }
 
-
+        } catch (IOException e) {
+            e.printStackTrace();
         }
 
 
     }
 
+
+
     private void inializeFields() {
-//        if(radioGroup1.getCheckedRadioButtonId()==-1){
-//            Toast.makeText(this, "you must choose the type of product", Toast.LENGTH_SHORT).show();
-//        }else{
-//            int id= radioGroup1.getCheckedRadioButtonId();
-//            RadioButton radioButton=(RadioButton) findViewById(id);
-//            String radioBtnTxt=radioButton.getText().toString();
-//            Log.v(TAG,"rrrrrrrrrrrrr"+radioButton.getText().toString());
-//            if(radioBtnTxt.matches(getString(R.string.watch))){
-//              category_id=1;
-//                  productNameAr="ساعة";
-//                  productNameEn="watch";
-//                Log.v(TAG,"rrrrrrrrrrrrr   "+category_id);
-//            }else if(radioBtnTxt.matches(getString(R.string.bracletes))){
-//                category_id=2;
-//                productNameAr="أسورة";
-//                productNameEn="braclet";
-//                Log.v(TAG,"rrrrrrrrrrrrr   "+category_id);
-//            }
-//
-//        }
-//
-//        if(radioGroup2.getCheckedRadioButtonId()==-1){
-//
-//        }else {
-//            int id= radioGroup2.getCheckedRadioButtonId();
-//            RadioButton radioButton=(RadioButton) findViewById(id);
-//            String radioBtnTxt=radioButton.getText().toString();
-//            if(radioBtnTxt.equals("New")){
-//                productShape="New";
-//            }else if(radioBtnTxt.equals("Old"))
-//                productShape="Old";
-//        }
-//
-//        if(radioGroup3.getCheckedRadioButtonId()==-1) {
-//
-//        }else {
-//            int id= radioGroup3.getCheckedRadioButtonId();
-//            RadioButton radioButton=(RadioButton) findViewById(id);
-//            String radioBtnTxt=radioButton.getText().toString();
-//            if(radioBtnTxt.equals("All")){
-//                contactType="all";
-//            }
-//
-//        }
         if(!FUtilsValidation.isEmpty(emailInput,getString(R.string.field_required))&&
         !FUtilsValidation.isEmpty(phoneNumberInput,getString(R.string.field_required))&&
         !FUtilsValidation.isEmpty(productPriceInput,getString(R.string.field_required))&&
         !FUtilsValidation.isEmpty(productDescriptionInput,getString(R.string.field_required))&&
         FUtilsValidation.isValidEmail(emailInput,getString(R.string.error_email_msg))
-        &&radioGroup1.getCheckedRadioButtonId()!=-1&&radioGroup2.getCheckedRadioButtonId()!=-1&&radioGroup3.getCheckedRadioButtonId()!=-1){
+                &&radioGroup1.getCheckedRadioButtonId()!=-1
+                &&radioGroup2.getCheckedRadioButtonId()!=-1
+                &&radioGroup3.getCheckedRadioButtonId()!=-1
+                 &&selectedUriList.size()>0){
             int id1= radioGroup1.getCheckedRadioButtonId();
             RadioButton radioButton=(RadioButton) findViewById(id1);
             String radioBtnTxt=radioButton.getText().toString();
@@ -203,16 +186,24 @@ public class EditAdsActivity extends AppCompatActivity {
             int id2= radioGroup2.getCheckedRadioButtonId();
             RadioButton radioButton2=(RadioButton) findViewById(id2);
             String radioBtnTxt2=radioButton2.getText().toString();
-            if(radioBtnTxt2.equals("New")){
+            if(radioBtnTxt2.equals(getString(R.string.new_products))){
                 productShape="New";
-            }else if(radioBtnTxt2.equals("Old")){
+            }else if(radioBtnTxt2.equals(getString(R.string.old_products))){
                 productShape="Used";
         }
 
             int id3= radioGroup3.getCheckedRadioButtonId();
             RadioButton radioButton3=(RadioButton) findViewById(id3);
-            String radioBtnTxt3=radioButton.getText().toString();
+            String radioBtnTxt3=radioButton3.getText().toString();
             if(radioBtnTxt3.equals("All")){
+                contactType="all";
+            }else if(radioBtnTxt3.equals(getString(R.string.phone_number_input))){
+                contactType="phone number";
+            }else if(radioBtnTxt3.equals(getString(R.string.email_input))){
+                contactType="email";
+            }else if(radioBtnTxt3.equals(getString(R.string.private_message))){
+                contactType="private message";
+            }else {
                 contactType="all";
             }
 
@@ -226,20 +217,18 @@ public class EditAdsActivity extends AppCompatActivity {
 
         }else {
             if(radioGroup1.getCheckedRadioButtonId()==-1){
-                Toast.makeText(this, "you must choose the type of product", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "you must choose the type of product", Toast.LENGTH_LONG).show();
             }if(radioGroup2.getCheckedRadioButtonId()==-1) {
-                Toast.makeText(this, "you must choose the status of product", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "you must choose the status of product", Toast.LENGTH_LONG).show();
             }if (radioGroup3.getCheckedRadioButtonId()==-1) {
-                Toast.makeText(this, "you must choose the type of contact", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "you must choose the type of contact", Toast.LENGTH_LONG).show();
+            }if(selectedUriList.size()==0){
+                Toast.makeText(this, "you must choose the at least one photo", Toast.LENGTH_LONG).show();
             }
 
             }
-
-
-
 
     }
-
 
     @OnClick(R.id.upload_images_img)
     void uploadOmages(){
@@ -291,44 +280,34 @@ public class EditAdsActivity extends AppCompatActivity {
     private void addAdsProducts(byte []bytes) throws FileNotFoundException {
         if(networkAvailable.isNetworkAvailable()){
 
-
-
             ProgressDialog progressDialog =dailogUtil.showProgressDialog(EditAdsActivity.this,getString(R.string.logging),false);
             progressDialog.show();
-
           apiServiceInterface= ApiClient.getClientService();
             Map<String,Object> map=new HashMap<>();
             map.put("category_id",category_id);
             map.put("ar_name",productNameAr);
-           // map.put("en_name",productNameEn);
             map.put("ar_description",productDesc);
-           // map.put("en_description","dddddddddddddd");
             map.put("price",Integer.valueOf(price));
-            map.put("shape","New");
-            map.put("contact_type","all");
-            map.put("contact_name","ali");
+            map.put("shape",productShape);
+            map.put("contact_type",contactType);
+            map.put("contact_name",LoginTraderUserActivity.userModel.getFullname());
             map.put("contact_mobile",phone);
             map.put("contact_email",email);
-
-            RequestBody requestBody = RequestBody.create(MediaType.parse("*/*"), bytes);
-            MultipartBody.Part fileToUpload = MultipartBody.Part.createFormData("file","name", requestBody);
-
 
             MultipartBody.Part[] parts=new MultipartBody.Part[selectedUriList.size()];
             RequestBody requestBody1 = null;
             for(int i=0;i<selectedUriList.size();i++){
                  requestBody1=RequestBody.create(MediaType.parse("*/*"),bytes);
-                parts[i]=MultipartBody.Part.createFormData("file","name",requestBody1);
+                parts[i]=MultipartBody.Part.createFormData("photos[]","photos[]",requestBody1);
                 Log.v(TAG,"selected uri part "+requestBody1.toString());
             }
             Log.v(TAG,"selected uri part "+parts.length);
             Call<AdsProductsModel> call=null;
-            Map <String, MultipartBody.Part []>partMap =new HashMap<>();
-            partMap.put("photos[]",parts);
+//            Map <String, MultipartBody.Part >partMap =new HashMap<>();
+//            partMap.put("photos[]",fileToUpload);
             if (parts != null) {
                  call=apiServiceInterface.addAdsProduct("application/json",
-                        "Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjQ1MDc5ZmE4NjQ5YjM5MDJiMmU3NzdhODgxMjAxYTgzNDVjMzhjY2Y5NzQyNGMzMmM3ZTVkMDc0ZTNiNGI5ZjMyZDY2NWRhZjVjOTFhZjEzIn0.eyJhdWQiOiIxIiwianRpIjoiNDUwNzlmYTg2NDliMzkwMmIyZTc3N2E4ODEyMDFhODM0NWMzOGNjZjk3NDI0YzMyYzdlNWQwNzRlM2I0YjlmMzJkNjY1ZGFmNWM5MWFmMTMiLCJpYXQiOjE1NzM0NzE4MTgsIm5iZiI6MTU3MzQ3MTgxOCwiZXhwIjoxNjA1MDk0MjE4LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.ACyzNWKJaH_XRFqdnAj2XrCnzaP8-3IWTIp2XtwscBRlt7jjOP6VO_-og3LI-5PN_HDn-GBMKZ-pojuVGxmBbs1OshjuOxMcpk5MMwZid2HhJSSH_pbLYXbwzAaHfI3tttU6e4lQPwmV_sRSbFBGnQutlp06S2xAeEcmYWWzlvy_m3D7gLEN2CaRgQZHaHXm02VyWGzcf1oD4C8I2wC8RkDmgOwaq3iQOoMFH-djzxANSbMjCMg8VbXKUvunck-FlOuzRHxJm_vQho118h2Or2JzSZoO21QLkZ6kbVxnYsVgHik4DtQyGna2Hp_4_RPtmokJdWIrUjbh8jCXJlrnrDU5TqH99dKg-RS0NdFz-DQOLL3ogg30nNuLm2BAnZrhbi9_VRxQkYEHWfc3zA9V5kmD233sbL7xtx2P9zU62SELoFexn4Unk5S5_1anS6NSQNcd0jixNbErqTwJUjOpBFLXH9nLooUCXnerE8htQ4LjnWrD3Y96zLwtBVA2ct9jUaF405Go-Q_1dkR0E-iLbJmn2HHVzXmKQ_AFBqtCpzJnabTc6vLinXrzIS2DuiU7LsvM82GiNw_3HBXA8Zza6-0tLEKul-X_5cvEsU_vtItSeg4DBfiY8CjwCTczeOPhC-HXLUxXFA_OegOcMOdltELgK5OeI55IiuIEwHfTGJM"
-                        ,map,parts);
+                         LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken(),map,parts);
             }
 
 
@@ -363,15 +342,87 @@ public class EditAdsActivity extends AppCompatActivity {
     }
 
 
-    private byte[] getByte(InputStream inputStream) throws IOException {
-        ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
-        int size=1024;
-        byte [] bytes=new byte[size];
-        int len=0;
 
-        while ((len=inputStream.read(bytes))!=-1){
-            outputStream.write(bytes,0,len);
+    private void editAdsProducts(byte[] bytes) {
+        if(networkAvailable.isNetworkAvailable()) {
+            ProgressDialog progressDialog = dailogUtil.showProgressDialog(EditAdsActivity.this, getString(R.string.logging), false);
+            progressDialog.show();
+            apiServiceInterface = ApiClient.getClientService();
+            Map<String, Object> map = new HashMap<>();
+            map.put("category_id", category_id);
+            map.put("ar_name", productNameAr);
+            // map.put("en_name",productNameEn);
+            map.put("ar_description", productDesc);
+            // map.put("en_description","dddddddddddddd");
+            map.put("price", Integer.valueOf(price));
+            map.put("shape", "New");
+            map.put("contact_type", "all");
+            map.put("contact_name", "ali");
+            map.put("contact_mobile", phone);
+            map.put("contact_email", email);
+            MultipartBody.Part[] parts = new MultipartBody.Part
+                    [selectedUriList.size()];
+            RequestBody requestBody1 = null;
+            for (int i = 0; i < selectedUriList.size(); i++) {
+                requestBody1 = RequestBody.create(MediaType.parse("*/*"), bytes);
+                parts[i] = MultipartBody.Part.createFormData("photos[]", "photos[]", requestBody1);
+                Log.v(TAG, "selected uri part " + requestBody1.toString());
+            }
+            Log.v(TAG, "selected uri part " + parts.length);
+//            if(dataArrayModel.getProductimages().size()>0) {
+//                for (int i = 0; i < dataArrayModel.getProductimages().size(); i++) {
+//                    dataArrayModel.getProductimages().get(0).setImageLink(null);
+//                }
+//            }
+            Call<EditAdsModel> call = null;
+            if (parts != null) {
+                call = apiServiceInterface.editAdsProduct(dataArrayModel.getProductId(), "application/json",
+                        LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken(), map, parts);
+            }
+            call.enqueue(new Callback<EditAdsModel>() {
+                @Override
+                public void onResponse(Call<EditAdsModel> call, Response<EditAdsModel> response) {
+                    if (response.body().isSuccess()) {
+                        Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
+                        startActivity(new Intent(getApplicationContext(), MyAdsActivity.class));
+                        progressDialog.dismiss();
+                    } else {
+                        Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
+                        progressDialog.dismiss();
+                    }
+                    if (response.code() == 404) {
+                        Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<EditAdsModel> call, Throwable t) {
+                    Toast.makeText(EditAdsActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    progressBar.setVisibility(View.GONE);
+                    progressDialog.dismiss();
+                }
+            });
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+
+
+    }
+
+
+    private byte[] getByte(InputStream inputStream) throws IOException {
+       ByteArrayOutputStream outputStream=new ByteArrayOutputStream();
+
+        InputStream inputStream1 = null;
+
+                int size = 1024;
+                byte[] bytes = new byte[size];
+                int len = 0;
+
+                while ((len = inputStream.read(bytes)) != -1) {
+                    outputStream.write(bytes, 0, len);
+                }
+
         return  outputStream.toByteArray();
     }
 

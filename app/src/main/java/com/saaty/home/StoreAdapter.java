@@ -54,7 +54,12 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.Holder> {
             storeName.setText(dataItem.getStoreEnName());
         }
 
-        Picasso.with(mContext).load(urls.base_url+"/"+dataItem.getStoreLogo()).into(storeImgId);
+        if(dataItem.getStoreLogo()==null){
+            storeImgId.setImageResource(R.drawable.store1);
+            Log.v(TAG,"logooo"+dataItem.getStoreLogo());
+        }
+       // Log.v(TAG,"logooo"+dataItem.getStoreLogo());
+        Picasso.with(mContext).load(urls.base_url+"/"+dataItem.getStoreLogo()).error(R.drawable.store1).into(storeImgId);
 
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
