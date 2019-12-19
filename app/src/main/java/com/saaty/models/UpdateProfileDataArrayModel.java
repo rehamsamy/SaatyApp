@@ -1,49 +1,52 @@
 package com.saaty.models;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 
-public class UpdateProfileDataArrayModel{
+public class UpdateProfileDataArrayModel implements Parcelable {
 
 	@SerializedName("store_id")
-	private Object storeId;
+	private int storeId;
 
 	@SerializedName("store_ar_name")
-	private Object storeArName;
+	private String storeArName;
 
 	@SerializedName("store_en_name")
-	private Object storeEnName;
+	private String storeEnName;
 
 	@SerializedName("mobile_verified_at")
-	private Object mobileVerifiedAt;
+	private String mobileVerifiedAt;
 
 	@SerializedName("store_ar_description")
-	private Object storeArDescription;
+	private String storeArDescription;
 
 	@SerializedName("store_logo")
-	private Object storeLogo;
+	private String storeLogo;
 
 	@SerializedName("mobile")
 	private String mobile;
 
 	@SerializedName("created_at")
-	private Object createdAt;
+	private String createdAt;
 
 	@SerializedName("email_verified_at")
-	private Object emailVerifiedAt;
+	private String emailVerifiedAt;
 
 	@SerializedName("type")
 	private String type;
 
 	@SerializedName("store_en_description")
-	private Object storeEnDescription;
+	private String storeEnDescription;
 
 	@SerializedName("updated_at")
-	private Object updatedAt;
+	private String updatedAt;
 
 	@SerializedName("user_id")
-	private Object userId;
+	private int userId;
 
 	@SerializedName("id")
 	private int id;
@@ -54,51 +57,71 @@ public class UpdateProfileDataArrayModel{
 	@SerializedName("email")
 	private String email;
 
-	public void setStoreId(Object storeId){
+	protected UpdateProfileDataArrayModel(Parcel in) {
+		mobile = in.readString();
+		type = in.readString();
+		id = in.readInt();
+		fullname = in.readString();
+		email = in.readString();
+	}
+
+	public static final Creator<UpdateProfileDataArrayModel> CREATOR = new Creator<UpdateProfileDataArrayModel>() {
+		@Override
+		public UpdateProfileDataArrayModel createFromParcel(Parcel in) {
+			return new UpdateProfileDataArrayModel(in);
+		}
+
+		@Override
+		public UpdateProfileDataArrayModel[] newArray(int size) {
+			return new UpdateProfileDataArrayModel[size];
+		}
+	};
+
+	public void setStoreId(int storeId){
 		this.storeId = storeId;
 	}
 
-	public Object getStoreId(){
+	public int getStoreId(){
 		return storeId;
 	}
 
-	public void setStoreArName(Object storeArName){
+	public void setStoreArName(String storeArName){
 		this.storeArName = storeArName;
 	}
 
-	public Object getStoreArName(){
+	public String getStoreArName(){
 		return storeArName;
 	}
 
-	public void setStoreEnName(Object storeEnName){
+	public void setStoreEnName(String storeEnName){
 		this.storeEnName = storeEnName;
 	}
 
-	public Object getStoreEnName(){
+	public String getStoreEnName(){
 		return storeEnName;
 	}
 
-	public void setMobileVerifiedAt(Object mobileVerifiedAt){
+	public void setMobileVerifiedAt(String mobileVerifiedAt){
 		this.mobileVerifiedAt = mobileVerifiedAt;
 	}
 
-	public Object getMobileVerifiedAt(){
+	public String getMobileVerifiedAt(){
 		return mobileVerifiedAt;
 	}
 
-	public void setStoreArDescription(Object storeArDescription){
+	public void setStoreArDescription(String storeArDescription){
 		this.storeArDescription = storeArDescription;
 	}
 
-	public Object getStoreArDescription(){
+	public String getStoreArDescription(){
 		return storeArDescription;
 	}
 
-	public void setStoreLogo(Object storeLogo){
+	public void setStoreLogo(String storeLogo){
 		this.storeLogo = storeLogo;
 	}
 
-	public Object getStoreLogo(){
+	public String getStoreLogo(){
 		return storeLogo;
 	}
 
@@ -110,19 +133,19 @@ public class UpdateProfileDataArrayModel{
 		return mobile;
 	}
 
-	public void setCreatedAt(Object createdAt){
+	public void setCreatedAt(String createdAt){
 		this.createdAt = createdAt;
 	}
 
-	public Object getCreatedAt(){
+	public String getCreatedAt(){
 		return createdAt;
 	}
 
-	public void setEmailVerifiedAt(Object emailVerifiedAt){
+	public void setEmailVerifiedAt(String emailVerifiedAt){
 		this.emailVerifiedAt = emailVerifiedAt;
 	}
 
-	public Object getEmailVerifiedAt(){
+	public String getEmailVerifiedAt(){
 		return emailVerifiedAt;
 	}
 
@@ -134,7 +157,7 @@ public class UpdateProfileDataArrayModel{
 		return type;
 	}
 
-	public void setStoreEnDescription(Object storeEnDescription){
+	public void setStoreEnDescription(String storeEnDescription){
 		this.storeEnDescription = storeEnDescription;
 	}
 
@@ -142,19 +165,19 @@ public class UpdateProfileDataArrayModel{
 		return storeEnDescription;
 	}
 
-	public void setUpdatedAt(Object updatedAt){
+	public void setUpdatedAt(String updatedAt){
 		this.updatedAt = updatedAt;
 	}
 
-	public Object getUpdatedAt(){
+	public String getUpdatedAt(){
 		return updatedAt;
 	}
 
-	public void setUserId(Object userId){
+	public void setUserId(int userId){
 		this.userId = userId;
 	}
 
-	public Object getUserId(){
+	public int getUserId(){
 		return userId;
 	}
 
@@ -204,4 +227,18 @@ public class UpdateProfileDataArrayModel{
 			",email = '" + email + '\'' + 
 			"}";
 		}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(mobile);
+		dest.writeString(type);
+		dest.writeInt(id);
+		dest.writeString(fullname);
+		dest.writeString(email);
+	}
 }

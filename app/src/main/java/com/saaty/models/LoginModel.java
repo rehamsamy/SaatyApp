@@ -1,13 +1,18 @@
 package com.saaty.models;
 
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
 
-public class LoginModel{
+public class LoginModel implements Parcelable {
 
+	@SerializedName("success")
+	private boolean isSucess;
 	@SerializedName("access_token")
 	private String accessToken;
 
@@ -31,6 +36,54 @@ public class LoginModel{
 
 	@SerializedName("user")
 	private List<UserModel> userModel;
+
+	protected LoginModel(Parcel in) {
+		isSucess = in.readByte() != 0;
+		accessToken = in.readString();
+		refreshToken = in.readString();
+		tokenType = in.readString();
+		expiresIn = in.readInt();
+		error = in.readString();
+		errorDescription = in.readString();
+		message = in.readString();
+		userModel = in.createTypedArrayList(UserModel.CREATOR);
+	}
+
+	public static final Creator<LoginModel> CREATOR = new Creator<LoginModel>() {
+		@Override
+		public LoginModel createFromParcel(Parcel in) {
+			return new LoginModel(in);
+		}
+
+		@Override
+		public LoginModel[] newArray(int size) {
+			return new LoginModel[size];
+		}
+	};
+
+	public boolean isSucess() {
+		return isSucess;
+	}
+
+	public void setSucess(boolean sucess) {
+		isSucess = sucess;
+	}
+
+	public void setError(String error) {
+		this.error = error;
+	}
+
+	public void setErrorDescription(String errorDescription) {
+		this.errorDescription = errorDescription;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public void setUserModel(List<UserModel> userModel) {
+		this.userModel = userModel;
+	}
 
 	public List<UserModel> getUserModel() {
 		return userModel;
@@ -90,4 +143,22 @@ public class LoginModel{
 			",expires_in = '" + expiresIn + '\'' + 
 			"}";
 		}
+
+	@Override
+	public int describeContents() {
+		return 0;
+	}
+
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeByte((byte) (isSucess ? 1 : 0));
+		dest.writeString(accessToken);
+		dest.writeString(refreshToken);
+		dest.writeString(tokenType);
+		dest.writeInt(expiresIn);
+		dest.writeString(error);
+		dest.writeString(errorDescription);
+		dest.writeString(message);
+		dest.writeTypedList(userModel);
+	}
 }

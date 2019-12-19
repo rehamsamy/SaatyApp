@@ -44,9 +44,9 @@
     <string name="search">بحث</string>
     <string name="no_product">لا توج بيانات</string>
     <string name="store_name">اسم المتجر</string>
-    <string name="splash_message1">We are pleased with the satisfaction of all our customers and buyers</string>
-    <string name="splash_message2">Your product reaches you as soon as possible</string>
-    <string name="splash_message3">Choose your product and payment method</string>
+    <string name="splash_message1">اختر منتجك وطريقة الدفع</string>
+    <string name="splash_message2">يصل اليك منتجك باسرع وقت</string>
+    <string name="splash_message3">يسعدنا رضاء جميع عملائنا البائعين والمشترين</string>
     <string name="field_required">هذا الحقل مطلوب</string>
     <string name="password_equal_error">كلمه المرور غير متساوية</string>
     <string name="error_email_msg">من فضلك ادخل بريد الالكتروني صحيح</string>
@@ -111,4 +111,17 @@
     <string name="used_products">المنتجات المستعمله</string>
     <string name="watches">الساعات</string>
     <string name="store_desc">اكتب وصف للمتجر</string>
+    <string name="edit_ads">Edit Ads</string>
+    <string name="state">State:</string>
+    <string name="category">Category:</string>
+    <string name="message_name">Ahmed Mohamed</string>
+    <string name="received">الواردة</string>
+    <string name="reply_with_message">رد برسالة</string>
+    <string name="message_text">نص الرسالة</string>
+    <string name="send_message">ارسل رسالة</string>
+    <string name="message_to">رساله ل:</string>
+    <string name="upload_store_img">من فضلك حمل صوره للمتجر:</string>
+    <string name="create_new_account">انشاء حساب جديد</string>
+    <string name="product_imges">صور المنتج:</string>
+
 </resources>

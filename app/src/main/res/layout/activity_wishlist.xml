@@ -32,17 +32,43 @@
 
 
 
-        <SearchView
+
+        <LinearLayout
             android:id="@+id/homeSearch_ed_id"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:iconifiedByDefault="false"
-            android:queryHint="@string/search"
-            android:paddingEnd="40dp"
-            android:searchIcon="@drawable/search"
-            android:elevation="4dp"
-            android:textAlignment="viewStart"
-            />
+            android:layout_height="40dp"
+            android:elevation="2dp"
+            android:orientation="horizontal"
+            android:layout_marginEnd="3dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="4dp">
+            <ImageView
+                android:id="@+id/search_btn_id"
+                android:layout_width="25dp"
+                android:layout_height="25dp"
+                android:layout_gravity="center_vertical"
+                android:clickable="false"
+                android:padding="3dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/search" />
+
+            <EditText
+                android:id="@+id/search_ed_id"
+                android:layout_width="0dp"
+                android:layout_marginEnd="30dp"
+                android:layout_height="match_parent"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:background="@android:color/transparent"
+                android:gravity="start|center_vertical"
+                android:hint="@string/search"
+                android:paddingStart="5dp"
+                android:imeOptions="actionSearch"
+                android:textAlignment="viewStart"
+
+
+                android:paddingEnd="5dp" />
+        </LinearLayout>
 
         <ImageView
             android:id="@+id/nav_filter_id"

@@ -59,6 +59,18 @@ public class UserModel implements Parcelable {
 	@SerializedName("email")
 	private String email;
 
+
+	@SerializedName("store_logo")
+	private  String storeLogo;
+
+	public String getStoreLogo() {
+		return storeLogo;
+	}
+
+	public void setStoreLogo(String storeLogo) {
+		this.storeLogo = storeLogo;
+	}
+
 	protected UserModel(Parcel in) {
 		mobile = in.readString();
 		type = in.readString();

@@ -5,6 +5,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+
 
 public class DataObjectModel{
 
@@ -44,7 +48,6 @@ public class DataObjectModel{
 	@SerializedName("current_page")
 	private int currentPage;
 
-
 	@SerializedName("id")
 	private int id;
 
@@ -59,6 +62,26 @@ public class DataObjectModel{
 
 	@SerializedName("updated_at")
 	private String updated_at;
+
+    @PrimaryKey(autoGenerate = true)
+	private int idd;
+
+	public DataObjectModel(int idd,List<DataArrayModel> dataArrayModelList) {
+		this.dataArrayModelList = dataArrayModelList;
+		this.idd=idd;
+	}
+
+	public int getIdd() {
+		return idd;
+	}
+
+	public void setIdd(int idd) {
+		this.idd = idd;
+	}
+
+	public void setDataArrayModelList(List<DataArrayModel> dataArrayModelList) {
+		this.dataArrayModelList = dataArrayModelList;
+	}
 
 	public int getId() {
 		return id;

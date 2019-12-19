@@ -12,6 +12,7 @@ import retrofit2.Response;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -47,6 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
     UpdateProfileDataArrayModel dataArrayModel;
     NetworkAvailable networkAvailable;
     ApiServiceInterface apiServiceInterface;
+    public  static String logo,storeName,storeDesc;
     DailogUtil dailogUtil;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,10 +70,9 @@ public class ProfileActivity extends AppCompatActivity {
     }
 
     private void getProfileData() {
-
         apiServiceInterface= ApiClient.getClientService();
         ProgressDialog progressDialog=dailogUtil.showProgressDialog(ProfileActivity.this,getString(R.string.logging),false);
-        Call<UpdateProfileModel> call=apiServiceInterface.getProfile("application/json", LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken());
+        Call<UpdateProfileModel> call=apiServiceInterface.getProfile("application/json",  HomeActivity.access_token);
         call.enqueue(new Callback<UpdateProfileModel>() {
             @Override
             public void onResponse(Call<UpdateProfileModel> call, Response<UpdateProfileModel> response) {
@@ -85,12 +86,17 @@ public class ProfileActivity extends AppCompatActivity {
                     phoneValueId.setText(phone);
                     userNameValeId.setText(name);
                     if(dataArrayModel.getType().equals("store")){
+                        Log.v("TAG","ssssssss"+dataArrayModel.toString());
+                        logo=dataArrayModel.getStoreLogo();
+                        storeName=dataArrayModel.getStoreArName();
+                        storeDesc=dataArrayModel.getStoreArDescription();
                         if(dataArrayModel.getStoreLogo()!=null)
                         Picasso.with(getApplicationContext()).load(urls.base_url+"/"+dataArrayModel.getStoreLogo())
-                               .error(R.drawable.store2).into(profileImg);
+                               .error(R.drawable.sidemenu_photo2).into(profileImg);
                    storeNameTxtValue.setVisibility(View.VISIBLE);
                    storeNameTxtValue.setText((CharSequence) dataArrayModel.getStoreArName());
                    storeNameTxt.setVisibility(View.VISIBLE);
+
                     }
 
                     progressDialog.dismiss();
@@ -113,7 +119,7 @@ public class ProfileActivity extends AppCompatActivity {
     @OnClick(R.id.edit_profile_back)
     void editProfile(){
         Intent intent=new Intent(getApplicationContext(),EditProfileActivity.class);
-        //intent.putExtra("profile_model",i)
+        intent.putExtra("profile_model",dataArrayModel);
         startActivity(intent);
     }
 
@@ -126,8 +132,7 @@ public class ProfileActivity extends AppCompatActivity {
 
     @OnClick(R.id.toolbar_home_id)
     void homeClick(){
-        Intent intent=new Intent(getApplicationContext(), HomeActivity.class);
-        startActivity(intent);
+        finish();
     }
 
 

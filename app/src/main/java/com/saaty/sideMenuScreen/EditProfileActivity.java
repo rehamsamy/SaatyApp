@@ -16,9 +16,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.Manifest;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
@@ -37,14 +39,19 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.LoginModel;
+import com.saaty.models.UpdateProfileDataArrayModel;
 import com.saaty.models.UpdateProfileModel;
+import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
+import com.saaty.util.urls;
+import com.squareup.picasso.Picasso;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -65,13 +72,13 @@ public class EditProfileActivity extends AppCompatActivity {
     NetworkAvailable networkAvailable;
     ApiServiceInterface apiServiceInterface;
     DailogUtil dailogUtil;
-    LoginModel loginModel;
     private static final int image_pick_gallery_code=330;
     Uri image_uri;
-    MultipartBody.Part body = null;
+    MultipartBody.Part body ;
     String storage_permission[];
+    UpdateProfileDataArrayModel dataArrayModel;
     String type;
-
+Intent intent;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,29 +86,40 @@ public class EditProfileActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         toolbarTxt.setText(getString(R.string.edit_profile));
         dailogUtil=new DailogUtil();
+        intent=getIntent();
         networkAvailable=new NetworkAvailable(getApplicationContext());
-        loginModel=LoginTraderUserActivity.loginModel;
-        type=loginModel.getUserModel().get(0).getType();
-        if(loginModel.getUserModel().get(0).getType().equals("user")){
 
+        if(intent.hasExtra("profile_model")) {
+            dataArrayModel = intent.getParcelableExtra("profile_model");
 
-        }else if(loginModel.getUserModel().get(0).getType().equals("store")){
-            storeDescInputId.setVisibility(View.VISIBLE);
-            storeNameInputId.setVisibility(View.VISIBLE);
-            addImgId.setVisibility(View.VISIBLE);
-            if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
-                storeNameInputId.setText((CharSequence) loginModel.getUserModel().get(0).getStoreArName());
-                storeDescInputId.setText((CharSequence) loginModel.getUserModel().get(0).getStoreArDescription());
-            }else if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
-                storeNameInputId.setText((CharSequence) loginModel.getUserModel().get(0).getStoreEnName());
-                storeDescInputId.setText((CharSequence) loginModel.getUserModel().get(0).getStoreEnDescription());
+            if (dataArrayModel.getType().equals("user")) {
+                Log.v("TAG", "typeeeee" + dataArrayModel.getType());
+
+                type = dataArrayModel.getType();
+            } else if (dataArrayModel.getType().equals("store")) {
+                Log.v("TAG", "typeeeee" + dataArrayModel.toString());
+                type = dataArrayModel.getType();
+                storeDescInputId.setVisibility(View.VISIBLE);
+                storeNameInputId.setVisibility(View.VISIBLE);
+                addImgId.setVisibility(View.VISIBLE);
+
+                storeNameInputId.setText( ProfileActivity.storeName);
+                storeDescInputId.setText( ProfileActivity.storeDesc);
+
+                Log.v("TAG", "typeeeee" + dataArrayModel.getStoreArName() +
+                        "   " + dataArrayModel.getStoreArDescription());
+
+                if (ProfileActivity.logo != null) {
+                    Picasso.with(getApplicationContext()).load(urls.base_url+"/"+ProfileActivity.logo).error(R.drawable.sidemenu_photo2)
+                            .into(profileImgId);
+                }
+
             }
+            nameInputId.setText(dataArrayModel.getFullname());
+            emailInputId.setText(dataArrayModel.getEmail());
+            phoneInputId.setText(dataArrayModel.getMobile());
 
         }
-        nameInputId.setText(loginModel.getUserModel().get(0).getFullname());
-        emailInputId.setText(loginModel.getUserModel().get(0).getEmail());
-        phoneInputId.setText(loginModel.getUserModel().get(0).getMobile());
-
 
         editProfileBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,7 +129,7 @@ public class EditProfileActivity extends AppCompatActivity {
                     if(type.equals("user")) {
                         updateProfile();
                     }else if(type.equals("store")){
-                        updateProfileForStore();
+                        updateProfileForStore(body);
                     }
                 }else {
                     Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
@@ -146,7 +164,7 @@ public class EditProfileActivity extends AppCompatActivity {
             map.put("mobile", phoneInputId.getText().toString());
             map.put("email", emailInputId.getText().toString());
             ProgressDialog progressDialog = dailogUtil.showProgressDialog(EditProfileActivity.this, getString(R.string.logging), false);
-            Call<UpdateProfileModel> call = apiServiceInterface.updateProfile("application/json", LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken(), map);
+            Call<UpdateProfileModel> call = apiServiceInterface.updateProfile("application/json",  HomeActivity.access_token, map);
             call.enqueue(new Callback<UpdateProfileModel>() {
                 @Override
                 public void onResponse(Call<UpdateProfileModel> call, Response<UpdateProfileModel> response) {
@@ -173,6 +191,7 @@ public class EditProfileActivity extends AppCompatActivity {
                 }
             });
         }
+
     }
 
 
@@ -219,8 +238,16 @@ public class EditProfileActivity extends AppCompatActivity {
                     Bitmap bitmap = MediaStore.Images.Media.getBitmap(getContentResolver(), selectedImage);
                     profileImgId.setImageBitmap(bitmap);
                     InputStream is = getContentResolver().openInputStream(data.getData());
-                    createMultiPartFile(getBytes(is));
-
+                    String [] proj={MediaStore.Images.Media.DATA};
+                    Cursor cursor = managedQuery( data.getData(),
+                            proj, // Which columns to return
+                            null,       // WHERE clause; which rows to return (all rows)
+                            null,       // WHERE clause selection arguments (none)
+                            null); // Order-by clause (ascending by name)
+                    int column_index = cursor.getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
+                    cursor.moveToFirst();
+               File file=new File(cursor.getString(column_index));
+                    createMultiPartFile(file);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -241,19 +268,21 @@ public class EditProfileActivity extends AppCompatActivity {
     }
 
 
-    private void createMultiPartFile(byte[] imageBytes) {
-        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageBytes);
-        body = MultipartBody.Part.createFormData("user_image ", "image.jpg", requestFile);
+    private void createMultiPartFile(File file) {
+       // File file = new File();
+        RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), file);
+        body = MultipartBody.Part.createFormData("store_logo", "image.jpg", requestFile);
     }
 
-    private void updateProfileForStore() {
+    private void updateProfileForStore(MultipartBody.Part body) {
 
         if (!FUtilsValidation.isEmpty(nameInputId, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(emailInputId, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(phoneInputId, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(storeNameInputId, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(storeDescInputId, getString(R.string.field_required))
-                && FUtilsValidation.isValidEmail(emailInputId, getString(R.string.error_email_msg))) {
+                && FUtilsValidation.isValidEmail(emailInputId, getString(R.string.error_email_msg))
+                  &&body !=null) {
             apiServiceInterface = ApiClient.getClientService();
             Map<String, Object> map = new HashMap<>();
             map.put("fullname", nameInputId.getText().toString());
@@ -264,18 +293,13 @@ public class EditProfileActivity extends AppCompatActivity {
             map.put("store_ar_description", storeDescInputId.getText().toString());
             map.put("store_en_description", storeDescInputId.getText().toString());
 
-            RequestBody NamePart = RequestBody.create(MultipartBody.FORM, storeNameInputId.getText().toString().trim());
-           Map<String,Object> map1=new HashMap<>();
-           map1.put("store_logo",body);
-           Log.v(TAG,"multiiii"+body.toString());
             ProgressDialog progressDialog = dailogUtil.showProgressDialog(EditProfileActivity.this, getString(R.string.logging), false);
             Call<UpdateProfileModel> call = apiServiceInterface.updateStoreProfile("application/json"
-                    , LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken()
-                    , map,map1);
+                    ,  HomeActivity.access_token
+                    , map,body);
             call.enqueue(new Callback<UpdateProfileModel>() {
                 @Override
                 public void onResponse(Call<UpdateProfileModel> call, Response<UpdateProfileModel> response) {
-
 
                     Log.v(TAG,"codeeee"+response.code());
 
@@ -305,6 +329,10 @@ public class EditProfileActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
             });
+        }else {
+            if (body == null) {
+                Toast.makeText(this, getString(R.string.enter_image_please), Toast.LENGTH_LONG).show();
+            }
         }
     }
 

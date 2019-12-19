@@ -112,4 +112,20 @@
     <string name="watches">Watches</string>
     <string name="store_desc">Write description of store</string>
     <string name="edit_ads">Edit Ads</string>
+    <string name="state">State:</string>
+    <string name="category">Category:</string>
+    <string name="message_name">Ahmed Mohamed</string>
+    <string name="received">Received</string>
+    <string name="reply_with_message">Reply with message</string>
+    <string name="message_text">Message Text</string>
+    <string name="send_message">Send Message</string>
+    <string name="message_to">Message to:</string>
+    <string name="upload_store_img">You must upload image for store:</string>
+    <string name="create_new_account">Create New Account</string>
+    <string name="product_imges">Product Images:</string>
+    <string name="log_out">Log out of saaty</string>
+    <string name="yes">Yes</string>
+    <string name="dismiss">Cancel</string>
+    <string name="enter_image_please">Please enter image of store</string>
+    <string name="logout_msg">Are you sure log out from saaty!!</string>
 </resources>

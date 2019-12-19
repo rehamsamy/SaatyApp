@@ -16,6 +16,7 @@ import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.DataItem;
 import com.saaty.models.ProductDataItem;
+import com.saaty.sideMenuScreen.myAds.AdsActivity;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
 import com.saaty.util.PreferenceHelper;
 import com.saaty.util.urls;
@@ -33,13 +34,26 @@ public class StoreProductAdapter extends RecyclerView.Adapter<StoreProductAdapte
     Context mContext;
     List<DataArrayModel> storeProductsList;
    OnItemClickRecyclerViewInterface mInterface;
+   int imageRes;
    List<Integer> ids=new ArrayList<>();
        ImageView checkWIshlistImg;
+       List<DataArrayModel> wishList;
+       int x;
     public StoreProductAdapter(Context mContext, List<DataArrayModel> storeProductsList) {
         this.mContext = mContext;
         this.storeProductsList = storeProductsList;
     }
 
+    public void setWislistProducts(List<DataArrayModel> wishlistProducts) {
+        this.wishList=wishlistProducts;
+
+    }
+
+
+    public void setWishList(ImageView checkWIshlistImg){
+        this.checkWIshlistImg=checkWIshlistImg;
+
+    }
 
 
 
@@ -61,43 +75,50 @@ public class StoreProductAdapter extends RecyclerView.Adapter<StoreProductAdapte
 
     @Override
     public void onBindViewHolder(@NonNull Holder holder, int position) {
-       DataArrayModel  item=  storeProductsList.get(position);
-        TextView productName=holder.itemView.findViewById(R.id.product_name_id);
-        TextView  productPrice=holder.itemView.findViewById(R.id.product_price_id);
-        ImageView productImg=holder.itemView.findViewById(R.id.store_img_id);
-        if(PreferenceHelper.getSharedPreference(mContext).equals("en")){
-            productName.setText(item.getEnName());
-            productPrice.setText(item.getPrice());
-        }else {
-            productName.setText(item.getArName());
-            productPrice.setText(String.valueOf(item.getPrice()));
-        }
+        DataArrayModel item = storeProductsList.get(position);
+        TextView productName = holder.itemView.findViewById(R.id.product_name_id);
+        TextView productPrice = holder.itemView.findViewById(R.id.product_price_id);
+        ImageView productImg = holder.itemView.findViewById(R.id.store_img_id);
+
+
+        productName.setText(item.getArName());
+        productPrice.setText(String.valueOf(item.getPrice()));
+
         if (item.getProductimages().size() > 0) {
-            Picasso.with(mContext).load(urls.base_url+"/"+item.getProductimages().get(0).getImageLink()).placeholder(R.drawable.watch_item2).into(productImg);
-        }else {
+            Picasso.with(mContext).load(urls.base_url + "/" + item.getProductimages().get(0).getImageLink()).error(R.drawable.watch_item2).placeholder(R.drawable.watch_item2).into(productImg);
+        } else {
             productImg.setImageResource(R.drawable.watch_item2);
         }
 
-        if (ids.size() > 0) {
-            for (int i = 0; i < ids.size(); i++) {
-                if (ids.get(i) == storeProductsList.get(position).getProductId()) {
-                    holder.wishlistImg.setImageResource(R.drawable.wishlist_select);
-                } else {
-                    holder.wishlistImg.setImageResource(R.drawable.wishlist_not_select);
-                }
-            }
-        }
+//
+//        if(wishList.size()>0){
+//            for (int j = 0; j < wishList.size(); j++) {
+//            for(int i=0;i<storeProductsList.size();i++) {
+//                    if (wishList.get(j).getProductId() == storeProductsList.get(i).getProductId()) {
+//                        holder.wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+//                        Log.v("TAG", "ids num1 " + wishList.size());
+//                    } else {
+//                        holder.wishlistImg.setImageResource(R.drawable.wishlist_select);
+//                        Log.v("TAG", "ids num2 " + wishList.size());
+//
+//                    }
+//                }
+//            }
+//            }
+//
+
 
     }
-
     @Override
     public int getItemCount() {
         Log.v(TAG,"storessss size"+storeProductsList.size());
         return storeProductsList.size();
           }
 
-    public ImageView getWishlistImg() {
-        return checkWIshlistImg;
+    public void getWishlistImg(int x) {
+
+        this.x=x;
+        notifyDataSetChanged();
     }
 
 
@@ -108,6 +129,28 @@ public class StoreProductAdapter extends RecyclerView.Adapter<StoreProductAdapte
             super(itemView);
              wishlistImg=itemView.findViewById(R.id.wish_list_img);
        checkWIshlistImg=wishlistImg;
+//
+//       if(AdsActivity.flag==1){
+//           wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+//           Log.v("TAG","ffffffffff");
+//       }else{
+//          wishlistImg.setImageResource(R.drawable.wishlist_select);
+//           Log.v("TAG","ggggggg");
+//       }
+//
+//       if(x==0){
+//           wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+//           Log.v("TAG","ffffffffff");
+//       }else if(x==1){
+//           wishlistImg.setImageResource(R.drawable.wishlist_select);
+//           Log.v("TAG","ggggggg");
+//       }
+
+//       if(x!=0){
+//           wishlistImg.setImageResource(x);
+//       }
+       wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -132,6 +175,8 @@ public class StoreProductAdapter extends RecyclerView.Adapter<StoreProductAdapte
                     }
                 }else{
                         mContext.startActivity(new Intent(mContext, LoginTraderUserActivity.class));
+
+
                     }
                 }
             });

@@ -18,12 +18,14 @@ import android.widget.Toast;
 import com.fourhcode.forhutils.FUtilsValidation;
 import com.google.android.material.textfield.TextInputEditText;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.SendCodeModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
+import com.saaty.util.urls;
 import com.squareup.picasso.Picasso;
 
 import java.util.HashMap;
@@ -55,13 +57,14 @@ public class ChangePasswordActivity extends AppCompatActivity {
         toolbarTxt.setText(getString(R.string.change_password));
         dailogUtil = new DailogUtil();
         networkAvailable = new NetworkAvailable(getApplicationContext());
-        type=LoginTraderUserActivity.loginModel.getUserModel().get(0).getType();
+        type=HomeActivity.type;
+
 
         if(type.equals("store")){
-
+         Picasso.with(getApplicationContext()).load(urls.base_url +"/"+HomeActivity.store_logo).error(R.drawable.sidemenu_photo2).into(profileImg);
 
         }else if(type.equals("user")){
-
+         profileImg.setImageResource(R.drawable.sidemenu_photo2);
         }
     }
 
@@ -89,8 +92,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
             map.put("old_password", oldPasswordInput.getText().toString());
             ProgressDialog progressDialog = dailogUtil.showProgressDialog(ChangePasswordActivity.this, getString(R.string.logging), false);
             Call<SendCodeModel> call = apiServiceInterface.changePassword("application/json",
-                    LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken()
-                    , map);
+                    HomeActivity.access_token, map);
             call.enqueue(new Callback<SendCodeModel>() {
                 @Override
                 public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {

@@ -20,11 +20,11 @@ public class StoreProductsPagerAdaper extends FragmentPagerAdapter {
     public Fragment getItem(int position) {
       if(position==0){
           Log.v(TAG,"New Clicked");
-          return new StoreNewProductFragment();
+          return new StoreNewProductFragment("New");
 
       }else if(position==1){
           Log.v(TAG,"Old Clicked");
-          return new StoreUsedProductFragment();
+          return new StoreNewProductFragment("Used");
 
       }else {
           return null;

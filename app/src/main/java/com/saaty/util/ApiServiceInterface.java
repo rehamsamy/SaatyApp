@@ -5,12 +5,16 @@ import com.saaty.models.CategoryModel;
 import com.saaty.models.CheckWishlistModel;
 import com.saaty.models.DataObjectModel;
 import com.saaty.models.DeleteAdsModel;
+import com.saaty.models.DeleteMessageModel;
 import com.saaty.models.EditAdsModel;
 import com.saaty.models.GetProductImagesModel;
 import com.saaty.models.LoginModel;
+import com.saaty.models.MessageModel;
 import com.saaty.models.ProductDataModel;
 import com.saaty.models.RegisterModel;
+import com.saaty.models.ReplyMessageModel;
 import com.saaty.models.SendCodeModel;
+import com.saaty.models.SendMessageProductModel;
 import com.saaty.models.StoreListModel;
 import com.saaty.models.UpdateProfileModel;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
@@ -42,6 +46,11 @@ public interface ApiServiceInterface {
 
     @POST("/api/register")
     Call<RegisterModel> registerUser(@Body Map<String, Object> map);
+
+////---------------------- register store---------------------------
+    @Multipart
+    @POST("/api/register")
+    Call<RegisterModel> registerStore(@QueryMap Map<String, Object> map,@Part MultipartBody.Part part);
 
 
     @GET("/api/SendMobileResetCode/{id}")
@@ -144,7 +153,7 @@ public interface ApiServiceInterface {
             , @Header("Authorization") String auth
             , @QueryMap Map<String, Object> map
 //            , @Part MultipartBody.Part image
-            ,@PartMap Map<String,Object> map1);
+            ,@Part MultipartBody.Part part);
 
 
     /////////////////////////  get Profile //////////////
@@ -195,5 +204,53 @@ public interface ApiServiceInterface {
 
     @GET("/api/storeproduct/search")
     Call<StoreListModel> searchforStoreProduct(@QueryMap Map<String, Object> map);
+
+
+    /////----------------------------get  received message -----------------------
+    @GET("/api/messages/received")
+    Call<MessageModel> getReceivedMessage(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
+   ////----------------------get send message-----------------------------------
+    @GET("/api/messages/sent")
+    Call<MessageModel> getSendMessage(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
+    ///----------------------delete message---------------------------------
+    @DELETE("/api/messages/{id}")
+    Call<DeleteMessageModel> deleteMessage(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            ,@Path("id") int id);
+
+    //////---------------------- send reply message -----------------------
+    @POST("/api/message/reply")
+    Call<ReplyMessageModel> sendReplyMessage(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            ,@QueryMap Map<String, Object> map);
+
+
+    //-----------------------get New -Old store Product--------------
+    @GET("/api/storeproduct/search")
+    Call<StoreListModel> getNewOldStoreProduct(@QueryMap Map<String,Object> map);
+
+
+
+    @GET("/api/storeproduct/search")
+    Call<StoreListModel> getStoreProduct(@QueryMap Map<String,Object> map);
+
+
+
+    ///------------------send product message-----------------------
+    @POST("/api/messages")
+    Call<SendMessageProductModel> sendProductMessage(
+            @Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
 
 }

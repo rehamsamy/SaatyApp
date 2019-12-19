@@ -17,27 +17,38 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.RadioGroup;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
+import com.saaty.home.StoresActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
+import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
+import com.saaty.util.FilterMethods;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
 import com.saaty.util.PreferenceHelper;
@@ -61,7 +72,10 @@ public class StoresProductsActivity extends AppCompatActivity {
     @BindView(R.id.store_img_id) CircleImageView storeImgId;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.empty_data_txt_id)TextView emptyData;
-    @BindView(R.id.homeSearch_ed_id) SearchView searchView;
+    @BindView(R.id.search_ed_id) EditText searchView;
+   // @BindView(R.id.view_pager_id) ViewPager viewPager;
+   List<DataArrayModel> newList=new ArrayList<>();
+    FilterMethods filterMethods;
     int tab_selected;
     @BindView(R.id.progress_id)
     ProgressBar progressBar;
@@ -85,11 +99,12 @@ public class StoresProductsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_stores_products);
         ButterKnife.bind(this);
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         networkAvailable=new NetworkAvailable(this);
         dealingWithWishList=new DealingWithWishList(this);
         mDialog=new Dialog(this);
-
-        if(networkAvailable.isNetworkAvailable()){
+        pagerAdaper=new StoreProductsPagerAdaper(getSupportFragmentManager());
+       if(networkAvailable.isNetworkAvailable()){
             if(HomeActivity.user_id !=0){
                 getWishList();
             }
@@ -113,11 +128,16 @@ public class StoresProductsActivity extends AppCompatActivity {
                     .error(R.drawable.store1).into(storeImgId);
         }
        if(networkAvailable.isNetworkAvailable()){
-           tabLayout.addTab(tabLayout.newTab().setText("         New       "),0);
+           String newProd=getString(R.string.new_products);
+           tabLayout.addTab(tabLayout.newTab().setText("      "+newProd+"     "),0);
            newProducts.clear();
            emptyData.setVisibility(View.GONE);
+
+           shape_type="New";
+           buildRecyclerViewForCategory();
            getStoreProducts(current_page,"New");
-           tabLayout.addTab(tabLayout.newTab().setText("          Used      "),1);
+           progressBar.setVisibility(View.GONE);
+           tabLayout.addTab(tabLayout.newTab().setText("        "+getString(R.string.old_products)+"        "),1);
 
        }else {
            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
@@ -130,8 +150,7 @@ public class StoresProductsActivity extends AppCompatActivity {
                if(tab.getPosition()==0){
                    shape_type="New";
                    Log.v(TAG,"shape selected"+tab.getPosition());
-                  // buildRecyclerViewForCategory();
-                 //  getStoreProducts(current_page,shape_type);
+
                }else if(tab.getPosition()==1){
                    shape_type="Used";
                    Log.v(TAG,"shape selected"+tab.getPosition());
@@ -139,9 +158,10 @@ public class StoresProductsActivity extends AppCompatActivity {
                //buildRecyclerViewForCategory();
                if(networkAvailable.isNetworkAvailable()) {
                    emptyData.setVisibility(View.GONE);
-                   newProducts.clear();
+                   storeProductsList.clear();
                    current_page=1;
-                   getStoreProducts(current_page, shape_type);
+                   buildRecyclerViewForCategory();
+                   getStoreProducts(current_page,shape_type);
                }else {
                    Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
                }
@@ -160,18 +180,49 @@ public class StoresProductsActivity extends AppCompatActivity {
 
 
 
+        searchView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newText = s.toString();
+                Log.v("TAG", "sssssssssss" + newProducts.size() + s.toString().toLowerCase());
+                ArrayList<DataArrayModel> newlist = new ArrayList<>();
+
+                for (DataArrayModel item : newProducts) {
+                    Log.v("TAG", "ar name" + item.getArName().contains(newText));
+                    if (item.getArName().contains(newText)) {
+                        newlist.add(item);
+                    }
+                }
+                newProducts.clear();
+                if(newlist.size()>0) {
+                    for (int i = 0; i < newlist.size(); i++) {
+                        newProducts.add(newlist.get(i));
+                        adapter.notifyDataSetChanged();
+
+                    }
+                }else {
+                    emptyData.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        });
+
+
+
 
     }
 
-    @OnClick(R.id.nav_filter_id)
-    void navFilterClick(){
-        mDialog.setCancelable(true);
-        mDialog.setContentView(R.layout.filter_sort_dialog_layout);
-        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
-        mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-        mDialog.show();
-
-    }
 
 
 
@@ -182,64 +233,30 @@ public class StoresProductsActivity extends AppCompatActivity {
             Map<String,Object> map=new HashMap<>();
             map.put("page",current_pag);
             map.put("limit",10);
+            map.put("product_shape",shape_type);
+            map.put("store_id",id);
             Log.v(TAG,"posss"+id);
-            Call<StoreListModel> call=apiServiceInterface.gerStoreProducts(id,map);
+            Call<StoreListModel> call=apiServiceInterface.getNewOldStoreProduct(map);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
-                    if(response.body().isSuccess()){
-                        storeProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
-                         //adapter.notifyDataSetChanged();
-                         products=response.body().getDataObjectModel().getDataArrayModelList();
+                    if (response.body().isSuccess()) {
+                        if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
+                            storeProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                            adapter.notifyDataSetChanged();
+                            progressBar.setVisibility(View.GONE);
+                        }else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_pag==1){
+                            progressBar.setVisibility(View.GONE);
+                            emptyData.setVisibility(View.VISIBLE);
+                        }
 
-                         if(products.size()>0) {
-                             Log.v(TAG, "all product" + storeProductsList.size());
-
-                             Log.v(TAG, "oooooooo " + storeProductsList.size());
-                             for (int i = 0; i < products.size(); i++) {
-                                 if (products.get(i).getShape().equals("New")&&shape_type.equals("New")) {
-                                     newProducts.add(storeProductsList.get(i));
-                                     Log.v(TAG, "new list " + newProducts.size());
-                                 } else if (products.get(i).getShape().equals("Used")&&shape_type.equals("Used")) {
-                                     newProducts.add(storeProductsList.get(i));
-                                     Log.v(TAG, "old list " + newProducts.size());
-                                 }else {
-                                     emptyData.setVisibility(View.VISIBLE);
-                                 }
-                             }
-
-                             GridLayoutManager layoutManager = new GridLayoutManager(StoresProductsActivity.this, 2);
-                             recyclerView.setHasFixedSize(true);
-                             recyclerView.setLayoutManager(layoutManager);
-                             adapter = new StoreProductAdapter(StoresProductsActivity.this, newProducts);
-                             if(ids.size()>0){
-                             adapter.setIds(ids);
-                             }
-                             recyclerView.setAdapter(adapter);
-                             buildOnClickListener();
-
-                             recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
-                                 @Override
-                                 public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                                     current_page++;
-                                     getStoreProducts(current_page, shape_type);
-                                 }
-                             });
-                             progressBar.setVisibility(View.GONE);
-
-                             Log.v(TAG, "dddddddddd" + storeProductsList.size());
-                             Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                         } else {
-                             emptyData.setVisibility(View.VISIBLE);
-                             progressBar.setVisibility(View.GONE);
-
-                         }
-                    }else {
+                    } else {
                         Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
+                        emptyData.setVisibility(View.VISIBLE);
                     }
-                }
 
+                }
                 @Override
                 public void onFailure(Call<StoreListModel> call, Throwable t) {
                     Toast.makeText(StoresProductsActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
@@ -258,7 +275,7 @@ public class StoresProductsActivity extends AppCompatActivity {
         GridLayoutManager layoutManager=new GridLayoutManager(StoresProductsActivity.this,2);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
-        adapter =new StoreProductAdapter(StoresProductsActivity.this,newProducts);
+        adapter =new StoreProductAdapter(StoresProductsActivity.this,storeProductsList);
         recyclerView.setAdapter(adapter);
         buildOnClickListener();
 
@@ -267,7 +284,8 @@ public class StoresProductsActivity extends AppCompatActivity {
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                // if(tab_selected==0){
                     current_page++;
-                    searchStoreProduct(current_page,shape_type);
+                    getStoreProducts(current_page,shape_type);
+                    //searchStoreProduct(current_page,shape_type);
                // }
                  }
         });
@@ -297,7 +315,7 @@ public class StoresProductsActivity extends AppCompatActivity {
             apiServiceInterface= ApiClient.getClientService();
             progressBar.setVisibility(View.VISIBLE);
             Map<String,Object> map=new HashMap<>();
-            String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+            String token=  HomeActivity.access_token;
 //            map.put("page",currentPage);
             map.put("page",1);
             map.put("limit",100);
@@ -340,58 +358,67 @@ public class StoresProductsActivity extends AppCompatActivity {
         }
     }
 
-    private void searchStoreProduct(int current_page,String shape_type){
-        if(networkAvailable.isNetworkAvailable()){
-            apiServiceInterface= ApiClient.getClientService();
-            progressBar.setVisibility(View.VISIBLE);
-            Map<String,Object> map=new HashMap<>();
-            map.put("product_name",searchView.getQuery().toString());
-            map.put("product_shape",shape_type);
-            map.put("store_id",id);
-            map.put("page",current_page);
-            map.put("limit",10);
-            Call<StoreListModel> call=apiServiceInterface.searchforStoreProduct(map);
-            call.enqueue(new Callback<StoreListModel>() {
-                @Override
-                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
-                    if(response.body().isSuccess()){
-                        if(response.body().isSuccess()) {
-                            newProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
 
-                            if(wishlistProducts.size()>0) {
-                                adapter.notifyDataSetChanged();
-                            }
-                        }else if(wishlistProducts.size()==0) {
-                            recyclerView.setVisibility(View.GONE);
-                            progressBar.setVisibility(View.GONE);
-                            // }
-                        }
 
-                    }
-                    else {
-                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        progressBar.setVisibility(View.GONE);
-                    }
+    @OnClick(R.id.nav_filter_id)
+    void filterClick(){
+        mDialog=new Dialog(StoresProductsActivity.this);
+        mDialog.setCancelable(true);
+        mDialog.setContentView(R.layout.filter_sort_dialog_layout);
+        CheckBox newProduct,oldProduct;
+        newProduct = mDialog.findViewById(R.id.new_product_check_box);
+        oldProduct = mDialog.findViewById(R.id.old_product_product_check_box);
+        Button done = mDialog.findViewById(R.id.login_visitor_btn_id);
+        RadioGroup group = mDialog.findViewById(R.id.radio_group);
+        filterMethods=new FilterMethods(getApplicationContext(),storeProductsList);
+        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
+        mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        mDialog.show();
+        done.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                int checked_id=group.getCheckedRadioButtonId();
+                Log.v("TAG","category filter"+storeProductsList.size());
+
+                if(checked_id == R.id.from_high_radio_btn_id && !newProduct.isChecked()&&!oldProduct.isChecked()){
+                    newList=filterMethods.getHighPrice(storeProductsList);
                 }
-
-                @Override
-                public void onFailure(Call<StoreListModel> call, Throwable t) {
-                    progressBar.setVisibility(View.GONE);
+                else  if (checked_id == R.id.from_high_radio_btn_id && newProduct.isChecked()&&!oldProduct.isChecked()) {
+                    List<DataArrayModel> x1 = filterMethods.getHighNewProducts(storeProductsList);
+                    newList=filterMethods.getHighPrice(x1);
+                }else if(checked_id == R.id.from_high_radio_btn_id && oldProduct.isChecked()&&!newProduct.isChecked()){
+                    List<DataArrayModel> x=filterMethods.getHighUsedProducts(storeProductsList);
+                    newList=filterMethods.getHighUsedProducts(x);
+                }else if(checked_id==R.id.from_low_radio_btn_id&&!newProduct.isChecked()&&!oldProduct.isChecked()){
+                    newList=filterMethods.getLowPice(storeProductsList);
+                }else if(checked_id==R.id.from_low_radio_btn_id&&newProduct.isChecked()&&!oldProduct.isChecked()){
+                    List<DataArrayModel>x=filterMethods.getHighNewProducts(storeProductsList);
+                    newList=filterMethods.getLowPice(x);
+                }else if(checked_id==R.id.from_low_radio_btn_id&&!newProduct.isChecked()&&oldProduct.isChecked()){
+                    List<DataArrayModel>x=filterMethods.getHighUsedProducts(storeProductsList);
+                    newList=filterMethods.getLowPice(x);
+                }else if(checked_id==R.id.from_low_radio_btn_id&&newProduct.isChecked()&&oldProduct.isChecked()){
+                    newList=filterMethods.getLowPice(storeProductsList);
+                } else if(checked_id==R.id.from_high_radio_btn_id&&newProduct.isChecked()&&oldProduct.isChecked()){
+                    newList=filterMethods.getHighPrice(storeProductsList);
+                }else {
+                    emptyData.setVisibility(View.VISIBLE);
+                    adapter.notifyDataSetChanged();
                 }
-            });
+                if(newList.size()>0) {
+                    storeProductsList = newList;
+                    GridLayoutManager layoutManager=new GridLayoutManager(StoresProductsActivity.this,2);
+                    adapter =new StoreProductAdapter(StoresProductsActivity.this,storeProductsList);
+                    recyclerView.setHasFixedSize(true);
+                    recyclerView.setLayoutManager(layoutManager);
+                    recyclerView.setAdapter(adapter);
+                   // buildOnClickListener();
+                }
+                mDialog.dismiss();
+            }
+        });
 
-        }else {
-            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
-            progressBar.setVisibility(View.GONE);
-        }
+
     }
-
-    @OnClick(R.id.homeSearch_ed_id)
-    void seachClick(){
-        buildRecyclerViewForCategory();
-        searchStoreProduct(current_page,shape_type);
-    }
-
 
 }
-

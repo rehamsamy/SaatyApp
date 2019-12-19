@@ -1,6 +1,7 @@
 package com.saaty.productDetails;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -19,8 +20,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Parcelable;
 import android.text.Layout;
 import android.util.Log;
 import android.view.View;
@@ -49,6 +52,7 @@ import com.saaty.home.HomeActivity;
 import com.saaty.home.StoresActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.CheckWishlistModel;
+import com.saaty.models.Data;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.DeleteAdsModel;
 import com.saaty.models.GetProductImagesModel;
@@ -56,7 +60,9 @@ import com.saaty.models.ProductDataItem;
 import com.saaty.models.ProductimagesItem;
 import com.saaty.models.SendCodeModel;
 import com.saaty.sideMenuScreen.EditProfileActivity;
+import com.saaty.sideMenuScreen.messages.SendMessageActivity;
 import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
+import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
@@ -71,9 +77,14 @@ import com.tbuonomo.viewpagerdotsindicator.SpringDotsIndicator;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -85,6 +96,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     public static final String WISHLIST_PRODUCTS_DETAILS = "wishlist_product_details";
     public static final String ADS_PRODUCTS_DETAILS = "ads_product_details";
     private static final String TAG = ProductDetailsActivity.class.getSimpleName();
+    DealingWithWishList dealingWithWishList;
     @BindView(R.id.recycler_view_id)
     RecyclerView recyclerView;
     @BindView(R.id.product_imgaes_layout)
@@ -119,10 +131,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     TextView toolbarTxt;
     @BindView(R.id.empty_data_txt_id)
     TextView emptyDataTxt;
-    @BindView(R.id.progress_id)
-    ProgressBar progressBar;
-    @BindView(R.id.wish_list_img)
-    ImageView wishlistImg;
+    @BindView(R.id.progress_id) ProgressBar progressBar;
+    @BindView(R.id.wish_list_img) ImageView wishlistImg;
     ApiServiceInterface apiServiceInterface;
     int selected_product_id;
     Intent intent;
@@ -140,6 +150,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     Dialog mDailog;
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -151,6 +162,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         mDailog = new Dialog(this);
         networkAvailable = new NetworkAvailable(this);
         toolbarHomeImg.setVisibility(GONE);
+        dealingWithWishList=new DealingWithWishList(this);
 
 
         intent = getIntent();
@@ -201,6 +213,24 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         }
 
 
+
+        if(HomeActivity.user_id!=0){
+            sendMsgImg.setImageResource(R.drawable.send_message);
+            sendMsgImg.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent intent=new Intent(getApplicationContext(), com.saaty.sideMenuScreen.messages.SendMessageActivity.class);
+                    intent.putExtra("product_id",dataArrayModel.getProductId());
+                    startActivity(intent);
+                }
+            });
+        }else {
+            sendMsgImg.setEnabled(false);
+        }
+
+
+
+
     }
 
 
@@ -208,7 +238,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         apiServiceInterface = ApiClient.getClientService();
         Call<SendCodeModel> call = apiServiceInterface.deleteItemFromWishlist(selected_product_id
                 , "application/json"
-                , LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken());
+                ,  HomeActivity.access_token);
         Log.v(TAG, "product selected  " + selected_product_id);
         call.enqueue(new Callback<SendCodeModel>() {
             @Override
@@ -257,12 +287,23 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromWishlist() {
         dataArrayModel = intent.getParcelableExtra(WISHLIST_PRODUCTS_DETAILS);
         toolbarHomeImg.setVisibility(VISIBLE);
         toolbarHomeImg.setImageResource(R.drawable.nav_delete);
         getProductDetailsFromDataArrayModel(dataArrayModel);
         sendMsgImg.setImageResource(R.drawable.send_message);
+
+        sendMsgImg.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(getApplicationContext(), SendMessageActivity.class);
+                intent.putExtra("product_id",dataArrayModel.getProductId());
+                startActivity(intent);
+            }
+        });
+
 //        selected_product_id = dataArrayModel.getProductId();
 //        if (PreferenceHelper.getValue(this).equals("en")) {
 //            productDescTxt.setText(dataArrayModel.getEnDescription());
@@ -313,6 +354,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromCategoryStores() {
         dataArrayModel = intent.getParcelableExtra(CATEGORY_PRODUCTS_DETAILS);
         getProductDetailsFromDataArrayModel(dataArrayModel);
@@ -361,7 +403,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     void checkProductInWishlist(int selected_product_id) {
         apiServiceInterface = ApiClient.getClientService();
-        Call<CheckWishlistModel> call = apiServiceInterface.checkWishlistProduct(selected_product_id, "application/json", LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken());
+        Call<CheckWishlistModel> call = apiServiceInterface.checkWishlistProduct(selected_product_id, "application/json",  HomeActivity.access_token);
         call.enqueue(new Callback<CheckWishlistModel>() {
             @Override
             public void onResponse(Call<CheckWishlistModel> call, Response<CheckWishlistModel> response) {
@@ -383,6 +425,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         });
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromAdsProducts() {
         dataArrayModel = intent.getParcelableExtra(ADS_PRODUCTS_DETAILS);
         getProductDetailsFromDataArrayModel(dataArrayModel);
@@ -401,8 +444,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(ProductDetailsActivity.this, EditAdsActivity.class);
-                intent.setAction(EditAdsActivity.EDIT_ADS_PRODUCT);
-                intent.putExtra(ProductDetailsActivity.ADS_PRODUCTS_DETAILS,dataArrayModel);
+                intent.putExtra(EditAdsActivity.EDIT_ADS_PRODUCT,dataArrayModel);
+                //intent.putExtra("images", (Parcelable) productimagesItems);
                 startActivity(intent);
             }
         });
@@ -447,7 +490,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         bar.setVisibility(VISIBLE);
         Call<DeleteAdsModel> call = apiServiceInterface.deleteAdsProduct(productId
                 , "application/json"
-                , LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken());
+                ,  HomeActivity.access_token);
         Log.v("TAG", "product selected  " + productId);
 
         call.enqueue(new Callback<DeleteAdsModel>() {
@@ -510,6 +553,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromDataArrayModel(DataArrayModel dataArrayModel) {
         if (PreferenceHelper.getValue(this).equals("ar")) {
             toolbarTxt.setText(dataArrayModel.getArName());
@@ -527,6 +571,33 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         companyEmailTxt.setText(dataArrayModel.getContactEmail());
         producerNameTxt.setText(dataArrayModel.getContactName());
 
+        String x=dataArrayModel.getUpdatedAt();
+        x.substring(10);
+       productTimeTxt.setText(x);
+
     }
+
+
+    @OnClick(R.id.wish_list_img)
+    void setWishlistClick(){
+      if(wishlistImg.getDrawable().getConstantState()==getResources().getDrawable(R.drawable.wishlist_select).getConstantState()){
+          Log.v("TAG","accccccc");
+          deleteFormWishList();
+          wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+      }else if(wishlistImg.getDrawable().getConstantState()==getResources().getDrawable(R.drawable.wishlist_not_select).getConstantState()){
+          Log.v("TAG","rejjjjj");
+         addToWishList();
+          wishlistImg.setImageResource(R.drawable.wishlist_select);
+      }
+    }
+
+    private void deleteFormWishList() {
+        dealingWithWishList.deleteWishList(dataArrayModel,progressBar,wishlistImg);
+    }
+
+    private void addToWishList() {
+        dealingWithWishList.addToWishList(dataArrayModel,progressBar,wishlistImg);
+    }
+
 }
 

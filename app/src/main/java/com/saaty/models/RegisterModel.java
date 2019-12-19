@@ -14,12 +14,6 @@ public class RegisterModel{
 	@SerializedName("message")
 	private String message;
 
-	@SerializedName("user_data")
-	private UserDataRegisterObject userDataRegisterObject;
-
-	public UserDataRegisterObject getUserDataRegisterObject() {
-		return userDataRegisterObject;
-	}
 
 	public void setData(Data data){
 		this.data = data;

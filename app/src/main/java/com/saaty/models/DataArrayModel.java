@@ -7,6 +7,10 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.List;
 
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+
 
 public class DataArrayModel implements Parcelable {
 
@@ -80,11 +84,79 @@ public class DataArrayModel implements Parcelable {
 	private String contactMobile;
 
 
+	@PrimaryKey(autoGenerate = true)
+	private  int idd;
+
+//	public DataArrayModel(int idd) {
+//		this.productId=productId;
+//		this.idd = idd;
+//	}
+
+
+
+	public int getIdd() {
+		return idd;
+	}
+
+	public void setIdd(int idd) {
+		this.idd = idd;
+	}
+
+
+
 	public void setProductimages(List<ProductimagesItem> productimages) {
 		this.productimages = productimages;
 	}
 
-	protected DataArrayModel(Parcel in) {
+	public void setContactName(String contactName) {
+		this.contactName = contactName;
+	}
+
+	public void setShape(String shape) {
+		this.shape = shape;
+	}
+
+	public void setEnDescription(String enDescription) {
+		this.enDescription = enDescription;
+	}
+
+	public void setArName(String arName) {
+		this.arName = arName;
+	}
+
+	public void setArDescription(String arDescription) {
+		this.arDescription = arDescription;
+	}
+
+	public void setContactEmail(String contactEmail) {
+		this.contactEmail = contactEmail;
+	}
+
+	public void setContactType(String contactType) {
+		this.contactType = contactType;
+	}
+
+	public void setCategoryId(int categoryId) {
+		this.categoryId = categoryId;
+	}
+
+	public void setPrice(int price) {
+		this.price = price;
+	}
+
+	public void setProductId(int productId) {
+		this.productId = productId;
+	}
+
+	public void setEnName(String enName) {
+		this.enName = enName;
+	}
+
+	public void setContactMobile(String contactMobile) {
+		this.contactMobile = contactMobile;
+	}
+
+	public DataArrayModel(Parcel in) {
 		storeId = in.readInt();
 		storeArName = in.readString();
 		storeEnDescription = in.readString();

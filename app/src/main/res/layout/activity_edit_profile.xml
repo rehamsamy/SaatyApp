@@ -131,7 +131,7 @@
         app:layout_constraintTop_toBottomOf="@id/email_input_id"
         android:layout_marginTop="20dp"
         android:hint="@string/store_desc"
-        android:inputType="number"
+        android:inputType="text"
         android:drawableStart="@drawable/message_body"
         android:drawablePadding="15dp"
         android:visibility="gone"/>

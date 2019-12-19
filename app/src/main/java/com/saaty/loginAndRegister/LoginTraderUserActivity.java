@@ -15,14 +15,17 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fourhcode.forhutils.FUtilsValidation;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.models.LoginModel;
+import com.saaty.models.UserDataRegisterObject;
 import com.saaty.models.UserModel;
 import com.saaty.password.ForgetPasswordActivity;
 import com.saaty.util.ApiClient;
@@ -36,6 +39,7 @@ import java.util.Map;
 public class LoginTraderUserActivity extends AppCompatActivity {
 
     private static final String TAG =LoginTraderUserActivity.class.getSimpleName() ;
+    public static final String MY_PREFS_NAME ="my_data" ;
     @BindView(R.id.email_input_id) TextInputEditText emailInput;
     @BindView(R.id.password_input_id)TextInputEditText passwordInput;
     @BindView(R.id.save_login_info_id) CheckBox  saveInfoCheckBox;
@@ -45,8 +49,8 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     DailogUtil dailogUtil;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor editor;
-    public static UserModel userModel;
-    public static  LoginModel loginModel;
+    UserModel userModel;
+    LoginModel loginModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +60,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
         networkAvailable=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
 
-            sharedPreferences=getSharedPreferences("MY_DATA",MODE_PRIVATE);
+            sharedPreferences=getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
             passwordInput.setText(sharedPreferences.getString("password",""));
             emailInput.setText(sharedPreferences.getString("email",""));
 
@@ -74,7 +78,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     @OnClick(R.id.login_visitor_btn_id)
     void loginVistor(){
         Intent intent=new Intent(getApplicationContext(), HomeActivity.class);
-        intent.setAction("login_visitor");
+        intent.putExtra("login_visitor","visitor");
         startActivity(intent);
     }
 
@@ -107,19 +111,46 @@ public class LoginTraderUserActivity extends AppCompatActivity {
                 call.enqueue(new Callback<LoginModel>() {
                     @Override
                     public void onResponse(Call<LoginModel> call, Response<LoginModel> response) {
-                        if(response.body().getTokenType().equals("Bearer")){
-                            Log.v(TAG,"login sucess1");
-                            userModel=response.body().getUserModel().get(0);
-                            loginModel=response.body();
-                            Intent intent=new Intent(getApplicationContext(),HomeActivity.class);
-                            intent.putExtra("user_model",userModel);
-                            startActivity(intent);
+                        if(response.code()==200) {
+                            if (response.body().isSucess()) {
+                                Log.v(TAG, "login sucess1");
+                                userModel = response.body().getUserModel().get(0);
+                                loginModel = response.body();
+                                userModel.setEmail(userModel.getEmail());
+                                userModel.setMobile(userModel.getMobile());
+                                userModel.setFullname(userModel.getFullname());
+                                userModel.setType(userModel.getType());
+                                userModel.setUserId(userModel.getUserId());
+                                userModel.setStoreArName(userModel.getStoreArName());
+                                userModel.setStoreArDescription(userModel.getStoreArDescription());
+                                userModel.setStoreLogo(userModel.getStoreLogo());
+                                userModel.setStoreId(userModel.getStoreId());
+
+                                loginModel.setUserModel(response.body().getUserModel());
+                                loginModel.setAccessToken(response.body().getAccessToken());
+                                loginModel.setTokenType(response.body().getTokenType());
+
+
+
+                                Gson gson = new Gson();
+                                String user_data = gson.toJson(loginModel);
+                                editor = getSharedPreferences(MY_PREFS_NAME, MODE_PRIVATE).edit();
+                                editor.putString("user_data", user_data);
+                                editor.commit();
+
+                                Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
+                                intent.putExtra("user_model", loginModel);
+                                startActivity(intent);
+                                Toast.makeText(LoginTraderUserActivity.this, "loging sucess", Toast.LENGTH_LONG).show();
+                                progressDialog.dismiss();
+                            } else {
+                                Log.v(TAG, "login sucess2");
+                                Toast.makeText(LoginTraderUserActivity.this, response.body().getErrorDescription().toString(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                            }
+                        }else if(response.code()==401){
+                            Toast.makeText(LoginTraderUserActivity.this,"The user credentials were incorrect.", Toast.LENGTH_LONG).show();
                             progressDialog.dismiss();
-                        }
-                        else {
-                            Log.v(TAG,"login sucess2");
-                            Toast.makeText(LoginTraderUserActivity.this, response.body().getErrorDescription().toString(), Toast.LENGTH_SHORT).show();
-                        progressDialog.dismiss();
                         }
                     }
 
@@ -146,6 +177,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
             editor = sharedPreferences.edit();
             editor.putString("password", passwordInput.getText().toString());
             editor.putString("email", emailInput.getText().toString());
+            editor.putInt("used_id",userModel.getId());
             editor.commit();
             editor.apply();
 
@@ -157,4 +189,6 @@ public class LoginTraderUserActivity extends AppCompatActivity {
             editor.apply();
         }
     }
+
+
 }

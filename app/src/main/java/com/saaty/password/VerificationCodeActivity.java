@@ -70,17 +70,22 @@ public class VerificationCodeActivity extends AppCompatActivity {
                 call.enqueue(new Callback<SendCodeModel>() {
                     @Override
                     public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
-                        if(response.body().isSuccess()){
-                            Toast.makeText(VerificationCodeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                            Intent intent=new Intent(getApplicationContext(),ResetPasswordActivity.class);
-                            intent.putExtra("phone",phoneNumber);
-                            intent.putExtra("token",verifyCodeInputId.getText().toString());
-                            startActivity(intent);
-                            progressDialog.dismiss();
+                        if (response.code() == 200) {
+                            if (response.body().isSuccess()) {
+                                Toast.makeText(VerificationCodeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                Intent intent = new Intent(getApplicationContext(), ResetPasswordActivity.class);
+                                intent.putExtra("phone", phoneNumber);
+                                intent.putExtra("token", verifyCodeInputId.getText().toString());
+                                startActivity(intent);
+                                progressDialog.dismiss();
 
-                        }else {
-                            Toast.makeText(VerificationCodeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
-                            progressDialog.dismiss();
+                            } else {
+                                Toast.makeText(VerificationCodeActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                                progressDialog.dismiss();
+                            }
+                        }else if(response.code()==404){
+                            Toast.makeText(VerificationCodeActivity.this, "this code is invalid", Toast.LENGTH_LONG).show();
+
                         }
                     }
 

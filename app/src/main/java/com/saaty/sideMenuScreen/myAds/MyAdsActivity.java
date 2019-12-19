@@ -16,17 +16,22 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.button.MaterialButton;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.home.StoresProduct.StoreProductAdapter;
 import com.saaty.home.StoresProduct.StoresProductsActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
@@ -42,6 +47,7 @@ import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
+import com.saaty.util.FilterMethods;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
@@ -59,6 +65,9 @@ public class MyAdsActivity extends AppCompatActivity  {
     @BindView(R.id.empty_data_txt_id)
     TextView emptyData;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;
+    @BindView(R.id.nav_filter_id)ImageView navFilterImg;
+    @BindView(R.id.search_ed_id) EditText searchEditTxt;
+    List<DataArrayModel> newSortedList;
     Dialog mDialog;
     List<DataArrayModel> adsProducts;
     WishlistAdapter wishlistAdapter;
@@ -66,7 +75,10 @@ public class MyAdsActivity extends AppCompatActivity  {
     NetworkAvailable networkAvailable;
     DealingWithWishList dealingWithWishList;
     int selected_product_id;
+    FilterMethods filterMethods;
     int current_page=1;
+    String shape_type;
+    List<DataArrayModel> searchList=new ArrayList<>();
     int checkMsg;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,13 +91,50 @@ public class MyAdsActivity extends AppCompatActivity  {
         dealingWithWishList=new DealingWithWishList(getApplicationContext());
         adsProducts=new ArrayList<>();
         adsProducts.clear();
-       // buildRecyclerViewForCategory();
-        getAdsroductList(1);
+        buildRecyclerViewForCategory();
+        getAdsroductList(current_page);
+
+
+        searchEditTxt.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newText = s.toString();
+                Log.v("TAG", "sssssssssss" + adsProducts.size() + s.toString().toLowerCase());
+                ArrayList<DataArrayModel> newlist = new ArrayList<>();
+
+                for (DataArrayModel item : adsProducts) {
+                    Log.v("TAG", "ar name" + item.getArName().contains(newText));
+                    if (item.getArName().contains(newText)) {
+                        newlist.add(item);
+                    }
+                }
+                adsProducts.clear();
+                if(newlist.size()>0) {
+                    for (int i = 0; i < newlist.size(); i++) {
+                        adsProducts.add(newlist.get(i));
+                        wishlistAdapter.notifyDataSetChanged();
+
+                    }
+                }else {
+                    emptyData.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        });
+
+
+
     }
-
-
-
-
 
 
     @OnClick(R.id.nav_filter_id)
@@ -98,6 +147,7 @@ public class MyAdsActivity extends AppCompatActivity  {
         newProducts=mDialog.findViewById(R.id.new_product_check_box);
         oldproducts=mDialog.findViewById(R.id.new_product_check_box);
         ConstraintLayout root=mDialog.findViewById(R.id.status_layout);
+        MaterialButton done=mDialog.findViewById(R.id.login_visitor_btn_id);
         watch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -115,11 +165,65 @@ public class MyAdsActivity extends AppCompatActivity  {
             }
         });
 
+        filterMethods=new FilterMethods(getApplicationContext(),adsProducts);
+
         mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT,ViewGroup.LayoutParams.WRAP_CONTENT);
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.show();
 
+     done.setOnClickListener(new View.OnClickListener() {
+         @Override
+         public void onClick(View v) {
+             List<DataArrayModel> newList;
+             if(watch.isChecked()==true&&bracletes.isChecked()==false&&oldproducts.isChecked()==false&&newProducts.isChecked()){
+                 List<DataArrayModel> watchProducts=filterMethods.getWatchesCategory(adsProducts);
+                 adsProducts.addAll(watchProducts);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(bracletes.isChecked()==true){
+                 List<DataArrayModel> bracletsProducts=filterMethods.getBracletCategory(adsProducts);
+                 adsProducts.addAll(bracletsProducts);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(newProducts.isChecked()==true){
+                 List<DataArrayModel> newProducts=filterMethods.getHighNewProducts(adsProducts);
+                 adsProducts.addAll(newProducts);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(oldproducts.isChecked()==true){
+                 List<DataArrayModel> bracletsProducts=filterMethods.getHighUsedProducts(adsProducts);
+                 adsProducts.addAll(bracletsProducts);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(watch.isChecked()==true&&newProducts.isChecked()==true){
+                 List<DataArrayModel> watchesCategory=filterMethods.getWatchesCategory(adsProducts);
+                 List<DataArrayModel> watchNew=filterMethods.getHighNewProducts(watchesCategory);
+                 adsProducts.addAll(watchNew);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(watch.isChecked()==true&&oldproducts.isChecked()==true){
+                 List<DataArrayModel> watchesCategory=filterMethods.getWatchesCategory(adsProducts);
+                 List<DataArrayModel> watchUsed=filterMethods.getHighUsedProducts(watchesCategory);
+                 adsProducts.addAll(watchUsed);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(bracletes.isChecked()==true&&newProducts.isChecked()==true){
+                 List<DataArrayModel> bracletesCategory=filterMethods.getBracletCategory(adsProducts);
+                 List<DataArrayModel> bracletesNew=filterMethods.getHighNewProducts(bracletesCategory);
+                 adsProducts.addAll(bracletesNew);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else if(bracletes.isChecked()==true&&oldproducts.isChecked()==true){
+                 List<DataArrayModel> bracletesCategory=filterMethods.getBracletCategory(adsProducts);
+                 List<DataArrayModel> bracletesUsed=filterMethods.getHighUsedProducts(bracletesCategory);
+                 adsProducts.addAll(bracletesUsed);
+                 wishlistAdapter.notifyDataSetChanged();
+             }else{
+                emptyData.setVisibility(View.VISIBLE);
+             }
+
+         mDialog.dismiss();
+         }
+     });
+
+
+
     }
+
+
 
 
 
@@ -128,9 +232,9 @@ public class MyAdsActivity extends AppCompatActivity  {
             apiServiceInterface= ApiClient.getClientService();
             progressBar.setVisibility(View.VISIBLE);
             Map<String,Object> map=new HashMap<>();
-            String token= LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken();
+            String token=  HomeActivity.access_token;
             map.put("page",current_page);
-            map.put("limit",100);
+            map.put("limit",10);
             Call<StoreListModel> call=apiServiceInterface.getAdsProducts("application/json",token,map);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
@@ -138,26 +242,27 @@ public class MyAdsActivity extends AppCompatActivity  {
                     if (response.code() == 200) {
                         if (response.body().isSuccess()) {
                             if (response.body().getDataObjectModel().getDataArrayModelList().size() > 0) {
-                               // adsProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
-                                //wishlistAdapter.notifyDataSetChanged();
-                               adsProducts=response.body().getDataObjectModel().getDataArrayModelList();
+
+                                adsProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                                wishlistAdapter.notifyDataSetChanged();
+                              // adsProducts=response.body().getDataObjectModel().getDataArrayModelList();
                                 Toast.makeText(MyAdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                                if (adsProducts.size() > 0) {
-                                    GridLayoutManager layoutManager=new GridLayoutManager(MyAdsActivity.this,2);
-                                    recyclerView.setHasFixedSize(true);
-                                    recyclerView.setLayoutManager(layoutManager);
-                                    wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,adsProducts);
-                                    recyclerView.setAdapter(wishlistAdapter);
-                                    for(int i=0;i<adsProducts.size();i++){
-                                        selected_product_id=adsProducts.get(i).getProductId();
-                                        checkProductInWishlist(selected_product_id);
-                                    }
-
-
-                                    buildOnClickListener();
+//                                if (adsProducts.size() > 0) {
+//                                    GridLayoutManager layoutManager=new GridLayoutManager(MyAdsActivity.this,2);
+//                                    recyclerView.setHasFixedSize(true);
+//                                    recyclerView.setLayoutManager(layoutManager);
+//                                    wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,adsProducts);
+//                                    recyclerView.setAdapter(wishlistAdapter);
+//                                    for(int i=0;i<adsProducts.size();i++){
+//                                        selected_product_id=adsProducts.get(i).getProductId();
+//                                        checkProductInWishlist(selected_product_id);
+//                                    }
+//
+//
+//                                    buildOnClickListener();
                                     progressBar.setVisibility(View.GONE);
                                     
-                                }
+
                             } else {
                                 recyclerView.setVisibility(View.GONE);
                                 emptyData.setVisibility(View.VISIBLE);
@@ -191,10 +296,10 @@ public class MyAdsActivity extends AppCompatActivity  {
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(layoutManager);
         wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,adsProducts);
-        for(int i=0;i<adsProducts.size();i++){
-            selected_product_id=adsProducts.get(i).getProductId();
-            checkProductInWishlist(selected_product_id);
-        }
+//        for(int i=0;i<adsProducts.size();i++){
+//            selected_product_id=adsProducts.get(i).getProductId();
+//            checkProductInWishlist(selected_product_id);
+//        }
 
         recyclerView.setAdapter(wishlistAdapter);
 
@@ -233,7 +338,7 @@ public class MyAdsActivity extends AppCompatActivity  {
     void checkProductInWishlist(int selected_product_idd){
         apiServiceInterface=ApiClient.getClientService();
        
-        Call<CheckWishlistModel> call=apiServiceInterface.checkWishlistProduct(selected_product_idd,"application/json", LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken());
+        Call<CheckWishlistModel> call=apiServiceInterface.checkWishlistProduct(selected_product_idd,"application/json",  HomeActivity.access_token);
         call.enqueue(new Callback<CheckWishlistModel>() {
             @Override
             public void onResponse(Call<CheckWishlistModel> call, Response<CheckWishlistModel> response) {
@@ -258,5 +363,54 @@ public class MyAdsActivity extends AppCompatActivity  {
             }
         });
     }
+    private void searchStoreProduct(int current_page,String shape_type){
+        if(networkAvailable.isNetworkAvailable()){
+            apiServiceInterface= ApiClient.getClientService();
+            progressBar.setVisibility(View.VISIBLE);
+            Map<String,Object> map=new HashMap<>();
+            map.put("product_shape",shape_type);
+            map.put("page",current_page);
+            map.put("limit",10);
+            Call<StoreListModel> call=apiServiceInterface.searchforStoreProduct(map);
+            call.enqueue(new Callback<StoreListModel>() {
+                @Override
+                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
+                        if(response.body().isSuccess()) {
+                            searchList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+
+                            if(searchList.size()>0) {
+                                GridLayoutManager layoutManager=new GridLayoutManager(MyAdsActivity.this,2);
+                                recyclerView.setHasFixedSize(true);
+                                recyclerView.setLayoutManager(layoutManager);
+                                wishlistAdapter =new WishlistAdapter(MyAdsActivity.this,searchList);
+                                recyclerView.setAdapter(wishlistAdapter);
+
+                            }
+                        }else if(searchList.size()==0) {
+                            recyclerView.setVisibility(View.GONE);
+                            progressBar.setVisibility(View.GONE);
+                            emptyData.setVisibility(View.VISIBLE);
+                            // }
+                        }
+
+                    else {
+                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        progressBar.setVisibility(View.GONE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<StoreListModel> call, Throwable t) {
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+            progressBar.setVisibility(View.GONE);
+        }
+    }
+
+
 
 }

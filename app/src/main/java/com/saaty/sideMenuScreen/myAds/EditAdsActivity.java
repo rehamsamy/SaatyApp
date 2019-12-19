@@ -44,6 +44,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.gun0912.tedpermission.PermissionListener;
 import com.gun0912.tedpermission.TedPermission;
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.AdsProductsModel;
 import com.saaty.models.DataArrayModel;
@@ -68,10 +69,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 public class EditAdsActivity extends AppCompatActivity {
 
     public static final String EDIT_ADS_PRODUCT ="edit_ads_product";
+    public static final String ADD_NEW_AD ="add_new_ad";
     private static final String TAG =EditAdsActivity.class.getSimpleName() ;
     @BindView(R.id.progress_id) ProgressBar progressBar;
     @BindView(R.id.upload_images_img) ImageView uploadImg;
@@ -114,16 +115,19 @@ public class EditAdsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_edit_ads);
         ButterKnife.bind(this);
         intent=getIntent();
-        if(intent.getAction().equals("add_new_ads")){
+        if(intent.hasExtra(ADD_NEW_AD)){
             toolbarTxt.setText(getString(R.string.add_ads));
-        }else if(intent.getAction().equals(EditAdsActivity.EDIT_ADS_PRODUCT)){
+        }else if(intent.hasExtra(EDIT_ADS_PRODUCT)){
             toolbarTxt.setText(getString(R.string.edit_ads));
-            dataArrayModel=intent.getParcelableExtra(ProductDetailsActivity.ADS_PRODUCTS_DETAILS);
+            dataArrayModel=intent.getParcelableExtra(EDIT_ADS_PRODUCT);
+            getAdsProductDetails(dataArrayModel);
         }
         networkAvailable=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
 
     }
+
+
 
     @OnClick(R.id.add_ads_btn_id)
     void addAdsBtn(){
@@ -142,10 +146,11 @@ public class EditAdsActivity extends AppCompatActivity {
         }
 
         try {
-            if(intent.getAction().equals("add_new_ads")){
-                addAdsProducts(getByte(inputStream));
-            }else if(intent.getAction().equals(EditAdsActivity.EDIT_ADS_PRODUCT)){
-                editAdsProducts(getByte(inputStream));
+            if(intent.hasExtra(ADD_NEW_AD)){
+                //getFile(selectedUriList);
+                addAdsProducts();
+            }else if(intent.hasExtra(EDIT_ADS_PRODUCT)){
+                editAdsProducts();
 
             }
 
@@ -155,8 +160,6 @@ public class EditAdsActivity extends AppCompatActivity {
 
 
     }
-
-
 
     private void inializeFields() {
         if(!FUtilsValidation.isEmpty(emailInput,getString(R.string.field_required))&&
@@ -186,11 +189,15 @@ public class EditAdsActivity extends AppCompatActivity {
             int id2= radioGroup2.getCheckedRadioButtonId();
             RadioButton radioButton2=(RadioButton) findViewById(id2);
             String radioBtnTxt2=radioButton2.getText().toString();
-            if(radioBtnTxt2.equals(getString(R.string.new_products))){
+            if(id2==R.id.new_radio_btn_id){
                 productShape="New";
-            }else if(radioBtnTxt2.equals(getString(R.string.old_products))){
+                Log.v(TAG,"shape type   "+productShape);
+            }else if(id2==R.id.old_radio_btn_id){
                 productShape="Used";
+                Log.v(TAG,"shape type   "+productShape);
         }
+
+            Log.v(TAG,"shape type final  "+productShape);
 
             int id3= radioGroup3.getCheckedRadioButtonId();
             RadioButton radioButton3=(RadioButton) findViewById(id3);
@@ -243,6 +250,7 @@ public class EditAdsActivity extends AppCompatActivity {
                         .showMultiImage(uriList ->{
                             selectedUriList=uriList;
                             showUriList(uriList);
+
                                 }
                                 );
             }
@@ -277,7 +285,7 @@ public class EditAdsActivity extends AppCompatActivity {
 
 
 
-    private void addAdsProducts(byte []bytes) throws FileNotFoundException {
+    private void addAdsProducts() throws FileNotFoundException {
         if(networkAvailable.isNetworkAvailable()){
 
             ProgressDialog progressDialog =dailogUtil.showProgressDialog(EditAdsActivity.this,getString(R.string.logging),false);
@@ -287,27 +295,25 @@ public class EditAdsActivity extends AppCompatActivity {
             map.put("category_id",category_id);
             map.put("ar_name",productNameAr);
             map.put("ar_description",productDesc);
-            map.put("price",Integer.valueOf(price));
+            map.put("price",Integer.valueOf(productPriceInput.getText().toString()));
             map.put("shape",productShape);
             map.put("contact_type",contactType);
-            map.put("contact_name",LoginTraderUserActivity.userModel.getFullname());
+            map.put("contact_name",HomeActivity.full_name);
             map.put("contact_mobile",phone);
             map.put("contact_email",email);
 
             MultipartBody.Part[] parts=new MultipartBody.Part[selectedUriList.size()];
             RequestBody requestBody1 = null;
             for(int i=0;i<selectedUriList.size();i++){
-                 requestBody1=RequestBody.create(MediaType.parse("*/*"),bytes);
+                File file=new File(selectedUriList.get(i).getPath());
+                 requestBody1=RequestBody.create(MediaType.parse("*/*"),file);
                 parts[i]=MultipartBody.Part.createFormData("photos[]","photos[]",requestBody1);
                 Log.v(TAG,"selected uri part "+requestBody1.toString());
             }
-            Log.v(TAG,"selected uri part "+parts.length);
             Call<AdsProductsModel> call=null;
-//            Map <String, MultipartBody.Part >partMap =new HashMap<>();
-//            partMap.put("photos[]",fileToUpload);
             if (parts != null) {
                  call=apiServiceInterface.addAdsProduct("application/json",
-                         LoginTraderUserActivity.loginModel.getTokenType()+" "+LoginTraderUserActivity.loginModel.getAccessToken(),map,parts);
+                         HomeActivity.access_token,map,parts);
             }
 
 
@@ -343,41 +349,36 @@ public class EditAdsActivity extends AppCompatActivity {
 
 
 
-    private void editAdsProducts(byte[] bytes) {
+    private void editAdsProducts() {
         if(networkAvailable.isNetworkAvailable()) {
             ProgressDialog progressDialog = dailogUtil.showProgressDialog(EditAdsActivity.this, getString(R.string.logging), false);
             progressDialog.show();
             apiServiceInterface = ApiClient.getClientService();
             Map<String, Object> map = new HashMap<>();
-            map.put("category_id", category_id);
-            map.put("ar_name", productNameAr);
-            // map.put("en_name",productNameEn);
-            map.put("ar_description", productDesc);
-            // map.put("en_description","dddddddddddddd");
-            map.put("price", Integer.valueOf(price));
-            map.put("shape", "New");
-            map.put("contact_type", "all");
-            map.put("contact_name", "ali");
-            map.put("contact_mobile", phone);
-            map.put("contact_email", email);
+            map.put("category_id",category_id);
+            map.put("ar_name",productNameAr);
+            map.put("ar_description",productDesc);
+            map.put("price",Integer.valueOf(productPriceInput.getText().toString()));
+            map.put("shape",productShape);
+            map.put("contact_type",contactType);
+            map.put("contact_name",HomeActivity.full_name);
+            map.put("contact_mobile",phone);
+            map.put("contact_email",email);
+
             MultipartBody.Part[] parts = new MultipartBody.Part
                     [selectedUriList.size()];
             RequestBody requestBody1 = null;
             for (int i = 0; i < selectedUriList.size(); i++) {
-                requestBody1 = RequestBody.create(MediaType.parse("*/*"), bytes);
+                File file=new File(selectedUriList.get(i).getPath());
+                requestBody1 = RequestBody.create(MediaType.parse("*/*"), file);
                 parts[i] = MultipartBody.Part.createFormData("photos[]", "photos[]", requestBody1);
                 Log.v(TAG, "selected uri part " + requestBody1.toString());
             }
-            Log.v(TAG, "selected uri part " + parts.length);
-//            if(dataArrayModel.getProductimages().size()>0) {
-//                for (int i = 0; i < dataArrayModel.getProductimages().size(); i++) {
-//                    dataArrayModel.getProductimages().get(0).setImageLink(null);
-//                }
-//            }
+
             Call<EditAdsModel> call = null;
             if (parts != null) {
                 call = apiServiceInterface.editAdsProduct(dataArrayModel.getProductId(), "application/json",
-                        LoginTraderUserActivity.loginModel.getTokenType() + " " + LoginTraderUserActivity.loginModel.getAccessToken(), map, parts);
+                        HomeActivity.access_token, map, parts);
             }
             call.enqueue(new Callback<EditAdsModel>() {
                 @Override
@@ -428,6 +429,58 @@ public class EditAdsActivity extends AppCompatActivity {
 
 
 
+
+
+    private void getAdsProductDetails(DataArrayModel dataArrayModel) {
+
+
+
+        Log.v("TAG","data model   "+dataArrayModel.toString());
+        if(dataArrayModel.getShape().equals("New")){
+            radioGroup2.check((R.id.new_radio_btn_id));
+        }else if(dataArrayModel.getShape().equals("Used")){
+            radioGroup2.check((R.id.old_radio_btn_id));
+        }
+
+        if(dataArrayModel.getCategoryId()==1){
+            radioGroup1.check(R.id.watch_radio_btn_id);
+        }else if(dataArrayModel.getCategoryId()==2){
+            radioGroup1.check(R.id.bracletes_radio_btn_id);
+        }
+        productNameInput.setText(dataArrayModel.getArName());
+        productPriceInput.setText(String.valueOf(dataArrayModel.getPrice()));
+        phoneNumberInput.setText(String.valueOf(dataArrayModel.getContactMobile()));
+        emailInput.setText(dataArrayModel.getContactEmail());
+        productDescriptionInput.setText(dataArrayModel.getArDescription());
+        String contactType=dataArrayModel.getContactType();
+        if(contactType.equals("all")){
+            radioGroup3.check(R.id.all_radio_btn_id);
+        }else if(contactType.equals("email")){
+            radioGroup3.check(R.id.email_radio_btn_id);
+        }else if(contactType.equals("message")){
+            radioGroup3.check(R.id.message_radio_btn_id);
+        }else if(contactType.equals("phone")){
+            radioGroup3.check(R.id.phone_radio_btn_id);
+        }
+
+//        if (dataArrayModel.getProductimages().size() == 0) {
+//            List<Uri> uris = new ArrayList<>();
+//            Log.v("TAG","sssssssss"+dataArrayModel.getProductimages().size());
+//            for (int i = 0; i < dataArrayModel.getProductimages().size(); i++) {
+//                uris.add(Uri.parse(dataArrayModel.getProductimages().get(i).getImageLink()));
+//            }
+//            adapter = new UploadImageAdapter(this, uris);
+//            recyclerView.setLayoutManager(new GridLayoutManager(getApplicationContext(), 4));
+//            recyclerView.setAdapter(adapter);
+//
+//        }
+
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void onClick(){
+        finish();
+    }
 
 
 }

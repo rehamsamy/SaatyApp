@@ -77,8 +77,8 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                  @Override
                  public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
                      Log.v(TAG,"sucess");
+                     if(response.code()==200){
                      if(response.body().isSuccess()){
-
                          Log.v(TAG,"sucess1");
                          Toast.makeText(ForgetPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                          Intent intent=new Intent(getApplicationContext(),VerificationCodeActivity.class);
@@ -91,7 +91,12 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
                          progressDialog.dismiss();
                      }
+                 }else if(response.code()==404){
+                         Toast.makeText(ForgetPasswordActivity.this, "Mobile Not Found", Toast.LENGTH_LONG).show();
+
+                     }
                  }
+
 
                  @Override
                  public void onFailure(Call<SendCodeModel> call, Throwable t) {
