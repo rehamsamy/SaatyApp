@@ -296,7 +296,8 @@ public class StoresProductsActivity extends AppCompatActivity {
         adapter.setOnItemClickListenerRecyclerView(new OnItemClickRecyclerViewInterface() {
             @Override
             public void OnWishListClick(int position, ImageView wishlist_image) {
-            dealingWithWishList.addToWishList(newProducts.get(position),progressBar,wishlist_image);
+           // dealingWithWishList.addToWishList(newProducts.get(position),progressBar,wishlist_image);
+                dealingWithWishList.addToWishList(storeProductsList.get(position),progressBar,wishlist_image);
             }
 
             @Override
@@ -305,6 +306,7 @@ public class StoresProductsActivity extends AppCompatActivity {
                 Intent intent=new Intent(getApplicationContext(), ProductDetailsActivity.class);
                 intent.putExtra(ProductDetailsActivity.CATEGORY_PRODUCTS_DETAILS,item);
                 startActivity(intent);
+                 
             }
         });
 

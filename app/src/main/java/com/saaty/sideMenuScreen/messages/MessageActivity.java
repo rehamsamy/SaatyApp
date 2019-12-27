@@ -51,12 +51,12 @@ public class MessageActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_txt_id)TextView toolbarTxt;
     @BindView(R.id.toolbar_home_id) ImageView homeImg;
     @BindView(R.id.toolbar_edit_id)ImageView deleteImg;
-   public static MessageArrayModel model;
+    public static MessageArrayModel model;
     ApiServiceInterface apiServiceInterface;
     NetworkAvailable networkAvailable;
     MessageAdapter messageAdapter;
     private  int current_page=1;
-   public static Boolean clicked;
+    public static Boolean clicked;
     int  tab_selected;
     int flag;
     List<MessageArrayModel> receivedMessage=new ArrayList<>();
@@ -75,8 +75,8 @@ public class MessageActivity extends AppCompatActivity {
         deleteImg.setVisibility(View.GONE);
         deleteImg.setImageResource(R.drawable.nav_delete);
 
-
-
+        sendMessage=new ArrayList<>();
+        receivedMessage=new ArrayList<>();
 
            if(networkAvailable.isNetworkAvailable()) {
                tabLayout.addTab(tabLayout.newTab().setText("         " +getString(R.string.received)+"      "),0);
@@ -167,8 +167,8 @@ public class MessageActivity extends AppCompatActivity {
                         Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
 
-                    } else {
-                        recyclerView.setVisibility(View.GONE);
+                    } else if(current_page==1&&sendMessage.size()==0){
+                        ////recyclerView.setVisibility(View.GONE);
                         emptyData.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                     }
@@ -210,8 +210,8 @@ public class MessageActivity extends AppCompatActivity {
                            Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
 
-                    } else {
-                        recyclerView.setVisibility(View.GONE);
+                    } else if(current_page==1&&receivedMessage.size()==0){
+                        //recyclerView.setVisibility(View.GONE);
                         emptyData.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                     }
@@ -300,6 +300,7 @@ public class MessageActivity extends AppCompatActivity {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
                 // if(tab_selected==0){
+                messageAdapter.notifyDataSetChanged();
                 current_page++;
                 getSendMessage(current_page);
                 // }
