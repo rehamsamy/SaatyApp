@@ -3,6 +3,7 @@ package com.saaty.sideMenuScreen;
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -51,7 +52,8 @@ public class AboutAppActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<ProductDataModel> call, Response<ProductDataModel> response) {
                     if (response.body().isSuccess()) {
-                        Toast.makeText(AboutAppActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(AboutAppActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        aboutAppTxt.setText(response.body().getProductDataModels().get(0).getValue1());
                         progressBar.setVisibility(View.GONE);
                     } else {
                         Toast.makeText(AboutAppActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
@@ -69,5 +71,15 @@ public class AboutAppActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backClick(){
+        finish();
+    }
+
+    @OnClick(R.id.toolbar_home_id)
+    void homeClick(){
+        finish();
     }
 }

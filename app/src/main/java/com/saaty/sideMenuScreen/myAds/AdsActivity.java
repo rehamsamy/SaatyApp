@@ -7,11 +7,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
@@ -47,6 +49,7 @@ import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.DailogUtil;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.FilterMethods;
 import com.saaty.util.NetworkAvailable;
@@ -62,8 +65,8 @@ public class AdsActivity extends AppCompatActivity {
 
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-    @BindView(R.id.progress_id)
-    ProgressBar progressBar;
+//    @BindView(R.id.progress_id)
+MaterialProgressBar progressBar;
     @BindView(R.id.empty_data_txt_id)
     TextView emptyData;
     @BindView(R.id.toolbar_txt_id)
@@ -72,6 +75,7 @@ public class AdsActivity extends AppCompatActivity {
     ImageView navFilterImg;
     @BindView(R.id.search_ed_id)
     EditText searchEditTxt;
+DailogUtil xDailog;
     public static int flag;
     List<DataArrayModel> newList=new ArrayList<>();
     List<DataArrayModel> newAdsProduct=new ArrayList<>();
@@ -96,6 +100,7 @@ public class AdsActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_ads);
+        progressBar=findViewById(R.id.progress_id1);
         mDialog = new Dialog(this);
         ButterKnife.bind(this);
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
@@ -105,8 +110,10 @@ public class AdsActivity extends AppCompatActivity {
         adsProducts = new ArrayList<>();
         buildRecyclerViewForCategory();
         getAdsroductList(current_page);
-        checkWishlist(newAdsProduct);
-        storeProductAdapter.notifyDataSetChanged();
+        xDailog=new DailogUtil();
+        //checkWishlist(newAdsProduct);
+       // storeProductAdapter.notifyDataSetChanged();
+
        // progressBar.setVisibility(View.GONE);
 
 
@@ -158,7 +165,7 @@ public class AdsActivity extends AppCompatActivity {
     private void getAdsroductList(int current_page) {
         if (networkAvailable.isNetworkAvailable()) {
             apiServiceInterface = ApiClient.getClientService();
-            progressBar.setVisibility(View.VISIBLE);
+            //progressBar.setVisibility(View.VISIBLE);
             Map<String, Object> map = new HashMap<>();
             String token = HomeActivity.access_token;
             map.put("page", current_page);
@@ -174,26 +181,18 @@ public class AdsActivity extends AppCompatActivity {
                                 adsProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                                 storeProductAdapter.notifyDataSetChanged();
                                 checkWishlist(newAdsProduct);
-//
-
-//                                GridLayoutManager layoutManager = new GridLayoutManager(AdsActivity.this, 2);
-//                                recyclerView.setHasFixedSize(true);
-//                                recyclerView.setLayoutManager(layoutManager);
-//                                storeProductAdapter =new StoreProductAdapter(AdsActivity.this,newAdsProduct);
-//                                getWishList(adsProducts);
-//                                recyclerView.setAdapter(storeProductAdapter);
-//                                Log.v("TAG", "ads products" + adsProducts.size());
-//                                buildOnClickListener();
-                                Toast.makeText(AdsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-////                                progressBar.setVisibility(View.GONE);
                                 progressBar.setVisibility(View.GONE);
+                                Log.v("TAG","option 1");
+                            } else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_page==1){
+                                emptyData.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                                Log.v("TAG","option 2");
                             }
-                        } else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_page==1){
-                            recyclerView.setVisibility(View.GONE);
+                        } else {
                             emptyData.setVisibility(View.VISIBLE);
                             progressBar.setVisibility(View.GONE);
                         }
-//
+
                     } else if (response.code() == 405) {
                         Toast.makeText(AdsActivity.this, "error", Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);

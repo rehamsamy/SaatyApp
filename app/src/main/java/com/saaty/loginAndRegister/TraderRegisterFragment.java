@@ -7,14 +7,19 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.afollestad.materialdialogs.util.DialogUtils;
@@ -27,6 +32,7 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.models.Data;
 import com.saaty.models.RegisterModel;
+import com.saaty.sideMenuScreen.TermsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
@@ -68,6 +74,7 @@ public class TraderRegisterFragment extends Fragment {
     CheckBox acceptTerms;
     MultipartBody.Part body=null;
     SharedPreferences.Editor editor;
+    TextView acceptTermsTxt;
     Data data;
 
     @Nullable
@@ -83,6 +90,7 @@ public class TraderRegisterFragment extends Fragment {
         confirmPssword = view.findViewById(R.id.confirm_password_input_id);
         uploadImg=view.findViewById(R.id.upload_store_img);
         acceptTerms=view.findViewById(R.id.accept_terms_id);
+        acceptTermsTxt=view.findViewById(R.id.accept_terms_txt);
 
         storage_permission = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
 
@@ -106,6 +114,21 @@ public class TraderRegisterFragment extends Fragment {
         });
 
 
+        acceptTermsTxt.setClickable(true);
+       // acceptTermsTxt.setText("");
+        acceptTermsTxt.setPaintFlags(acceptTermsTxt.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        Linkify.addLinks(acceptTermsTxt, Linkify.ALL);
+        acceptTermsTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("LoginActivity", "Sign Up Activity activated.");
+                // this is where you should start the new Activity
+                Intent intent = new Intent(getContext(), TermsActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
 
         registerBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -114,6 +137,8 @@ public class TraderRegisterFragment extends Fragment {
                 registerTrader();
             }
         });
+
+        
 
         return view;
 
@@ -174,6 +199,9 @@ public class TraderRegisterFragment extends Fragment {
                          data.getUserDataRegisterObject().setFullname(data.getUserDataRegisterObject().getFullname());
                          data.getUserDataRegisterObject().setMobile(data.getUserDataRegisterObject().getMobile());
                          data.getUserDataRegisterObject().setId(data.getUserDataRegisterObject().getId());
+                         Log.v("TAg","store logooo"+data.getStoreDataRegisterObject().getStoreLogo());
+                         String logo=data.getStoreDataRegisterObject().getStoreLogo();
+                         String storeName=data.getStoreDataRegisterObject().getStoreArName();
                         Gson gson = new Gson();
                         String user_data = gson.toJson(data);
                         editor = getContext().getSharedPreferences(LoginTraderUserActivity.MY_PREFS_NAME, MODE_PRIVATE).edit();
@@ -181,7 +209,9 @@ public class TraderRegisterFragment extends Fragment {
                         Log.v("TAG","regggg"+gson.toString());
                         editor.commit();
                         Intent intent=new Intent(getActivity(), HomeActivity.class);
-                        intent.putExtra("register_store_model",response.body().getData());
+                        intent.putExtra("register_store_model",data);
+                        intent.putExtra("logo",logo);
+                        intent.putExtra("store_name",storeName);
                         startActivity(intent);
                         progressDialog.dismiss();
 

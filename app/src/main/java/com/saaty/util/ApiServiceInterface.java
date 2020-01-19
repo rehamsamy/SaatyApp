@@ -1,8 +1,10 @@
 package com.saaty.util;
 
 import com.saaty.models.AdsProductsModel;
+import com.saaty.models.AdvsModel;
 import com.saaty.models.CategoryModel;
 import com.saaty.models.CheckWishlistModel;
+import com.saaty.models.CityModel;
 import com.saaty.models.DataObjectModel;
 import com.saaty.models.DeleteAdsModel;
 import com.saaty.models.DeleteMessageModel;
@@ -252,5 +254,21 @@ public interface ApiServiceInterface {
             @Header("Accept") String accept
             , @Header("Authorization") String auth
             , @QueryMap Map<String, Object> map);
+
+
+    //--------------------------  get city list ---------------------------
+    @GET("/api/cities")
+    Call<CityModel> getCityList();
+
+
+    //--------------------------   get advs  ---------------------------------
+
+    @POST("/api/getscreen")
+    Call<AdvsModel> getAdvs(@Body Map<String, Object> map);
+
+    //--------------------------   get advs  ---------------------------------
+
+    @POST("/api/getscreen")
+    Call<AdvsModel> getTerms(@Body Map<String, Object> map);
 
 }

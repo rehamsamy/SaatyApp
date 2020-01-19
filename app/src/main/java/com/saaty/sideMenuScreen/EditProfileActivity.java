@@ -169,13 +169,15 @@ Intent intent;
                 @Override
                 public void onResponse(Call<UpdateProfileModel> call, Response<UpdateProfileModel> response) {
                    if(response.code()==404){
-                       Toast.makeText(EditProfileActivity.this, "error", Toast.LENGTH_LONG).show();
+                       Toast.makeText(EditProfileActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
 
                    }else if(response.code()==200) {
                        if (response.body().isSuccess()) {
                            Toast.makeText(EditProfileActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                            progressDialog.dismiss();
-                           finish();
+                           Intent intent=new Intent(getApplicationContext(),ProfileActivity.class);
+                           intent.putExtra("data","data");
+                         startActivity(intent);
                        } else {
                            Toast.makeText(EditProfileActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                            progressDialog.dismiss();
@@ -304,7 +306,7 @@ Intent intent;
                     Log.v(TAG,"codeeee"+response.code());
 
                     if(response.code()==404){
-                        Toast.makeText(EditProfileActivity.this, "error", Toast.LENGTH_LONG).show();
+                        Toast.makeText(EditProfileActivity.this, " an error occured", Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
                     }
                     else if(response.code()==200){

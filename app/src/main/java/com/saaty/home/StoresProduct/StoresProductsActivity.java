@@ -43,6 +43,7 @@ import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
+import com.saaty.productDetails.SendMessageActivity;
 import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
@@ -73,12 +74,12 @@ public class StoresProductsActivity extends AppCompatActivity {
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.empty_data_txt_id)TextView emptyData;
     @BindView(R.id.search_ed_id) EditText searchView;
+    @BindView(R.id.progress_id) ProgressBar progressBar;
    // @BindView(R.id.view_pager_id) ViewPager viewPager;
    List<DataArrayModel> newList=new ArrayList<>();
     FilterMethods filterMethods;
     int tab_selected;
-    @BindView(R.id.progress_id)
-    ProgressBar progressBar;
+
     String shape_type="New";
     int current_page=1;
     StoreProductsPagerAdaper pagerAdaper;
@@ -128,15 +129,16 @@ public class StoresProductsActivity extends AppCompatActivity {
                     .error(R.drawable.store1).into(storeImgId);
         }
        if(networkAvailable.isNetworkAvailable()){
+           progressBar.setVisibility(View.GONE);
            String newProd=getString(R.string.new_products);
            tabLayout.addTab(tabLayout.newTab().setText("      "+newProd+"     "),0);
-           newProducts.clear();
+          // newProducts.clear();
+           Log.v("TAG","passsss");
            emptyData.setVisibility(View.GONE);
-
            shape_type="New";
            buildRecyclerViewForCategory();
            getStoreProducts(current_page,"New");
-           progressBar.setVisibility(View.GONE);
+
            tabLayout.addTab(tabLayout.newTab().setText("        "+getString(R.string.old_products)+"        "),1);
 
        }else {
@@ -189,23 +191,24 @@ public class StoresProductsActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String newText = s.toString();
-                Log.v("TAG", "sssssssssss" + newProducts.size() + s.toString().toLowerCase());
+                Log.v("TAG", "sssssssssss" + storeProductsList.size() + s.toString().toLowerCase());
                 ArrayList<DataArrayModel> newlist = new ArrayList<>();
 
-                for (DataArrayModel item : newProducts) {
+                for (DataArrayModel item : storeProductsList) {
                     Log.v("TAG", "ar name" + item.getArName().contains(newText));
                     if (item.getArName().contains(newText)) {
                         newlist.add(item);
                     }
                 }
-                newProducts.clear();
+                storeProductsList.clear();
                 if(newlist.size()>0) {
                     for (int i = 0; i < newlist.size(); i++) {
-                        newProducts.add(newlist.get(i));
+                        storeProductsList.add(newlist.get(i));
                         adapter.notifyDataSetChanged();
 
                     }
                 }else {
+                    storeProductsList.clear();
                     emptyData.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
                 }
@@ -228,7 +231,6 @@ public class StoresProductsActivity extends AppCompatActivity {
 
     private void getStoreProducts(int current_pag,String shape_type) {
         if(networkAvailable.isNetworkAvailable()){
-            progressBar.setVisibility(View.VISIBLE);
             apiServiceInterface= ApiClient.getClientService();
             Map<String,Object> map=new HashMap<>();
             map.put("page",current_pag);
@@ -237,21 +239,24 @@ public class StoresProductsActivity extends AppCompatActivity {
             map.put("store_id",id);
             Log.v(TAG,"posss"+id);
             Call<StoreListModel> call=apiServiceInterface.getNewOldStoreProduct(map);
+            progressBar.setVisibility(View.VISIBLE);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if (response.body().isSuccess()) {
                         if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
+                            progressBar.setVisibility(View.GONE);
                             storeProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                             adapter.notifyDataSetChanged();
-                            progressBar.setVisibility(View.GONE);
+                            Log.v("TAG","option 1");
                         }else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_pag==1){
                             progressBar.setVisibility(View.GONE);
                             emptyData.setVisibility(View.VISIBLE);
+                            Log.v("TAG","option 2");
                         }
 
                     } else {
-                        Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                       // Toast.makeText(StoresProductsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
                         emptyData.setVisibility(View.VISIBLE);
                     }
@@ -259,7 +264,7 @@ public class StoresProductsActivity extends AppCompatActivity {
                 }
                 @Override
                 public void onFailure(Call<StoreListModel> call, Throwable t) {
-                    Toast.makeText(StoresProductsActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(StoresProductsActivity.this, t.getMessage().toString(), Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.GONE);
                 }
             });
@@ -406,6 +411,7 @@ public class StoresProductsActivity extends AppCompatActivity {
                 }else {
                     emptyData.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
+                    storeProductsList.clear();
                 }
                 if(newList.size()>0) {
                     storeProductsList = newList;
@@ -421,6 +427,25 @@ public class StoresProductsActivity extends AppCompatActivity {
         });
 
 
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backClick(){
+        finish();
+    }
+
+    @OnClick(R.id.toolbar_home_id)
+    void homeClick(){
+        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+    }
+
+    @OnClick(R.id.send_img_id)
+    void sendMessage(){
+       if(HomeActivity.user_id !=0){
+           startActivity(new Intent(getApplicationContext(), SendMessageActivity.class));
+       }else {
+           startActivity(new Intent(getApplicationContext(), LoginTraderUserActivity.class));
+       }
     }
 
 }

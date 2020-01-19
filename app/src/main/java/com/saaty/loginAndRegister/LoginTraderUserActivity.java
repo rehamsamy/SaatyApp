@@ -13,6 +13,8 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.widget.CheckBox;
 import android.widget.TextView;
@@ -44,6 +46,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     @BindView(R.id.password_input_id)TextInputEditText passwordInput;
     @BindView(R.id.save_login_info_id) CheckBox  saveInfoCheckBox;
     @BindView(R.id.login_visitor_btn_id) MaterialButton loginVistorBtn;
+    @BindView(R.id.create_account_txt_id)TextView createAccount;
     NetworkAvailable networkAvailable;
     ApiServiceInterface apiServiceInterface;
     DailogUtil dailogUtil;
@@ -63,6 +66,8 @@ public class LoginTraderUserActivity extends AppCompatActivity {
             sharedPreferences=getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
             passwordInput.setText(sharedPreferences.getString("password",""));
             emailInput.setText(sharedPreferences.getString("email",""));
+
+
 
 
     }

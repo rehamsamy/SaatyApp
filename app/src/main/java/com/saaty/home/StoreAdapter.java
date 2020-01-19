@@ -48,10 +48,11 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.Holder> {
         TextView storeName=holder.itemView.findViewById(R.id.store_name_id);
         ImageView storeImgId=holder.itemView.findViewById(R.id.store_img_id);
 
+
         if(PreferenceHelper.getValue(mContext).equals("ar")){
             storeName.setText(dataItem.getStoreArName());
         }else if(PreferenceHelper.getValue(mContext).equals("en")){
-            storeName.setText(dataItem.getStoreEnName());
+            storeName.setText(dataItem.getStoreArName());
         }
 
         if(dataItem.getStoreLogo()==null){

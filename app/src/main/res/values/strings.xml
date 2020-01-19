@@ -128,4 +128,12 @@
     <string name="dismiss">Cancel</string>
     <string name="enter_image_please">Please enter image of store</string>
     <string name="logout_msg">Are you sure log out from saaty!!</string>
+    <string name="english">english</string>
+    <string name="arabic">arabic</string>
+    <string name="select_city">Select City:</string>
+    <string name="sending" translatable="false">ارسل رسالة</string>
+    <string name="show_Ads">Show Ads</string>
+    <string name="skip_ads">Skip Ads</string>
+    <string name="terms_conditions">Termis And Conditions</string>
+
 </resources>

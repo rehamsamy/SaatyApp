@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+<string name="app_name" translatable="false">ساعتي</string>
+<string name="choose_lang" translatable="false">أختار اللغة</string>
+<string name="arabic_lang" translatable="false">العربيه </string>
+<string name="english_lang"  translatable="false">English</string>
+<string name="email_input"  translatable="false">الايميل</string>
+<string name="password_input" translatable="false">كلمه المرور</string>
+<string name="save_info_login" translatable="false">حفظ معلومات التسجيل</string>
+<string name="login_btn" translatable="false">تسجيل الدخول</string>
+<string name="login_visitor_btn" translatable="false">الدخول كزائر</string>
+<string name="forget_password_txt" translatable="false">نسيت كلمة المرور?</string>
+<string name="create_account_txt" translatable="false">انشاء حساب جديد</string>
+<string name="forget_pass" translatable="false">نسيت كلمة المرور</string>
+<string name="enter_phone_number" translatable="false">من فضلك ادخل رقم الهاتف</string>
+<string name="phone_number_input" translatable="false">رقم الهاتف</string>
+<string name="confirm" translatable="false">تاكيد</string>
+<string name="verify_code_txt" translatable="false">من فضلك تاكد من فحص الهاتف </string>
+<string name="enter_code" translatable="false">ادخل الكود</string>
+<string name="resend_code_txt" translatable="false">اعاده ارسال الكود</string>
+<string name="change_password_txt" translatable="false">من فضلك ادخل كلمه مرور جديده</string>
+<string name="accept_terms_txt" translatable="false">اوافق علي الشروط والاحكام</string>
+<string name="confirm_new_password_input" translatable="false">تاكيد كلمه المرور</string>
+<string name="register_user" translatable="false">تسجيل كمستخدم</string>
+<string name="register_trader" translatable="false">تسجيل كزائر</string>
+<string name="user_name_input" translatable="false">اسم المستخدم</string>
+<string name="confirm_password_input" translatable="false">تاكيد كلمه المرور</string>
+<string name="trader_name_input" translatable="false">اسم التاجر</string>
+<string name="store" translatable="false">المتاجر</string>
+<string name="user_name" translatable="false">اسم المستخم</string>
+<string name="home_page" translatable="false">الصفحة الرئيسية</string>
+<string name="my_account" translatable="false">حسابي</string>
+<string name="wishlist" translatable="false">المفضلة</string>
+<string name="my_ads" translatable="false">اعلاناتي</string>
+<string name="message" translatable="false">الرسائل</string>
+<string name="sign_out" translatable="false">تسجيل الخروج</string>
+<string name="contact_us" translatable="false">اتصل بنا</string>
+<string name="about_us" translatable="false">من نحن</string>
+<string name="about_app" translatable="false">عن التطبيق</string>
+<string name="setting" translatable="false">الاعدادات</string>
+<string name="open_drawer" translatable="false">فتح</string>
+<string name="close_drawer" translatable="false">غلق</string>
+<string name="add_ads" translatable="false">اضافة اعلان</string>
+<string name="weclome_visitor" translatable="false">مرحبا بك كزائر لساعتي</string>
+<string name="search" translatable="false">بحث</string>
+<string name="no_product" translatable="false">لا توجد بيانات</string>
+<string name="store_name" translatable="false">اسم المتجر</string>
+<string name="splash_message1" translatable="false">اختر منتجك وطريقة الدفع</string>
+<string name="splash_message2" translatable="false">يصل اليك منتجك باسرع وقت</string>
+<string name="splash_message3" translatable="false">يسعدنا رضاء جميع عملائنا البائعين والمشترين</string>
+<string name="field_required" translatable="false">هذا الحقل مطلوب</string>
+<string name="password_equal_error" translatable="false">كلمه المرور غير متساوية</string>
+<string name="error_email_msg" translatable="false">من فضلك ادخل بريد الالكتروني صحيح</string>
+<string name="weak_password" translatable="false">كلمة المرور ضعيفة</string>
+<string name="error_connection" translatable="false">تاكد من اتصال الانترنت</string>
+<string name="logging" translatable="false">تحميل.....</string>
+<string name="reset_password" translatable="false">تاكيد كلمة المرور</string>
+<string name="check_box" translatable="false">من فضلك وافق علي الشروط</string>
+<string name="stores_toolbar" translatable="false">المتاجر</string>
+<string name="empty_data" translatable="false">لا توجد بيانات</string>
+<string name="product_price" translatable="false">10</string>
+<string name="time" translatable="false">sice 20 mins</string>
+<string name="product_name" translatable="false">ساعة</string>
+<string name="product_desc" translatable="false">نايبا ينراتار سنؤاتؤرا</string>
+<string name="watch_imges" translatable="false">صور المنتج</string>
+<string name="producer_name" translatable="false">اسم التاجر:</string>
+<string name="producer_phone" translatable="false">01134551079</string>
+<string name="message_title" translatable="false">عنوان الرسالة</string>
+<string name="send" translatable="false">ارسال</string>
+<string name="save" translatable="false">حفظ</string>
+<string name="edit_profile" translatable="false">تعديل الحساب</string>
+<string name="old_password" translatable="false">كلمه المرور القديمة</string>
+<string name="new_password" translatable="false">كلمه المرور الجديدة</string>
+<string name="confirm_new_password" translatable="false">تاكي كلمه المرور</string>
+<string name="change_password" translatable="false">تغيير كلمه المرور</string>
+<string name="language" translatable="false">اللغة</string>
+<string name="sort_by" translatable="false">ترتيب حسب:</string>
+<string name="from_high_to_low" translatable="false">من اعلي الي اقل سعر</string>
+<string name="from_low_to_high" translatable="false">من اقل الي اعلي سعر</string>
+<string name="filter_by" translatable="false">فرز حسب:</string>
+<string name="old_products" translatable="false"> منتجات مستعملة</string>
+<string name="new_products" translatable="false">منتجات جديدة</string>
+<string name="remove_wishlist_item" translatable="false">هل انت متاكدمن حذف هذا العنصر?</string>
+<string name="remove_wishlist_title" translatable="false">حذف العنصر من المفضلة</string>
+<string name="delete" translatable="false">حذف</string>
+<string name="cancel" translatable="false">الغاء</string>
+<string name="select_language" translatable="false">اختر اللغة:</string>
+<string name="address_txt" translatable="false">العنوان:</string>
+<string name="address_value" translatable="false">Streat,Area,Country</string>
+<string name="website" translatable="false">الموقع الالكتروني:</string>
+<string name="website_value" translatable="false">www.company.com</string>
+<string name="email_value" translatable="false">company@gmail.com</string>
+<string name="sort_by_type" translatable="false">ترتيب حسب النوع:</string>
+<string name="filter_by_status" translatable="false">فرز حسب الحالة:</string>
+<string name="watch" translatable="false">ساعة</string>
+<string name="bracletes" translatable="false">أساور</string>
+<string name="delete_ads" translatable="false">حذف اعلان</string>
+<string name="delete_ads_msg" translatable="false">هل انت متاكد من حذف هذا الاعلان?</string>
+<string name="type" translatable="false">النوع:</string>
+<string name="status" translatable="false">الحالة:</string>
+<string name="producer_price" translatable="false">سعر المنتج:</string>
+<string name="price_type" translatable="false">ريال سعودي</string>
+<string name="phone_number_contact" translatable="false">رقم الهاتف :</string>
+<string name="email_contact" translatable="false">البريد الالكتروني:</string>
+<string name="contact_way" translatable="false">طريقه الاتصال:</string>
+<string name="private_message" translatable="false">الرسائل الخاصة</string>
+<string name="all" translatable="false">الكل</string>
+<string name="product_details" translatable="false">تفاصيل المنتج:</string>
+<string name="product_details_info" translatable="false">اكتب هنا التفاصيل ووصف المنتج</string>
+<string name="attatch_images" translatable="false">ارفق صور المنتج:</string>
+<string name="producet_name" translatable="false">اسم المنتج:</string>
+<string name="used_products" translatable="false">المنتجات المستعمله</string>
+<string name="watches" translatable="false">الساعات</string>
+<string name="store_desc" translatable="false">اكتب وصف للمتجر</string>
+<string name="edit_ads" translatable="false">Edit Ads</string>
+<string name="state" translatable="false">State:</string>
+<string name="category" translatable="false">Category:</string>
+<string name="message_name" translatable="false">Ahmed Mohamed</string>
+<string name="received" translatable="false">الواردة</string>
+<string name="reply_with_message" translatable="false">رد برسالة</string>
+<string name="message_text" translatable="false">نص الرسالة</string>
+<string name="send_message" translatable="false">ارسل رسالة</string>
+
+<string name="message_to" translatable="false">رساله ل:</string>
+<string name="upload_store_img" translatable="false">من فضلك حمل صوره للمتجر:</string>
+<string name="create_new_account" translatable="false">انشاء حساب جديد</string>
+<string name="product_imges" translatable="false">صور المنتج:</string>
+    <string name="select_city" translatable="false">أختار المدينة:</string>
+    <string name="sending" translatable="false">المرسلة</string>
+    <string name="show_Ads" translatable="false">مشاهدة الاعلان</string>
+    <string name="skip_ads" translatable="false">تخطي الاعلان</string>
+    <string name="terms_conditions" translatable="false">الشروط والاحكام</string>
+
+
+</resources>

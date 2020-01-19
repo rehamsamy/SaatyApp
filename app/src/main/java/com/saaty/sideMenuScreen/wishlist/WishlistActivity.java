@@ -24,6 +24,8 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -31,6 +33,8 @@ import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SearchView;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,6 +46,7 @@ import com.saaty.home.HomeActivity;
 import com.saaty.home.StoresActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.CheckWishlistModel;
+import com.saaty.models.CityModel;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.ProductDataModel;
@@ -55,6 +60,7 @@ import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
+import com.saaty.util.PreferenceHelper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -68,33 +74,27 @@ public class WishlistActivity extends AppCompatActivity  {
     @BindView(R.id.empty_data_txt_id) TextView emptyData;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;
     @BindView(R.id.search_ed_id)EditText searchEditTxt;
+   private String spinnerValue;
+   int spinnerIndex;
+   SpinnerAdapter spinnerAdapter;
+   List<String>cityNames=new ArrayList<>();
+   List<DataArrayModel> newList=new ArrayList<>();
     Database database;
 
     String sort_type;
     Dialog mDialog;
-    List<DataArrayModel> wishlistProducts;
+    List<DataArrayModel> wishlistProducts=new ArrayList<>();
     List<DataArrayModel> newWishlist;
     static List<DataArrayModel> newSortedList;
     WishlistAdapter wishlistAdapter;
     ApiServiceInterface apiServiceInterface;
-    int current_page;
+    int current_page=1;
     int selected_product_id;
     NetworkAvailable networkAvailable;
     DataArrayModel model;
 
     private GridLayoutManager layoutManager;
 
-    // Indicates if footer ProgressBar is shown (i.e. next page is loading)
-    private boolean isLoading = false;
-
-    // If current page is the last page (Pagination will stop after this page load)
-    private boolean isLastPage = false;
-
-    // total no. of pages to load. Initial load is page 0, after which 2 more pages will load.
-    private int TOTAL_PAGES;
-
-    // indicates the current page which Pagination is fetching.
-    private int currentPage = 1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,11 +106,13 @@ public class WishlistActivity extends AppCompatActivity  {
         networkAvailable=new NetworkAvailable(getApplicationContext());
         toolbarTxt.setText(getString(R.string.wishlist));
         wishlistProducts=new ArrayList<>();
-        initializeComponents();
+        //initializeComponents();
         database=Database.getInstance(this);
 
-        //buildWishlisrRecycler();
-        getWishList();
+        wishlistProducts.clear();
+        emptyData.setVisibility(View.GONE);
+        buildWishlisrRecycler();
+        getWishList(current_page);
 
         searchEditTxt.addTextChangedListener(new TextWatcher() {
             @Override
@@ -138,7 +140,9 @@ public class WishlistActivity extends AppCompatActivity  {
 
                     }
                 }else {
+                    wishlistProducts.clear();
                     emptyData.setVisibility(View.VISIBLE);
+                    wishlistAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -151,53 +155,42 @@ public class WishlistActivity extends AppCompatActivity  {
 
 
 
+
     }
 
-    private void getWishList() {
+
+
+    private void getWishList(int current_page) {
         if(networkAvailable.isNetworkAvailable()){
             apiServiceInterface= ApiClient.getClientService();
-            progressBar.setVisibility(View.VISIBLE);
+         //  progressBar.setVisibility(View.VISIBLE);
             Map<String,Object> map=new HashMap<>();
           String token= HomeActivity.access_token;
-//            map.put("page",currentPage);
-            map.put("page",1);
-            map.put("limit",100);
+          int limit=10;
+            map.put("page",current_page);
+            map.put("limit",limit);
             Call<StoreListModel> call=apiServiceInterface.getWishlist(map,"application/json",token);
                     call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if(response.code()==200){
+                        Log.v("TAG","ttttt"+response.body().getDataObjectModel().getDataArrayModelList().size()
+                        +"   page"+current_page);
                         if(response.body().isSuccess()) {
-                            wishlistProducts=response.body().getDataObjectModel().getDataArrayModelList();
-                                 if(wishlistProducts.size()>0) {
-                                     Log.v("TAG", "ssss" + wishlistProducts.size());
-                                     GridLayoutManager layoutManager = new GridLayoutManager(getApplicationContext(), 2);
-                                     recyclerView.setLayoutManager(layoutManager);
-                                     recyclerView.setItemAnimator(new DefaultItemAnimator());
-                                     recyclerView.setHasFixedSize(true);
-                                     wishlistAdapter = new WishlistAdapter(WishlistActivity.this, wishlistProducts);
-                                     recyclerView.setAdapter(wishlistAdapter);
-                                     Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                                     RoomModel roomModel = null;
-                                    // for (int i = 0; i < wishlistProducts.size(); i++) {
-                                         roomModel = new RoomModel(wishlistProducts.get(0).getProductId());
-                                         Log.v("TAG", "\n database sssssss  " +roomModel.getProduct_id());
-                                     //}
-                                     //database.dao().insertWishlist(roomModel);
-
-                                     //List<RoomModel> models = database.dao().getWishlist();
-
-
-                                     buildOnClickInterface();
+                            //shlistProducts=wiresponse.body().getDataObjectModel().getDataArrayModelList();
+                                 if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
+                                    wishlistProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                                    wishlistAdapter.notifyDataSetChanged();
                                      progressBar.setVisibility(View.GONE);
+                                     Log.v("TAG","optopn 1   "+ wishlistProducts.size());
+                                 }else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0 && current_page==1) {
+                                     //recyclerView.setVisibility(View.GONE);
+                                     emptyData.setVisibility(View.VISIBLE);
+                                     progressBar.setVisibility(View.GONE);
+                                     Log.v("TAG","option 2");
+                                     // }
                                  }
-                        }else if(wishlistProducts.size()==0) {
-                            recyclerView.setVisibility(View.GONE);
-                            emptyData.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
-                       // }
                         }
-//
 
                     }
                        else {
@@ -248,11 +241,13 @@ public class WishlistActivity extends AppCompatActivity  {
 
                 } else {
                     if (response.body().isSuccess()) {
-                        Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        getWishList();
+                       // Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        wishlistProducts.clear();
+                        buildWishlisrRecycler();
+                        getWishList(1);
                         Log.v("TAG", "product selected deleted " + selected_product_id);
                     } else {
-                        Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        //Toast.makeText(WishlistActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         Log.v("TAG", "product selected not deleted " + selected_product_id);
                     }
                 }
@@ -271,16 +266,14 @@ public class WishlistActivity extends AppCompatActivity  {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setHasFixedSize(true);
         wishlistAdapter=new WishlistAdapter(WishlistActivity.this,wishlistProducts);
+        Log.v("TAG","ffff"+wishlistProducts.size());
         recyclerView.setAdapter(wishlistAdapter);
-
+           buildOnClickInterface();
         recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
             public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                current_page=current_page+1;
-
-                    getWishList();
-
-
+                current_page++;
+                    getWishList(current_page);
             }
         });
 
@@ -294,35 +287,18 @@ public class WishlistActivity extends AppCompatActivity  {
         recyclerView.setLayoutManager(layoutManager);
         wishlistAdapter= new WishlistAdapter(getApplicationContext(),wishlistProducts);
         recyclerView.setAdapter(wishlistAdapter);
-        recyclerView.addOnScrollListener(new PaginationScrollListener(layoutManager) {
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
             @Override
-            protected void loadMoreItems() {
-                isLoading = true;
-                currentPage += 1;
-                getWishList();
-            }
-
-
-            @Override
-            public boolean isLastPage() {
-                return isLastPage;
-            }
-
-            @Override
-            public boolean isLoading() {
-                return isLoading;
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                current_page++;
+                getWishList(current_page);
             }
         });
 
 
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        currentPage=1;
-        getWishList();
-    }
+
 
     @OnClick(R.id.nav_filter_id)
     void navFilterDailog() {
@@ -341,10 +317,32 @@ public class WishlistActivity extends AppCompatActivity  {
         oldProduct = mDialog.findViewById(R.id.old_product_product_check_box);
         watchChecked=mDialog.findViewById(R.id.watch_check_box);
         bracletChecked=mDialog.findViewById(R.id.braclet_product_check_box);
+        Spinner spinner=mDialog.findViewById(R.id.spinner);
+
+
+        setSpinnerData(spinner);
+        //spinner.setSelected(false);
+
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> adapterView, View view, int i, long l) {
+                 spinnerValue = adapterView.getItemAtPosition(i).toString();
+
+                 spinnerIndex=i+1;
+                Log.v("TAG","spinnerrrr"+spinnerValue);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> adapterView) {
+
+            }
+
+        });
 
 
 
-       // getWishList();
+
+        // getWishList();
         done.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -439,7 +437,12 @@ public class WishlistActivity extends AppCompatActivity  {
                     List<DataArrayModel> bracletes = getWatchesCategory(x1);
                     newList = getHighNewProducts(bracletes);
                     Log.v("TAG", "exper 7");
-            }
+            } else if(spinner.getSelectedItem().toString()!=null){
+                    Log.v("TAg","filterrrr"+spinnerIndex);
+                    newList= filterCity(wishlistProducts,spinnerIndex);
+
+
+                }
 
                 else {
                     wishlistProducts.clear();
@@ -580,5 +583,65 @@ public class WishlistActivity extends AppCompatActivity  {
         finish();
     }
 
+
+
+    private void setSpinnerData(Spinner spinner) {
+        getCityList(spinner);
+    }
+
+    private  void getCityList(Spinner spinner){
+        apiServiceInterface=ApiClient.getClientService();
+        Call<CityModel> call=apiServiceInterface.getCityList();
+
+        call.enqueue(new Callback<CityModel>() {
+            @Override
+            public void onResponse(Call<CityModel> call, Response<CityModel> response) {
+                if(response.body().isSuccess()){
+                    if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameAr());
+                        }
+                        spinnerAdapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_layout,cityNames);
+                        spinner.setAdapter(spinnerAdapter);
+                    }else  if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameEn());
+                            spinnerAdapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_layout,cityNames);
+                            spinner.setAdapter(spinnerAdapter);
+                        }
+                    }
+                    Log.v("TAG","cityes"+response.body().getCitydatamodel().get(0).getCityNameAr());
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CityModel> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    private List<DataArrayModel> filterCity(List<DataArrayModel> wishlistProducts,int spinnerIndex) {
+        Log.v("TAG","wwwww"+wishlistProducts.size());
+        for(int i=0;i<wishlistProducts.size();i++){
+            if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
+               if(wishlistProducts.get(i).getCityId()==spinnerIndex) {
+                    newList.add(wishlistProducts.get(i));
+                    Log.v("TAG","city size"+newList.size()+wishlistProducts.get(i).getCityArName());
+               }
+            }else if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
+                if(wishlistProducts.get(i).getCityId()==spinnerIndex) {
+                    newList.add(wishlistProducts.get(i));
+                    Log.v("TAG", "city size" + newList.size());
+                }
+            }
+        }
+        return newList;
+
+
+    }
 
 }

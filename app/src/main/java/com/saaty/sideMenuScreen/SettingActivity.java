@@ -12,6 +12,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -50,39 +51,43 @@ public class SettingActivity extends AppCompatActivity {
     }
 
     private void showLanguageDialog() {
-        String [] items={"Arabic","English"};
+        String [] items={getString(R.string.english),getString(R.string.arabic)};
         AlertDialog.Builder builder=new AlertDialog.Builder(this);
         builder.setTitle(getString(R.string.select_language));
         builder.setItems(items, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if (which == 0) {
-                    lang_selected = "ar";
-                    PreferenceHelper.setValue(getApplicationContext(),lang_selected);
-                    setConfig(getApplicationContext(),lang_selected);
-                    languageSelected.setText("Arabic");
-                } else if (which == 1) {
+                    // English Item is Slected
                     lang_selected = "en";
-                    PreferenceHelper.setValue(getApplicationContext(),lang_selected);
-                    setConfig(getApplicationContext(),lang_selected);
-                    languageSelected.setText("English");
+                    PreferenceHelper.setValue(SettingActivity.this, lang_selected);
+                    setConfig( SettingActivity.this,lang_selected);
+                    Log.v("TAG","lang_selceted"+lang_selected);
+
+                } else if (which == 1) {
+                    // Arabic Item is Selected vvffrer
+                    lang_selected = "ar";
+                    PreferenceHelper.setValue(SettingActivity.this, lang_selected);
+                    setConfig( SettingActivity.this,lang_selected);
+                    Log.v("TAG","lang_selceted"+lang_selected);
                 }
-                Intent intent=getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                startActivity(intent);
+
+                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                startActivity(i);
             }
         });
-        builder.create();
+      //  builder.create();
         builder.show();
 
 
     }
 
     private  void setConfig(Context context,String lang){
-        Locale locale=new Locale(lang);
+        Locale locale = new Locale(lang);
         Locale.setDefault(locale);
-        Configuration configuration=new Configuration();
-        configuration.locale=locale;
-        context.getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
+        Configuration config = new Configuration();
+        config.locale = locale;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
 }

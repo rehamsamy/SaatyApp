@@ -10,6 +10,8 @@ import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import butterknife.OnItemClick;
+import butterknife.OnItemSelected;
 import gun0912.tedbottompicker.TedBottomPicker;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -31,11 +33,14 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -47,6 +52,7 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.AdsProductsModel;
+import com.saaty.models.CityModel;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.EditAdsModel;
 import com.saaty.models.ProductDataModel;
@@ -94,6 +100,11 @@ public class EditAdsActivity extends AppCompatActivity {
     @BindView(R.id.phone_number_input_id)TextInputEditText phoneNumberInput;
     @BindView(R.id.email_input_id)TextInputEditText emailInput;
     @BindView(R.id.product_details_input_id)TextInputEditText productDescriptionInput;
+
+    String cityName;
+    int cityId;
+    List<String> cityNames=new ArrayList<>();
+    @BindView(R.id.spinner) Spinner spinner;
     String userName;
     UploadImageAdapter adapter;
     DataArrayModel dataArrayModel;
@@ -109,6 +120,7 @@ public class EditAdsActivity extends AppCompatActivity {
     Intent intent;
     private String productNameAr,productNameEn,productDesc,phone,email,price,productShape,contactType;
     DailogUtil dailogUtil;
+    ArrayAdapter<String> spinnerAdapter;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -124,6 +136,12 @@ public class EditAdsActivity extends AppCompatActivity {
         }
         networkAvailable=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
+
+
+        getCityList();
+     // cityName= spinner.getSelectedItem().toString();
+
+
 
     }
 
@@ -301,6 +319,7 @@ public class EditAdsActivity extends AppCompatActivity {
             map.put("contact_name",HomeActivity.full_name);
             map.put("contact_mobile",phone);
             map.put("contact_email",email);
+            map.put("city_id",cityId);
 
             MultipartBody.Part[] parts=new MultipartBody.Part[selectedUriList.size()];
             RequestBody requestBody1 = null;
@@ -364,6 +383,7 @@ public class EditAdsActivity extends AppCompatActivity {
             map.put("contact_name",HomeActivity.full_name);
             map.put("contact_mobile",phone);
             map.put("contact_email",email);
+            map.put("city_id",cityId);
 
             MultipartBody.Part[] parts = new MultipartBody.Part
                     [selectedUriList.size()];
@@ -385,7 +405,7 @@ public class EditAdsActivity extends AppCompatActivity {
                 public void onResponse(Call<EditAdsModel> call, Response<EditAdsModel> response) {
                     if (response.body().isSuccess()) {
                         Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
-                        startActivity(new Intent(getApplicationContext(), MyAdsActivity.class));
+                        startActivity(new Intent(getApplicationContext(),AdsActivity.class));
                         progressDialog.dismiss();
                     } else {
                         Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
@@ -482,5 +502,47 @@ public class EditAdsActivity extends AppCompatActivity {
         finish();
     }
 
+
+
+    private  void getCityList(){
+        apiServiceInterface=ApiClient.getClientService();
+        Call<CityModel> call=apiServiceInterface.getCityList();
+        call.enqueue(new Callback<CityModel>() {
+            @Override
+            public void onResponse(Call<CityModel> call, Response<CityModel> response) {
+                if(response.body().isSuccess()){
+                    if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameAr());
+                        }
+                        spinnerAdapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_layout,cityNames);
+                        spinner.setAdapter(spinnerAdapter);
+                    }else  if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameEn());
+                            spinnerAdapter=new ArrayAdapter<String>(getApplicationContext(),R.layout.spinner_layout,cityNames);
+                            spinner.setAdapter(spinnerAdapter);
+                        }
+                    }
+                    Log.v("TAG","cityes"+response.body().getCitydatamodel().get(0).getCityNameAr());
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CityModel> call, Throwable t) {
+
+            }
+        });
+    }
+
+
+    @OnItemSelected(R.id.spinner)
+    void onItemSelected(int index) {
+        cityName = (String) spinnerAdapter.getItem(index);
+        cityId=index+1;
+        Log.v("TAG","cityyy  "+cityId);
+    }
 
 }

@@ -4,12 +4,15 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.fourhcode.forhutils.FUtilsValidation;
@@ -20,6 +23,7 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.models.Data;
 import com.saaty.models.RegisterModel;
+import com.saaty.sideMenuScreen.TermsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
@@ -47,8 +51,10 @@ public class UserRegisterFragment extends Fragment {
     MaterialButton registerBtn;
     DailogUtil dailogUtil;
     SharedPreferences.Editor editor;
-     CheckBox acceptTerms;
+    CheckBox acceptTerms;
+    TextView acceptTermsTxt;
      Data data;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,6 +65,7 @@ public class UserRegisterFragment extends Fragment {
         password = view.findViewById(R.id.password_input_id);
         confirmPssword = view.findViewById(R.id.confirm_password_input_id);
         acceptTerms=view.findViewById(R.id.accept_terms_id);
+        acceptTermsTxt=view.findViewById(R.id.accept_terms_txt);
         dailogUtil=new DailogUtil();
 
         registerBtn = view.findViewById(R.id.confirm_btn_id);
@@ -71,6 +78,25 @@ public class UserRegisterFragment extends Fragment {
                 registerUser();
             }
         });
+
+
+        acceptTermsTxt.setClickable(true);
+        // acceptTermsTxt.setText("");
+        acceptTermsTxt.setPaintFlags(acceptTermsTxt.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        Linkify.addLinks(acceptTermsTxt, Linkify.ALL);
+        acceptTermsTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("LoginActivity", "Sign Up Activity activated.");
+                // this is where you should start the new Activity
+                Intent intent = new Intent(getContext(), TermsActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
+
+
         return view;
     }
 

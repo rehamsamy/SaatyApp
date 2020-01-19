@@ -27,6 +27,7 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.Data;
+import com.saaty.models.UserDataRegisterObject;
 import com.saaty.models.UserModel;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
@@ -67,6 +68,10 @@ public class SplashActivity extends AppCompatActivity {
         Gson gson = new Gson();
         UserModel userModel = gson.fromJson(user_data, UserModel.class);
 
+        String registerData=prefs.getString("register_data","");
+        Gson gson1=new Gson();
+        UserDataRegisterObject userDataRegisterObject=gson1.fromJson(registerData,UserDataRegisterObject.class);
+
 //        String register_data = prefs.getString("register_data", "");
 //        Gson gson1 = new Gson();
 //        Data data = gson1.fromJson(register_data, Data.class);
@@ -78,7 +83,16 @@ public class SplashActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
             // overridePendingTransition(R.anim.enter_from_right, R.anim.exit_out_left);
-        } else {
+        }else if(registerData !=null&& ! registerData .equals("")){
+            Intent intent = new Intent(SplashActivity.this, LoginTraderUserActivity.class);
+           // intent.putExtra("user_data", userModel);
+            Log.v("TAG","splahhhh"+userDataRegisterObject.getFullname());
+            startActivity(intent);
+            finish();
+        }
+
+
+        else {
 
             List<Integer> x = new ArrayList<>();
             x.add(R.drawable.splash_photo_1);

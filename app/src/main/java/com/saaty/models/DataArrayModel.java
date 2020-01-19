@@ -14,6 +14,10 @@ import androidx.room.PrimaryKey;
 
 public class DataArrayModel implements Parcelable {
 
+
+	@SerializedName("city_id")
+	private int cityId;
+
 	@SerializedName("store_id")
 	private int storeId;
 
@@ -31,6 +35,13 @@ public class DataArrayModel implements Parcelable {
 
 	@SerializedName("user_id")
 	private int userId;
+
+	@SerializedName("city_name_ar")
+	private String cityArName;
+
+	@SerializedName("city_name_en")
+	private String cityEnName;
+
 
 	@SerializedName("store_ar_description")
 	private String storeArDescription;
@@ -93,6 +104,21 @@ public class DataArrayModel implements Parcelable {
 //	}
 
 
+	public String getCityArName() {
+		return cityArName;
+	}
+
+	public void setCityArName(String cityArName) {
+		this.cityArName = cityArName;
+	}
+
+	public String getCityEnName() {
+		return cityEnName;
+	}
+
+	public void setCityEnName(String cityEnName) {
+		this.cityEnName = cityEnName;
+	}
 
 	public int getIdd() {
 		return idd;
@@ -314,6 +340,14 @@ public class DataArrayModel implements Parcelable {
 
 	public String getCreatedAt(){
 		return createdAt;
+	}
+
+	public int getCityId() {
+		return cityId;
+	}
+
+	public void setCityId(int cityId) {
+		this.cityId = cityId;
 	}
 
 	@Override

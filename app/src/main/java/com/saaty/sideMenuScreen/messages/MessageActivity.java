@@ -84,7 +84,7 @@ public class MessageActivity extends AppCompatActivity {
                receivedMessage.clear();
                buildReceivedMessageRecycler();
                getReceivedMessage(current_page);
-               tabLayout.addTab(tabLayout.newTab().setText("           "+getString(R.string.send)+"          "),1);
+               tabLayout.addTab(tabLayout.newTab().setText("           "+getString(R.string.sending)+"          "),1);
 
 
            }else {
@@ -164,7 +164,7 @@ public class MessageActivity extends AppCompatActivity {
                         Log.v("TAG","send mess"+sendMessage.size());
                         sendMessage.addAll(response.body().getMessageObjectModel().getMessageArrayModelList());
                         messageAdapter.notifyDataSetChanged();
-                        Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                       // Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
 
                     } else if(current_page==1&&sendMessage.size()==0){
@@ -207,7 +207,7 @@ public class MessageActivity extends AppCompatActivity {
                         receivedMessage.addAll(response.body().getMessageObjectModel().getMessageArrayModelList());
                         Log.v("TAG","receive mess"+receivedMessage.size());
                         messageAdapter.notifyDataSetChanged();
-                           Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                          // Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
 
                     } else if(current_page==1&&receivedMessage.size()==0){
@@ -331,4 +331,65 @@ public class MessageActivity extends AppCompatActivity {
         void OnClick();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        tabLayout.removeAllTabs();
+        if(networkAvailable.isNetworkAvailable()) {
+            tabLayout.addTab(tabLayout.newTab().setText("         " +getString(R.string.received)+"      "),0);
+            sendMessage.clear();
+            receivedMessage.clear();
+            buildReceivedMessageRecycler();
+            getReceivedMessage(current_page);
+            tabLayout.addTab(tabLayout.newTab().setText("           "+getString(R.string.sending)+"          "),1);
+
+
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+
+        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                tab_selected=tab.getPosition();
+                if(tab.getPosition()==0){
+                    sendMessage.clear();
+                    receivedMessage.clear();
+                    current_page=1;
+                    buildReceivedMessageRecycler();
+                    getReceivedMessage(current_page);
+                    Log.v("TAG","pos"+tab.getPosition());
+                }else if(tab.getPosition()==1){
+                    receivedMessage.clear();
+                    sendMessage.clear();
+                    current_page=1;
+                    buildSendMessageRecycler();
+                    getSendMessage(current_page);
+                    Log.v("TAG","pos"+tab.getPosition());
+
+                }
+                //buildRecyclerViewForCategory();
+                if(networkAvailable.isNetworkAvailable()) {
+                    //emptyData.setVisibility(View.GONE);
+                    // newProducts.clear();
+                    // current_page=1;
+                    //getStoreProducts(current_page, shape_type);
+                }else {
+                    // Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+
+
+    }
 }

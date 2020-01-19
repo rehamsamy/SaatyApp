@@ -59,6 +59,8 @@ public class ChangePasswordActivity extends AppCompatActivity {
         networkAvailable = new NetworkAvailable(getApplicationContext());
         type=HomeActivity.type;
 
+        //Log.v("TAG","type  xxx  "+type);
+
 
         if(type.equals("store")){
          Picasso.with(getApplicationContext()).load(urls.base_url +"/"+HomeActivity.store_logo).error(R.drawable.sidemenu_photo2).into(profileImg);
@@ -84,7 +86,7 @@ public class ChangePasswordActivity extends AppCompatActivity {
         if (!FUtilsValidation.isEmpty(oldPasswordInput, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(newPasswordInput, getString(R.string.field_required))
                 && !FUtilsValidation.isEmpty(confirmPasswordInput, getString(R.string.field_required))
-                && FUtilsValidation.isPasswordEqual(newPasswordInput, oldPasswordInput, getString(R.string.password_equal_error))) {
+                && FUtilsValidation.isPasswordEqual(newPasswordInput, confirmPasswordInput, getString(R.string.password_equal_error))) {
             apiServiceInterface = ApiClient.getClientService();
             Map<String, Object> map = new HashMap<>();
             map.put("password", newPasswordInput.getText().toString());
@@ -96,12 +98,14 @@ public class ChangePasswordActivity extends AppCompatActivity {
             call.enqueue(new Callback<SendCodeModel>() {
                 @Override
                 public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
-                    if (response.body().isSuccess()) {
-                        Toast.makeText(ChangePasswordActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
-                        progressDialog.dismiss();
-                        finish();
-                    } else {
-                        Toast.makeText(ChangePasswordActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                    if(response.code()==200) {
+                        if (response.body().isSuccess()) {
+                            Toast.makeText(ChangePasswordActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                            progressDialog.dismiss();
+                            finish();
+                        }
+                    }else if(response.code()==404){
+                        Toast.makeText(ChangePasswordActivity.this, "this password is incorrect", Toast.LENGTH_LONG).show();
                         progressDialog.dismiss();
                     }
                 }

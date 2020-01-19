@@ -27,6 +27,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -52,6 +53,7 @@ import com.saaty.MainActivity;
 import com.saaty.R;
 import com.saaty.home.StoresProduct.StoresProductsActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
+import com.saaty.models.AdvsModel;
 import com.saaty.models.CategoryModel;
 import com.saaty.models.Data;
 import com.saaty.models.DataItem;
@@ -80,7 +82,9 @@ import com.saaty.util.urls;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static androidx.constraintlayout.widget.ConstraintSet.*;
 import static androidx.constraintlayout.widget.ConstraintSet.BOTTOM;
@@ -138,6 +142,8 @@ public static int user_id;
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         mDialog=new Dialog(this);
+
+        setAds();
         setSupportActionBar(toolbar);
        getSupportActionBar().setTitle("");
         ActionBarDrawerToggle toggle=new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.open_drawer,R.string.close_drawer);
@@ -220,19 +226,22 @@ public static int user_id;
            type=data.getUserDataRegisterObject().getType();
            user_id=data.getUserDataRegisterObject().getId();
               userImg= navigationView.getHeaderView(0).findViewById(R.id.user_img_id);
-              store_logo=data.getStoreDataRegisterObject().getStoreLogo();
+              store_logo=intent.getStringExtra("logo");
+           Log.v("TAg","store logooo"+store_logo);
            userName.setText(data.getUserDataRegisterObject().getFullname());
            full_name=data.getUserDataRegisterObject().getFullname();
-           store_name= data.getStoreDataRegisterObject().getStoreArName();
+           store_name= intent.getStringExtra("store_name");
            mobile=data.getUserDataRegisterObject().getMobile();
            email=data.getUserDataRegisterObject().getEmail();
+           Log.v("TAg","store logooo  "+store_name);
            store_desc= "";
-           if(data.getStoreDataRegisterObject().getStoreLogo()!=null){
+           if(store_logo!=null){
                Picasso.with(getApplicationContext()).load(urls.base_url+"/"+store_logo)
                        .error(R.drawable.sidemenu_photo2).into(userImg);
            }
 
            userImg.setImageResource(R.drawable.sidemenu_photo2);
+          // Log.v("TAG","type  xxx  "+type);
        }
        else {
 
@@ -246,26 +255,18 @@ public static int user_id;
                userModel=loginModel.getUserModel().get(0);
                userName.setText(userModel.getFullname());
                user_id=userModel.getId();
-               Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
-                       .error(R.drawable.sidemenu_photo2).into(userImg);
-           }
-//            else  if(prefs.contains("register_data")){
-//
-//                   String user_data = prefs.getString("register_data", "");
-//                   Gson gson = new Gson();
-//                   Log.v("TAG","eeeeeeeeeee"+ user_data.toString());
-//                   data = gson.fromJson(user_data, Data.class);
-//                   access_token="Bearer"+" "+data.getToken();
-//                   userName.setText(data.getUserDataRegisterObject().getFullname());
-//                   user_id=data.getUserDataRegisterObject().getId();
-//
-//                   if(data.getStoreDataRegisterObject().getStoreLogo()!=null) {
-//                       Picasso.with(getApplicationContext()).load(urls.base_url + "/" + data.getStoreDataRegisterObject()
-//                               .getStoreLogo())
-//                               .error(R.drawable.sidemenu_photo2).into(userImg);
-//                   }
+               type=loginModel.getUserModel().get(0).getType();
+               full_name=userModel.getFullname();
+                Log.v("TAG","type   xxx "+type+"  " +full_name);
+                if (type.equals("user")) {
+                    Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
+                            .error(R.drawable.sidemenu_photo).into(userImg);
+                }else if(type.equals("store")){
+                    Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
+                            .error(R.drawable.sidemenu_photo).into(userImg);
+                }
 
-             //  }
+           }
 
 
        }
@@ -356,6 +357,7 @@ public static int user_id;
 
     }
 
+
     private void checkLanguage() {
         if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
             arabicArrowId.setVisibility(View.GONE);
@@ -386,7 +388,7 @@ public static int user_id;
                 @Override
                 public void onResponse(Call<CategoryModel> call, Response<CategoryModel> response) {
                     if(response.body().isSuccess()){
-                        Toast.makeText(HomeActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                       // Toast.makeText(HomeActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         categoryItem=response.body().getData();
 
                          if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
@@ -532,7 +534,7 @@ public static int user_id;
 
 
 
-    private void logoutOfApp() {
+    public void logoutOfApp() {
 
         mDialog.setCancelable(false);
         mDialog.setContentView(R.layout.logout_layout);
@@ -563,6 +565,72 @@ public static int user_id;
 
 
 
+    }
+
+    private void setAds() {
+        apiServiceInterface = ApiClient.getClientService();
+        Map<String, Object> map = new HashMap<>();
+        map.put("key", "advs");
+
+        Call<AdvsModel> call = apiServiceInterface.getAdvs(map);
+        call.enqueue(new Callback<AdvsModel>() {
+            @Override
+            public void onResponse(Call<AdvsModel> call, Response<AdvsModel> response) {
+                if (response.body().isSuccess()) {
+                    AdvsModel model = response.body();
+
+                    mDialog.setCancelable(false);
+                    mDialog.setContentView(R.layout.advs_layout);
+                    MaterialButton showAdsBtn = mDialog.findViewById(R.id.show_advs_btn);
+                    ImageView cancelAds = mDialog.findViewById(R.id.cancel_ads_btn);
+                    ImageView adsImg = mDialog.findViewById(R.id.advs_img);
+                    TextView adsTxt = mDialog.findViewById(R.id.advs_txt);
+                    TextView skipAdsTxt = mDialog.findViewById(R.id.skip_ads_txt);
+
+                    adsTxt.setText(model.getAdvData().get(0).getValue3());
+                    Picasso.with(getApplicationContext()).load(model.getAdvData().get(0).getValue1()).error(R.drawable.watch_item1).into(adsImg);
+
+                    mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                    mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                    mDialog.show();
+
+                    cancelAds.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mDialog.dismiss();
+                        }
+                    });
+                    skipAdsTxt.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mDialog.dismiss();
+                        }
+                    });
+
+                    showAdsBtn.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View view) {
+                            mDialog.dismiss();
+                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                            Uri uri=Uri.parse(model.getAdvData().get(0).getValue1());
+                            intent.setData(uri);
+                       // intent.setPackage(model.getAdvData().get(0).getValue2());
+                            startActivity(intent);
+
+                        }
+                    });
+
+
+
+
+         }
+     }
+
+     @Override
+     public void onFailure(Call<AdvsModel> call, Throwable t) {
+
+     }
+ });
     }
 
 

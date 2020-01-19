@@ -23,12 +23,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".sideMenuScreen.messages.MessageActivity2"></activity>
-        <activity android:name=".sideMenuScreen.myAds.AdsActivity" />
-        <activity android:name=".sideMenuScreen.messages.MessageSendDetailsActivity" />
-        <activity android:name=".sideMenuScreen.messages.SendMessageActivity" />
-        <activity android:name=".sideMenuScreen.messages.MessageDetailsActivity" />
-        <activity android:name=".sideMenuScreen.messages.MessageActivity" />
+        <activity android:name=".sideMenuScreen.TermsActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity android:name=".sideMenuScreen.messages.MessageActivity2"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.myAds.AdsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.messages.MessageSendDetailsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.messages.SendMessageActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.messages.MessageDetailsActivity"
+            android:screenOrientation="portrait"/>
+        <activity android:name=".sideMenuScreen.messages.MessageActivity"
+            android:screenOrientation="portrait"/>
         <activity
             android:name=".sideMenuScreen.myAds.EditAdsActivity"
             android:screenOrientation="portrait" />

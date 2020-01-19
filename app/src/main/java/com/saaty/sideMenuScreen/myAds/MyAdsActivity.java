@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import me.zhanghai.android.materialprogressbar.MaterialProgressBar;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -60,8 +61,8 @@ import java.util.Map;
 public class MyAdsActivity extends AppCompatActivity  {
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
-    @BindView(R.id.progress_id)
-    ProgressBar progressBar;
+   @BindView(R.id.progress_id1)
+    MaterialProgressBar progressBar;
     @BindView(R.id.empty_data_txt_id)
     TextView emptyData;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;
@@ -223,9 +224,13 @@ public class MyAdsActivity extends AppCompatActivity  {
 
     }
 
-
-
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        adsProducts.clear();
+        buildRecyclerViewForCategory();
+        getAdsroductList(1);
+    }
 
     private void getAdsroductList(int current_page) {
         if(networkAvailable.isNetworkAvailable()){

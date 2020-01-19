@@ -61,6 +61,7 @@ import com.saaty.models.ProductimagesItem;
 import com.saaty.models.SendCodeModel;
 import com.saaty.sideMenuScreen.EditProfileActivity;
 import com.saaty.sideMenuScreen.messages.SendMessageActivity;
+import com.saaty.sideMenuScreen.myAds.AdsActivity;
 import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
 import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
@@ -244,12 +245,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
             @Override
             public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
                 if (response.body().isSuccess()) {
-                    Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                   // Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     mDailog.dismiss();
                     finish();
                     Log.v(TAG, "product selected deleted " + selected_product_id);
                 } else {
-                    Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                  //  Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     Log.v(TAG, "product selected not deleted " + selected_product_id);
                 }
             }
@@ -372,7 +373,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
                     productimagesItems = response.body().getProductimagesItems();
 
                     if (productimagesItems.size() > 0) {
-                        Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                      //  Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         imagesListAdapter = new ProductImagesListAdapter(ProductDetailsActivity.this, productimagesItems);
                         recyclerView.setAdapter(imagesListAdapter);
                         progressBar.setVisibility(GONE);
@@ -386,7 +387,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
                     }
 
                 } else {
-                    Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                   // Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     emptyDataTxt.setVisibility(VISIBLE);
                     progressBar.setVisibility(GONE);
                 }
@@ -408,12 +409,12 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
             @Override
             public void onResponse(Call<CheckWishlistModel> call, Response<CheckWishlistModel> response) {
                 if (response.body().isSuccess()&&response.body().getMessage().equals("Products retrieved successfully.")) {
-                    Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                   // Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     wishlistImg.setImageResource(R.drawable.wishlist_select);
                     Log.v(TAG,"already added");
                 } else if(response.body().getMessage().equals("Product not found.")){
                     wishlistImg.setImageResource(R.drawable.wishlist_not_select);
-                    Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     Log.v(TAG,"already not added");
                 }
             }
@@ -466,7 +467,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
                     progressBar1.setVisibility(VISIBLE);
                     deleteAdsProduct(dataArrayModel.getProductId(),mDailog,progressBar1);
                 } else {
-                    Toast.makeText(ProductDetailsActivity.this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+                    //Toast.makeText(ProductDetailsActivity.this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
                 }
 
             }
@@ -505,7 +506,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
                         Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         bar.setVisibility(GONE);
                         dialog.dismiss();
-                        startActivity(new Intent(getApplicationContext(),EditAdsActivity.class));
+                        startActivity(new Intent(getApplicationContext(), AdsActivity.class));
                         Log.v("TAG", "product selected deleted " + selected_product_id);
                     } else {
                         Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
@@ -564,7 +565,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
             productNameTxt.setText(dataArrayModel.getEnName());
             productDescTxt.setText(dataArrayModel.getEnDescription());
         }
-        productPriceTxt.setText(String.valueOf(dataArrayModel.getPrice()));
+        productPriceTxt.setText(String.valueOf(dataArrayModel.getPrice())+" "+getString(R.string.price_type));
         position = intent.getIntExtra(POSITION, 0);
         selected_product_id = dataArrayModel.getProductId();
         producerPhoneTxt.setText(dataArrayModel.getContactMobile());

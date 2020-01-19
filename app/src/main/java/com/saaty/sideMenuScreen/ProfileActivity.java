@@ -66,6 +66,18 @@ public class ProfileActivity extends AppCompatActivity {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
 
+        if(getIntent().hasExtra("data")){
+            Log.v("TAG","eeeee");
+            getProfileData();
+        }
+
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getProfileData();
 
     }
 
