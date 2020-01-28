@@ -11,6 +11,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -23,6 +24,9 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.models.Data;
 import com.saaty.models.RegisterModel;
+import com.saaty.models.SendCodeModel;
+import com.saaty.models.UserDataRegisterObject;
+import com.saaty.password.VerificationCodeActivity;
 import com.saaty.sideMenuScreen.TermsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
@@ -45,20 +49,23 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class UserRegisterFragment extends Fragment {
 
 
+    public static final String MY_PREFS_NAME ="my_data1" ;
     ApiServiceInterface serviceInterface;
     NetworkAvailable networkAvailable;
     TextInputEditText nameInput, phoneInput, emailInput, password, confirmPssword;
     MaterialButton registerBtn;
     DailogUtil dailogUtil;
     SharedPreferences.Editor editor;
+    SharedPreferences sharedPreferences;
     CheckBox acceptTerms;
     TextView acceptTermsTxt;
-     Data data;
+   public  static   Data data;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view=LayoutInflater.from(getContext()).inflate(R.layout.register_user_fragment_layout,container,false);
+        getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
         nameInput = view.findViewById(R.id.user_name_input_id);
         phoneInput = view.findViewById(R.id.phone_input_id);
         emailInput = view.findViewById(R.id.email_input_id);
@@ -67,6 +74,8 @@ public class UserRegisterFragment extends Fragment {
         acceptTerms=view.findViewById(R.id.accept_terms_id);
         acceptTermsTxt=view.findViewById(R.id.accept_terms_txt);
         dailogUtil=new DailogUtil();
+
+        sharedPreferences=getContext().getSharedPreferences(UserRegisterFragment.MY_PREFS_NAME,MODE_PRIVATE);
 
         registerBtn = view.findViewById(R.id.confirm_btn_id);
         networkAvailable=new NetworkAvailable(getContext());
@@ -139,20 +148,30 @@ public class UserRegisterFragment extends Fragment {
                                 Log.v(TAG, "valid error1 ");
                                  data=response.body().getData();
                                 data.setToken(response.body().getData().getToken());
-                                data.getUserDataRegisterObject().setEmail(data.getUserDataRegisterObject().getEmail());
-                                data.getUserDataRegisterObject().setFullname(data.getUserDataRegisterObject().getFullname());
-                                data.getUserDataRegisterObject().setMobile(data.getUserDataRegisterObject().getMobile());
-                                data.getUserDataRegisterObject().setId(data.getUserDataRegisterObject().getId());
+                                data.getUserDataRegisterObject().setEmail(response.body().getData().getUserDataRegisterObject().getEmail());
+                                data.getUserDataRegisterObject().setFullname(response.body().getData().getUserDataRegisterObject().getFullname());
+                                data.getUserDataRegisterObject().setMobile(response.body().getData().getUserDataRegisterObject().getFullname());
+                                data.getUserDataRegisterObject().setId(response.body().getData().getUserDataRegisterObject().getId());
+                                data.getUserDataRegisterObject().setType(response.body().getData().getUserDataRegisterObject().getType());
+                                data.setUserDataRegisterObject(response.body().getData().getUserDataRegisterObject());
                                 Gson gson = new Gson();
                                 String user_data = gson.toJson(data);
-                                editor = getContext().getSharedPreferences(LoginTraderUserActivity.MY_PREFS_NAME, MODE_PRIVATE).edit();
-                                editor.putString("register_data", user_data);
-                                Log.v("TAG","regggg"+gson.toString());
-                                editor.commit();
 
-                                Intent intent = new Intent(getActivity(), HomeActivity.class);
-                                intent.putExtra("register_user_model", response.body().getData());
-                                startActivity(intent);
+
+                                 editor=sharedPreferences.edit();
+                                editor = getContext().getSharedPreferences(UserRegisterFragment.MY_PREFS_NAME, MODE_PRIVATE).edit();
+                                editor.putString("register_data", user_data);
+                                Log.v("TAG","regggg     xxxx   "+sharedPreferences.getString("type",""));
+                                editor.commit();
+                                editor.apply();
+
+
+
+//                                Intent intent = new Intent(getActivity(), HomeActivity.class);
+//                                intent.putExtra("register_user_model", response.body().getData());
+//                                startActivity(intent);
+
+                                sendEmailVerificationCode(response.body().getData().getToken());
                                 Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                                 progressDialog.dismiss();
                             } else if (response.body().getSuccess() == false) {
@@ -186,6 +205,41 @@ public class UserRegisterFragment extends Fragment {
         }
     }
 
+    private void sendEmailVerificationCode(String token) {
+        if (networkAvailable.isNetworkAvailable()) {
+
+            ProgressDialog progressDialog=DailogUtil.showProgressDialog(getContext(),getString(R.string.send_email_verify),false);
+            serviceInterface = ApiClient.getClientService();
+            Call<SendCodeModel> call=serviceInterface.sendCodeToEmail("application/json","Bearer "+token);
+            call.enqueue(new Callback<SendCodeModel>() {
+                @Override
+                public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
+                    if(response.body().isSuccess()){
+                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        Intent intent=new Intent(getActivity(), VerificationCodeActivity.class);
+                        intent.putExtra("register_user_model", data);
+//                        intent.putExtra("logo",logo);
+//                        intent.putExtra("store_name",storeName);
+                        progressDialog.dismiss();
+                        startActivity(intent);
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SendCodeModel> call, Throwable t) {
+
+                }
+            });
+        }else {
+
+
+            Toast.makeText(getContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+    }
 
     }
+
+
+
 

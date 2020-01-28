@@ -84,7 +84,7 @@ public class WishlistActivity extends AppCompatActivity  {
     String sort_type;
     Dialog mDialog;
     List<DataArrayModel> wishlistProducts=new ArrayList<>();
-    List<DataArrayModel> newWishlist;
+    List<DataArrayModel> newWishlist=new ArrayList<>();
     static List<DataArrayModel> newSortedList;
     WishlistAdapter wishlistAdapter;
     ApiServiceInterface apiServiceInterface;
@@ -139,9 +139,12 @@ public class WishlistActivity extends AppCompatActivity  {
                         wishlistAdapter.notifyDataSetChanged();
 
                     }
-                }else {
+                }else if(newlist.size()==0&&s.length()!=0){
                     wishlistProducts.clear();
                     emptyData.setVisibility(View.VISIBLE);
+                    wishlistAdapter.notifyDataSetChanged();
+                }else if(s.length()==0&&newlist.size()==0){
+                    wishlistProducts.addAll(newWishlist);
                     wishlistAdapter.notifyDataSetChanged();
                 }
             }
@@ -166,7 +169,7 @@ public class WishlistActivity extends AppCompatActivity  {
          //  progressBar.setVisibility(View.VISIBLE);
             Map<String,Object> map=new HashMap<>();
           String token= HomeActivity.access_token;
-          int limit=10;
+          int limit=50;
             map.put("page",current_page);
             map.put("limit",limit);
             Call<StoreListModel> call=apiServiceInterface.getWishlist(map,"application/json",token);
@@ -179,6 +182,7 @@ public class WishlistActivity extends AppCompatActivity  {
                         if(response.body().isSuccess()) {
                             //shlistProducts=wiresponse.body().getDataObjectModel().getDataArrayModelList();
                                  if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
+                                     newWishlist=response.body().getDataObjectModel().getDataArrayModelList();
                                     wishlistProducts.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                                     wishlistAdapter.notifyDataSetChanged();
                                      progressBar.setVisibility(View.GONE);
@@ -644,4 +648,11 @@ public class WishlistActivity extends AppCompatActivity  {
 
     }
 
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+    }
 }

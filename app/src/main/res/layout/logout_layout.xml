@@ -3,6 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="10dp"
+    android:layout_margin="15dp"
     android:background="@color/white">
 
 
@@ -12,24 +14,27 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/logout_msg"
-        android:textColor="@color/gray"
+        android:textColor="@color/black"
         android:layout_marginTop="40dp"
         android:textSize="17sp"
         android:textAlignment="center"
         app:layout_constraintStart_toStartOf="parent"
+        android:drawableEnd="@drawable/sidemenu_signout"
+        android:drawablePadding="15dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/delete_btn_id"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/cancel_btn_id"
         app:layout_constraintTop_toBottomOf="@id/delete_ads_txt_id"
         app:layout_constraintBottom_toBottomOf="parent"
         android:textAllCaps="false"
         android:layout_marginTop="30dp"
+        android:layout_marginBottom="20dp"
         android:textColor="@color/white"
         android:text="@string/log_out"
         android:background="@color/blue"/>
@@ -39,14 +44,15 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/cancel_btn_id"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="50dp"
         app:layout_constraintStart_toEndOf="@id/delete_btn_id"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="5dp"
+        android:layout_marginStart="10dp"
         android:textAllCaps="false"
         android:layout_marginTop="10dp"
         android:textColor="@color/white"
+        android:layout_marginBottom="20dp"
         android:text="@string/cancel"
         android:background="@color/blue"/>
 

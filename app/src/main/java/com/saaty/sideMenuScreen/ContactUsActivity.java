@@ -56,7 +56,7 @@ public class ContactUsActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<ProductDataModel> call, Response<ProductDataModel> response) {
                     if (response.body().isSuccess()) {
-                        Toast.makeText(ContactUsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
+                       // Toast.makeText(ContactUsActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                           phoneNumTxt.setText(response.body().getProductDataModels().get(0).getValue1());
                         emailTxt.setText(response.body().getProductDataModels().get(0).getValue2());
                         addressTxt.setText(response.body().getProductDataModels().get(0).getValue3());

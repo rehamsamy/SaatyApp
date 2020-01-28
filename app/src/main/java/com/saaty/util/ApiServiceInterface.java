@@ -54,8 +54,8 @@ public interface ApiServiceInterface {
     @POST("/api/register")
     Call<RegisterModel> registerStore(@QueryMap Map<String, Object> map,@Part MultipartBody.Part part);
 
-
-    @GET("/api/SendMobileResetCode/{id}")
+///SendEmailResetCode/a@a.com
+    @GET("/api/SendEmailResetCode/{id}")
     Call<SendCodeModel> sendMobileCode(@Path("id") String email);
 
     @POST("/api/CheckResetCode")
@@ -238,7 +238,7 @@ public interface ApiServiceInterface {
 
 
     //-----------------------get New -Old store Product--------------
-    @GET("/api/storeproduct/search")
+    @GET("/api/products")
     Call<StoreListModel> getNewOldStoreProduct(@QueryMap Map<String,Object> map);
 
 
@@ -270,5 +270,34 @@ public interface ApiServiceInterface {
 
     @POST("/api/getscreen")
     Call<AdvsModel> getTerms(@Body Map<String, Object> map);
+
+
+    //-----------------------------   get product by city id -----------------------
+    @GET("/api/product/search")
+    Call<StoreListModel> getProductsByCityId(@Body Map<String, Object> map);
+
+
+
+    //---------------------------  send email register --------------------------
+    @POST("/api/SendEmailVerifyCode")
+    Call<SendCodeModel> sendCodeToEmail(@Header("Accept") String accept
+                                       ,@Header("Authorization") String token);
+
+
+   ///-----------------------------  verify code in email register ------------------
+   @POST("/api/VerifyCode")
+   Call<SendCodeModel> verifyCodeFromEmail(@Header("Accept") String accept
+                                           ,@Header("Authorization") String token,
+                                           @Body Map<String, Object> map);
+
+
+   //-------------------------------  get message  replies ---------------------------
+    @GET("/api/messages/{id}")
+    Call<MessageModel> getMessageReblies(
+            @Path("id") int id
+            ,@Header("Accept") String accept
+            , @Header("Authorization") String auth
+            , @QueryMap Map<String, Object> map);
+
 
 }

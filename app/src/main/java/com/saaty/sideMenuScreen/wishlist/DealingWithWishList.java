@@ -74,10 +74,12 @@ Context mContext;
                 if(response.body().isSuccess()){
                     Toast.makeText(mContext, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     imageView.setImageResource(R.drawable.wishlist_not_select);
+                    Log.v("TAG","dellll 1");
                     progressBar.setVisibility(View.GONE);
                 }else {
                     Toast.makeText(mContext, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     progressBar.setVisibility(View.GONE);
+                    Log.v("TAG","dellll 2");
                 }
             }
 
@@ -127,5 +129,8 @@ Context mContext;
         });
 
     }
+
+
+
 
 }

@@ -104,6 +104,46 @@ public class DataArrayModel implements Parcelable {
 //	}
 
 
+	protected DataArrayModel(Parcel in) {
+		cityId = in.readInt();
+		storeId = in.readInt();
+		storeArName = in.readString();
+		storeEnDescription = in.readString();
+		storeEnName = in.readString();
+		updatedAt = in.readString();
+		userId = in.readInt();
+		cityArName = in.readString();
+		cityEnName = in.readString();
+		storeArDescription = in.readString();
+		storeLogo = in.readString();
+		createdAt = in.readString();
+		contactName = in.readString();
+		shape = in.readString();
+		enDescription = in.readString();
+		arName = in.readString();
+		arDescription = in.readString();
+		contactEmail = in.readString();
+		contactType = in.readString();
+		categoryId = in.readInt();
+		price = in.readInt();
+		productId = in.readInt();
+		enName = in.readString();
+		contactMobile = in.readString();
+		idd = in.readInt();
+	}
+
+	public static final Creator<DataArrayModel> CREATOR = new Creator<DataArrayModel>() {
+		@Override
+		public DataArrayModel createFromParcel(Parcel in) {
+			return new DataArrayModel(in);
+		}
+
+		@Override
+		public DataArrayModel[] newArray(int size) {
+			return new DataArrayModel[size];
+		}
+	};
+
 	public String getCityArName() {
 		return cityArName;
 	}
@@ -182,41 +222,7 @@ public class DataArrayModel implements Parcelable {
 		this.contactMobile = contactMobile;
 	}
 
-	public DataArrayModel(Parcel in) {
-		storeId = in.readInt();
-		storeArName = in.readString();
-		storeEnDescription = in.readString();
-		storeEnName = in.readString();
-		updatedAt = in.readString();
-		userId = in.readInt();
-		storeArDescription = in.readString();
-		storeLogo = in.readString();
-		createdAt = in.readString();
-		contactName = in.readString();
-		shape = in.readString();
-		enDescription = in.readString();
-		arName = in.readString();
-		arDescription = in.readString();
-		contactEmail = in.readString();
-		contactType = in.readString();
-		categoryId = in.readInt();
-		price = in.readInt();
-		productId = in.readInt();
-		enName = in.readString();
-		contactMobile = in.readString();
-	}
 
-	public static final Creator<DataArrayModel> CREATOR = new Creator<DataArrayModel>() {
-		@Override
-		public DataArrayModel createFromParcel(Parcel in) {
-			return new DataArrayModel(in);
-		}
-
-		@Override
-		public DataArrayModel[] newArray(int size) {
-			return new DataArrayModel[size];
-		}
-	};
 
 	public String getContactName() {
 		return contactName;
@@ -372,27 +378,34 @@ public class DataArrayModel implements Parcelable {
 	}
 
 	@Override
-	public void writeToParcel(Parcel dest, int flags) {
-		dest.writeInt(storeId);
-		dest.writeString(storeArName);
-		dest.writeString(storeEnDescription);
-		dest.writeString(storeEnName);
-		dest.writeString(updatedAt);
-		dest.writeInt(userId);
-		dest.writeString(storeArDescription);
-		dest.writeString(storeLogo);
-		dest.writeString(createdAt);
-		dest.writeString(contactName);
-		dest.writeString(shape);
-		dest.writeString(enDescription);
-		dest.writeString(arName);
-		dest.writeString(arDescription);
-		dest.writeString(contactEmail);
-		dest.writeString(contactType);
-		dest.writeInt(categoryId);
-		dest.writeInt(price);
-		dest.writeInt(productId);
-		dest.writeString(enName);
-		dest.writeString(contactMobile);
+	public void writeToParcel(Parcel parcel, int i) {
+
+		parcel.writeInt(cityId);
+		parcel.writeInt(storeId);
+		parcel.writeString(storeArName);
+		parcel.writeString(storeEnDescription);
+		parcel.writeString(storeEnName);
+		parcel.writeString(updatedAt);
+		parcel.writeInt(userId);
+		parcel.writeString(cityArName);
+		parcel.writeString(cityEnName);
+		parcel.writeString(storeArDescription);
+		parcel.writeString(storeLogo);
+		parcel.writeString(createdAt);
+		parcel.writeString(contactName);
+		parcel.writeString(shape);
+		parcel.writeString(enDescription);
+		parcel.writeString(arName);
+		parcel.writeString(arDescription);
+		parcel.writeString(contactEmail);
+		parcel.writeString(contactType);
+		parcel.writeInt(categoryId);
+		parcel.writeInt(price);
+		parcel.writeInt(productId);
+		parcel.writeString(enName);
+		parcel.writeString(contactMobile);
+		parcel.writeInt(idd);
 	}
+
+
 }

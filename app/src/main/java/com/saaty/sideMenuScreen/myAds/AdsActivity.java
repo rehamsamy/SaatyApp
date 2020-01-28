@@ -144,16 +144,28 @@ DailogUtil xDailog;
                         storeProductAdapter.notifyDataSetChanged();
 
                     }
-                } else {
+                }
+                else if(newlist.size()== 0&&s.length()!=0){
+                    Log.v("TAG","ex   1");
                     adsProducts.clear();
                     emptyData.setVisibility(View.VISIBLE);
                     storeProductAdapter.notifyDataSetChanged();
+                }else if(s.length()==0&&newlist.size()==0){
+                    Log.v("TAG","ex   2");
+                    emptyData.setVisibility(View.GONE);
+                    adsProducts.addAll(newAdsProduct);
+                    storeProductAdapter.notifyDataSetChanged();
+//                    buildRecyclerViewForCategory();
+//                    getAdsroductList(current_page);
                 }
+
             }
 
             @Override
             public void afterTextChanged(Editable s) {
+                if(s.length()==0){
 
+                }
 
             }
         });
@@ -169,7 +181,7 @@ DailogUtil xDailog;
             Map<String, Object> map = new HashMap<>();
             String token = HomeActivity.access_token;
             map.put("page", current_page);
-            map.put("limit", 10);
+            map.put("limit", 50);
             Call<StoreListModel> call = apiServiceInterface.getAdsProducts("application/json", token, map);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
@@ -461,5 +473,12 @@ DailogUtil xDailog;
 
 
         }
+    }
+
+    @OnClick(R.id.add_ads_btn_id)
+    void addAdsClick(){
+        Intent intent1=new Intent(new Intent(AdsActivity.this, EditAdsActivity.class));
+        intent1.putExtra(EditAdsActivity.ADD_NEW_AD,"add_new_ads");
+        startActivity(intent1);
     }
 }

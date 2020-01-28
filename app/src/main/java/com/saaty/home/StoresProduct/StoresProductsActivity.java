@@ -75,6 +75,7 @@ public class StoresProductsActivity extends AppCompatActivity {
     @BindView(R.id.empty_data_txt_id)TextView emptyData;
     @BindView(R.id.search_ed_id) EditText searchView;
     @BindView(R.id.progress_id) ProgressBar progressBar;
+    @BindView(R.id.send_img_id) ImageView sendImg;
    // @BindView(R.id.view_pager_id) ViewPager viewPager;
    List<DataArrayModel> newList=new ArrayList<>();
     FilterMethods filterMethods;
@@ -87,6 +88,9 @@ public class StoresProductsActivity extends AppCompatActivity {
     ApiServiceInterface apiServiceInterface;
     List<DataArrayModel> storeProductsList=new ArrayList<>();
     List<DataArrayModel> newProducts=new ArrayList<>();
+    List<DataArrayModel> nWProducts=new ArrayList<>();
+    List<DataArrayModel> usedProducts=new ArrayList<>();
+
     List<DataArrayModel> products=new ArrayList<>();
     List<DataArrayModel> wishlistProducts=new ArrayList<>();
     List<Integer> ids=new ArrayList<>();
@@ -94,6 +98,7 @@ public class StoresProductsActivity extends AppCompatActivity {
     StoreProductAdapter adapter;
     Dialog mDialog;
     String store_name;
+
     int id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,6 +110,16 @@ public class StoresProductsActivity extends AppCompatActivity {
         dealingWithWishList=new DealingWithWishList(this);
         mDialog=new Dialog(this);
         pagerAdaper=new StoreProductsPagerAdaper(getSupportFragmentManager());
+
+
+        if(HomeActivity.user_id==0){
+            sendImg.setImageResource(R.drawable.send_message_not_active);
+            sendImg.setEnabled(true);
+        }else {
+            sendImg.setEnabled(true);
+            sendImg.setImageResource(R.drawable.send_message);
+        }
+
        if(networkAvailable.isNetworkAvailable()){
             if(HomeActivity.user_id !=0){
                 getWishList();
@@ -133,6 +148,7 @@ public class StoresProductsActivity extends AppCompatActivity {
            String newProd=getString(R.string.new_products);
            tabLayout.addTab(tabLayout.newTab().setText("      "+newProd+"     "),0);
           // newProducts.clear();
+           nWProducts.clear();
            Log.v("TAG","passsss");
            emptyData.setVisibility(View.GONE);
            shape_type="New";
@@ -140,6 +156,7 @@ public class StoresProductsActivity extends AppCompatActivity {
            getStoreProducts(current_page,"New");
 
            tabLayout.addTab(tabLayout.newTab().setText("        "+getString(R.string.old_products)+"        "),1);
+
 
        }else {
            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
@@ -161,6 +178,7 @@ public class StoresProductsActivity extends AppCompatActivity {
                if(networkAvailable.isNetworkAvailable()) {
                    emptyData.setVisibility(View.GONE);
                    storeProductsList.clear();
+                   nWProducts.clear();
                    current_page=1;
                    buildRecyclerViewForCategory();
                    getStoreProducts(current_page,shape_type);
@@ -191,8 +209,10 @@ public class StoresProductsActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String newText = s.toString();
-                Log.v("TAG", "sssssssssss" + storeProductsList.size() + s.toString().toLowerCase());
+                Log.v("TAG", "sssssssssss" + count +"   "+storeProductsList.size() + s.toString().toLowerCase());
                 ArrayList<DataArrayModel> newlist = new ArrayList<>();
+
+
 
                 for (DataArrayModel item : storeProductsList) {
                     Log.v("TAG", "ar name" + item.getArName().contains(newText));
@@ -200,18 +220,46 @@ public class StoresProductsActivity extends AppCompatActivity {
                         newlist.add(item);
                     }
                 }
-                storeProductsList.clear();
+
                 if(newlist.size()>0) {
+                    storeProductsList.clear();
                     for (int i = 0; i < newlist.size(); i++) {
                         storeProductsList.add(newlist.get(i));
                         adapter.notifyDataSetChanged();
-
+                        Log.v("TAG","expp0");
                     }
-                }else {
+                }else if(newlist.size()==0&&s.length()>0){
                     storeProductsList.clear();
                     emptyData.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
+                    Log.v("TAG","expp1");
+                }else if(s.length()==0&&newlist.size()==0){
+
+//                    if(tabLayout.getS){
+//                        buildRecyclerViewForCategory();
+//                        getStoreProducts(current_page,"New");
+//                    }else{
+//                        buildRecyclerViewForCategory();
+//                        getStoreProducts(current_page,"Used");
+//                    }
+//                    storeProductsList.addAll(newProducts);
+//                    adapter.notifyDataSetChanged();
+                    Log.v("TAG","expp2");
                 }
+//                storeProductsList.clear();
+//                if(newlist.size()>0) {
+//                    for (int i = 0; i < newlist.size(); i++) {
+//                        storeProductsList.add(newlist.get(i));
+//                        adapter.notifyDataSetChanged();
+//
+//                    }
+//                }else if(count==0){
+//                    //storeProductsList.clear();
+//                    //emptyData.setVisibility(View.VISIBLE);
+//
+//                    Log.v("TAG","sxxxxx"+storeProductsList.size());
+//                    //adapter.notifyDataSetChanged();
+//                }
             }
 
             @Override
@@ -235,20 +283,34 @@ public class StoresProductsActivity extends AppCompatActivity {
             Map<String,Object> map=new HashMap<>();
             map.put("page",current_pag);
             map.put("limit",10);
-            map.put("product_shape",shape_type);
             map.put("store_id",id);
             Log.v(TAG,"posss"+id);
             Call<StoreListModel> call=apiServiceInterface.getNewOldStoreProduct(map);
-            progressBar.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if (response.body().isSuccess()) {
+                        List<DataArrayModel>x=response.body().getDataObjectModel().getDataArrayModelList();
                         if(response.body().getDataObjectModel().getDataArrayModelList().size()>0) {
-                            progressBar.setVisibility(View.GONE);
-                            storeProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
+                            for(int i=0;i<x.size();i++){
+                               if(x.get(i).getShape().equals("New")&&shape_type.equals("New")){
+                                   nWProducts.add(x.get(i));
+                               }else if(x.get(i).getShape().equals("Used")&&shape_type.equals("Used")){
+                                   nWProducts.add(x.get(i));
+                               }
+                            }
+                            Log.v("TAG","xxxccc"+nWProducts.size()+"   "+id+"   ");
+                        if(nWProducts.size()>0){
+                            storeProductsList.addAll(nWProducts);
+                            Log.v("TAG","zzzzsss"+storeProductsList.size());
                             adapter.notifyDataSetChanged();
-                            Log.v("TAG","option 1");
+                        }else {
+                            emptyData.setVisibility(View.VISIBLE);
+                        }
+
+
+                            Log.v("TAG","option 1"+response.body().getDataObjectModel().getDataArrayModelList().get(0).getCityArName());
                         }else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_pag==1){
                             progressBar.setVisibility(View.GONE);
                             emptyData.setVisibility(View.VISIBLE);
@@ -441,11 +503,10 @@ public class StoresProductsActivity extends AppCompatActivity {
 
     @OnClick(R.id.send_img_id)
     void sendMessage(){
-       if(HomeActivity.user_id !=0){
            startActivity(new Intent(getApplicationContext(), SendMessageActivity.class));
-       }else {
-           startActivity(new Intent(getApplicationContext(), LoginTraderUserActivity.class));
-       }
+
+          // startActivity(new Intent(getApplicationContext(), LoginTraderUserActivity.class));
+
     }
 
 }

@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,9 +27,13 @@ import com.saaty.CustomPagerAdapter;
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
+import com.saaty.loginAndRegister.TraderRegisterFragment;
+import com.saaty.loginAndRegister.UserRegisterFragment;
 import com.saaty.models.Data;
+import com.saaty.models.LoginModel;
 import com.saaty.models.UserDataRegisterObject;
 import com.saaty.models.UserModel;
+import com.saaty.password.VerificationCodeActivity;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
 import com.tbuonomo.viewpagerdotsindicator.BaseDotsIndicator;
@@ -66,34 +71,91 @@ public class SplashActivity extends AppCompatActivity {
         SharedPreferences prefs = getSharedPreferences(LoginTraderUserActivity.MY_PREFS_NAME, MODE_PRIVATE);
         String user_data = prefs.getString("user_data", "");
         Gson gson = new Gson();
-        UserModel userModel = gson.fromJson(user_data, UserModel.class);
+        LoginModel userModel = gson.fromJson(user_data, LoginModel.class);
+        // Log.v("TAG","fffff   "+userModel.getType().toString());
 
-        String registerData=prefs.getString("register_data","");
-        Gson gson1=new Gson();
-        UserDataRegisterObject userDataRegisterObject=gson1.fromJson(registerData,UserDataRegisterObject.class);
 
-//        String register_data = prefs.getString("register_data", "");
-//        Gson gson1 = new Gson();
-//        Data data = gson1.fromJson(register_data, Data.class);
+        SharedPreferences prefsRegisterTrader = getSharedPreferences(TraderRegisterFragment.MY_PREFS_NAME, MODE_PRIVATE);
+        String registerDataTrader = prefsRegisterTrader.getString("register_data", "");
+        Gson gson2 = new Gson();
+        Data userDataRegisterObject2 = gson2.fromJson(registerDataTrader, Data.class);
+
+
+        SharedPreferences prefsRegisterUser = getSharedPreferences(UserRegisterFragment.MY_PREFS_NAME, MODE_PRIVATE);
+        String registerDataUser = prefsRegisterUser.getString("register_data", "");
+        Gson gson1 = new Gson();
+        Data userDataRegisterObject1 = gson1.fromJson(registerDataUser, Data.class);
+
+
+
+        SharedPreferences prefsVistor = getSharedPreferences("vistor", MODE_PRIVATE);
+        String value = prefsVistor.getString("loginVistor", "");
+        Log.v("TAG", "fffff" + prefsVistor.toString());
+
+
+        SharedPreferences prefsV=getSharedPreferences("check1",MODE_PRIVATE);
+        int v=prefsV.getInt("user",0);
+
+        SharedPreferences prefV2=getSharedPreferences("check2",MODE_PRIVATE);
+        int v2=prefV2.getInt("trader",0);
+
+        //Log.v("TAG","ddddd   "+prefsV.getString("user",""));
+        if(prefsV!=null){
+            Log.v("TAG","ddddd   "+prefsV.getInt("user",0));
+        }
+
+
+        if(prefsV.contains("user")){
+            Log.v("TAG","uuuu  xxxx  "+prefs.getString("user",""));
+        }
+
+
+
+        SharedPreferences prefsVerify = getSharedPreferences(VerificationCodeActivity.VERIFY_CHECK, MODE_PRIVATE);
+        String verify = prefsVerify.getString("token","");
+
 
         if (user_data != null && !user_data.equals("")) {
             Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
             intent.putExtra("user_data", userModel);
-            Log.v("TAG","splahhhh");
+            Log.v("TAG", "splahhhh 1"+userModel.getUserModel().get(0).getEmail());
             startActivity(intent);
             finish();
-            // overridePendingTransition(R.anim.enter_from_right, R.anim.exit_out_left);
-        }else if(registerData !=null&& ! registerData .equals("")){
+
+        } else if (registerDataUser != null && !registerDataUser.equals("") && v!=0 ) {
             Intent intent = new Intent(SplashActivity.this, LoginTraderUserActivity.class);
-           // intent.putExtra("user_data", userModel);
-            Log.v("TAG","splahhhh"+userDataRegisterObject.getFullname());
+            Log.v("TAG", "splahhhh 2" + userDataRegisterObject1.getUserDataRegisterObject().getType());
             startActivity(intent);
             finish();
+        }else if (registerDataUser != null && !registerDataUser.equals("") && v==0) {
+            Intent intent = new Intent(SplashActivity.this, VerificationCodeActivity.class);
+            intent.putExtra("register_user", userDataRegisterObject1);
+            Log.v("TAG", "splahhhh 3" + userDataRegisterObject1.getUserDataRegisterObject().getFullname());
+            startActivity(intent);
+
+        } else if (registerDataTrader != null && !registerDataTrader.equals("") && v2!=0) {
+            Intent intent = new Intent(SplashActivity.this, LoginTraderUserActivity.class);
+            Log.v("TAG", "splahhhh 3 " + userDataRegisterObject2.getUserDataRegisterObject().getFullname());
+            startActivity(intent);
+            finish();
+        } else if (registerDataTrader != null && !registerDataTrader.equals("") &&v2==0) {
+            Intent intent = new Intent(SplashActivity.this, VerificationCodeActivity.class);
+            Log.v("TAG", "splahhhh 4" + userDataRegisterObject2.getUserDataRegisterObject().getType());
+            intent.putExtra("register_trader",userDataRegisterObject2);
+            startActivity(intent);
+        }else if(value!=null && !value.equals("")){
+            Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
+            intent.putExtra("login_visitor", userModel);
+            Log.v("TAG","exper visitor"+value);
+            Log.v("TAG", "splahhhh 5" );
+            startActivity(intent);
+            finish();
+
         }
 
-
         else {
-
+              Log.v("TAG","exper  first ");
+            Log.v("TAG", "splahhhh 5" );
             List<Integer> x = new ArrayList<>();
             x.add(R.drawable.splash_photo_1);
             x.add(R.drawable.splash_photo_2);
@@ -114,15 +176,15 @@ public class SplashActivity extends AppCompatActivity {
                 @Override
                 public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                     if (position == 2) {
-                        handler = new Handler();
-                        handler.postDelayed(new Runnable() {
-                            @Override
-                            public void run() {
+//                        handler = new Handler();
+//                        handler.postDelayed(new Runnable() {
+//                            @Override
+//                            public void run() {
 
                                 startActivity(new Intent(SplashActivity.this, SplashLanguageActivity.class));
 
-                            }
-                        }, 1000);
+//                            }
+//                        }, 1000);
                     }
                 }
 
@@ -140,6 +202,11 @@ public class SplashActivity extends AppCompatActivity {
 
 
         }
+
+//        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+//                .putBoolean("isFirstRun", false).commit();
+
+
 
         List<Integer> newWishlist=new ArrayList<>();
         List<Integer> sorted=new ArrayList<>();
@@ -205,6 +272,40 @@ public class SplashActivity extends AppCompatActivity {
        // context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+//        boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
+//        if(!previouslyStarted) {
+//            SharedPreferences.Editor edit = prefs.edit();
+//            edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
+//            edit.commit();
+
+        }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+//        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
+//                .getBoolean("isFirstRun", true);
+//        if (isFirstRun) {
+//            //show start activity
+//            startActivity(new Intent(getApplicationContext(), SplashActivity.class));
+//            Log.v("TAG","first ttt"+isFirstRun);
+//            Toast.makeText(SplashActivity.this, "First Run", Toast.LENGTH_LONG)
+//                    .show();
+////            getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+////                    .putBoolean("isFirstRun", false).commit();
+//
+//        }else {
+//            startActivity(new Intent(SplashActivity.this, HomeActivity.class));
+//            Log.v("TAG","first ttt"+isFirstRun);
+//        }
+//        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
+//                   .putBoolean("isFirstRun", false).commit();
+
+    }
 }
+

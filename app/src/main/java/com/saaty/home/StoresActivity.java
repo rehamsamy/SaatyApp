@@ -5,6 +5,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -12,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import de.hdodenhof.circleimageview.CircleImageView;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -28,6 +31,8 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -60,6 +65,7 @@ import com.saaty.models.CityModel;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.DataItem;
 import com.saaty.models.StoreListModel;
+import com.saaty.models.UserModel;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.sideMenuScreen.AboutAppActivity;
 import com.saaty.sideMenuScreen.AboutUsActivity;
@@ -80,6 +86,8 @@ import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
 import com.saaty.util.PreferenceHelper;
+import com.saaty.util.urls;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -108,11 +116,16 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
     SpinnerAdapter spinnerAdapter;
     NetworkAvailable networkAvailable;
     List<DataArrayModel> newList=new ArrayList<>();
+    List<DataArrayModel> newWatches=new ArrayList<>();
+    List<DataArrayModel> newStoresList=new ArrayList<>();
     DailogUtil dailogUtil;
     FilterMethods filterMethods;
     private SharedPreferences prefs;
     private SharedPreferences.Editor editor;
     List<String> cityNames=new ArrayList<>();
+    MenuItem logoutItem;
+    TextView userName;
+    int x;
 
     int flag;
     ApiServiceInterface apiServiceInterface;
@@ -132,7 +145,10 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
    List<DataArrayModel> wishlistProducts;
    List<Integer> ids=new ArrayList<>();
    @BindView(R.id.nav_filter_id) ImageView navFilterImg;
+    CircleImageView userImg;
+   UserModel userModel;
    Dialog mDialog;
+   int sFlag;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -154,7 +170,10 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
         networkAvailable = new NetworkAvailable(this);
         dealingWithWishList=new DealingWithWishList(getApplicationContext());
         toolbarTxt.setText(getString(R.string.stores_toolbar));
-        mDialog=new Dialog(getApplicationContext());
+        mDialog=new Dialog(this);
+        View view=navigationView.getHeaderView(0);
+        userName= navigationView.getHeaderView(0).findViewById(R.id.user_name_id);
+        userImg=  view.findViewById(R.id.user_img_id);
         //ids=new ArrayList<>();
 
 
@@ -169,11 +188,15 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                 storesList.clear();
                 emptyDataTxt.setVisibility(View.GONE);
                 navFilterImg.setVisibility(View.VISIBLE);
-               buildRecyclerViewForCategory();
-               getCateogryProductsList(current_page,1);
-             searchOnProduct(categoryProductsList);
+                 if(networkAvailable.isNetworkAvailable()){
+                     buildRecyclerViewForCategory();
+                     getCateogryProductsList(current_page,1);
+                     searchOnWatchProduct(categoryProductsList);
+                     setTabClick1();
+                 }else {
+                     Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+                 }
 
-             setTabClick1();
 
             }
 
@@ -182,16 +205,21 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             tabLayout.addTab(tabLayout.newTab().setText("    " +  getString(R.string.bracletes)+"   "),0);
             tabLayout.addTab(tabLayout.newTab().setText("    " +  getString(R.string.store)+"   "),1);
             tabLayout.addTab(tabLayout.newTab().setText("    " +  getString(R.string.watches)+"   "),2);
-            categoryProductsList.clear();
-            emptyDataTxt.setVisibility(View.GONE);
-            storesList.clear();
-            buildRecyclerViewForCategory();
-            getCateogryProductsList(current_page,2);
-            searchOnProduct(categoryProductsList);
-            navFilterImg.setVisibility(View.VISIBLE);
-            setTabClick2();
-
+            if(networkAvailable.isNetworkAvailable()) {
+                categoryProductsList.clear();
+                emptyDataTxt.setVisibility(View.GONE);
+                storesList.clear();
+                buildRecyclerViewForCategory();
+                getCateogryProductsList(current_page, 2);
+                searchOnWatchProduct(categoryProductsList);
+                navFilterImg.setVisibility(View.VISIBLE);
+                setTabClick2();
+        }else {
+            Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+
+
+    }
 
         else if(intent.hasExtra("store")) {
             if (networkAvailable.isNetworkAvailable()) {
@@ -220,7 +248,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                 return;
             }
 
-
+           if(networkAvailable.isNetworkAvailable()){
             tabLayout.addTab(tabLayout.newTab().setText("    " + getString(R.string.store) + "   "), 0);
             categoryProductsList.clear();
             storesList.clear();
@@ -230,8 +258,46 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             getCateogry();
             searchOnStore(storesList);
             navFilterImg.setVisibility(View.GONE);
-
             setTabClick3();
+           }else {
+               Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+           }
+
+        }
+
+
+        intent =getIntent();
+
+        if(HomeActivity.userModel!=null) {
+            userModel = HomeActivity.userModel;
+            userName.setText(userModel.getFullname());
+            if (userModel.getStoreLogo() != null) {
+                Picasso.with(getApplicationContext()).load(urls.base_url + "/" + userModel.getStoreLogo())
+                        .error(R.drawable.sidemenu_photo).into(userImg);
+            } else {
+                Picasso.with(getApplicationContext()).load(urls.base_url + "/" + userModel.getStoreLogo())
+                        .error(R.drawable.sidemenu_photo).into(userImg);
+            }
+        }
+
+        sFlag=intent.getIntExtra("flag",0);
+        if(sFlag==3){
+            user_id=0;
+            hideNavigationItems();
+            if (user_id == 0) {
+                logoutItem.setTitle(getString(R.string.login_btn));
+            } else {
+                logoutItem.setTitle(getString(R.string.sign_out));
+                logoutItem.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        return false;
+                    }
+                });
+            }
+
+            ConstraintLayout layout=(ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.visitor_header_layout,null);
+            navigationView.addHeaderView(layout);
         }
 //        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
 //            @Override
@@ -292,7 +358,15 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
 
     }
 
-
+    private void hideNavigationItems() {
+        Menu menu=navigationView.getMenu();
+        menu.findItem(R.id.nav_my_account).setVisible(false);
+        menu.findItem(R.id.nav_wishlist).setVisible(false);
+        menu.findItem(R.id.nav_my_ads).setVisible(false);
+        menu.findItem(R.id.nav_messages).setVisible(false);
+        navigationView.getHeaderView(0).setVisibility(View.GONE);
+        logoutItem=menu.findItem(R.id.nav_logout);
+    }
 
 
     private void setTabClick1(){
@@ -308,7 +382,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.clear();
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page,1);
-                    searchOnProduct(categoryProductsList);
+                    searchOnWatchProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }else if(tab_category_pos==1){
@@ -329,7 +403,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     emptyDataTxt.setVisibility(View.GONE);
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page, 2);
-                    searchOnProduct(categoryProductsList);
+                    searchOnWatchProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -362,7 +436,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     buildRecyclerViewForCategory();
                     current_page=1;
                     getCateogryProductsList(current_page,2);
-                    searchOnProduct(categoryProductsList);
+                    searchOnBracletProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }else if(tab_category_pos==1){
@@ -382,8 +456,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.clear();
                     emptyDataTxt.setVisibility(View.GONE);
                     buildRecyclerViewForCategory();
-                    getCateogryProductsList(current_page, 2);
-                    searchOnProduct(categoryProductsList);
+                    getCateogryProductsList(current_page, 1);
+                    searchOnBracletProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -427,7 +501,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.clear();
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page,1);
-                    searchOnProduct(categoryProductsList);
+                    searchOnWatchProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
 
@@ -439,7 +513,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     buildRecyclerViewForCategory();
                     current_page=1;
                     getCateogryProductsList(current_page, 2);
-                    searchOnProduct(categoryProductsList);
+                    searchOnBracletProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -467,18 +541,20 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             progressBar.setVisibility(View.VISIBLE);
             Map<String,Object> map=new HashMap<>();
             map.put("page",current_page);
-            map.put("limit",10);
+            map.put("limit",20);
            Call<StoreListModel> call= apiServiceInterface.getStoresList(map);
            call.enqueue(new Callback<StoreListModel>() {
                @Override
                public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                    if(response.body().isSuccess()){
                        storesList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
-                       if(storesList.size()>0) {
-                           adapter.notifyDataSetChanged();
+                       adapter.notifyDataSetChanged();
                            //Toast.makeText(StoresActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                            progressBar.setVisibility(View.GONE);
-                       }else {
+                        if(response.body().getDataObjectModel().getDataArrayModelList().size()>0&& current_page==1){
+                              newStoresList=response.body().getDataObjectModel().getDataArrayModelList();
+                       }
+                       else {
                            emptyDataTxt.setVisibility(View.VISIBLE);
                            progressBar.setVisibility(View.GONE);
                        }
@@ -573,13 +649,23 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             Map<String,Object> map=new HashMap<>();
             map.put("category_id",position);
             map.put("page",current_page);
-            map.put("limit",10);
+            map.put("limit",20);
             Call<StoreListModel> call=apiServiceInterface.getCategoryProductsList(map);
             call.enqueue(new Callback<StoreListModel>() {
                 @Override
                 public void onResponse(Call<StoreListModel> call, Response<StoreListModel> response) {
                     if(response.body().isSuccess()){
+                       //if(position==1){
 
+                        if(response.body().getDataObjectModel().getDataArrayModelList().size()>0&&current_page==1){
+                            newWatches=response.body().getDataObjectModel().getDataArrayModelList();
+                            Log.v("TAG","aaa   size  is  "+newWatches.size());
+                        }
+
+
+                       // }else if(position==2){
+                            //newBracletes=response.body().getDataObjectModel().getDataArrayModelList();
+                        //}
                         categoryProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                         storeProductAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
@@ -715,7 +801,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
         }
     }
 
-    private void searchOnProduct(List<DataArrayModel> newProducts){
+    private void searchOnWatchProduct(List<DataArrayModel> categoryProductsList){
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -726,11 +812,9 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String newText = s.toString();
                 emptyDataTxt.setVisibility(View.GONE);
-               // Log.v("TAG", "sssssssssss" + newProducts.size() + s.toString().toLowerCase());
                 ArrayList<DataArrayModel> newlist = new ArrayList<>();
 
                 for (DataArrayModel item : categoryProductsList) {
-                   // Log.v("TAG", "ar name" + item.getArName().contains(newText));
                     if (item.getArName().contains(newText)) {
                         newlist.add(item);
                     }
@@ -741,10 +825,65 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                         categoryProductsList.add(newlist.get(i));
                         storeProductAdapter.notifyDataSetChanged();
                     }
-                   // buildOnClickListener();
-                }else {
+                }else if(newlist.size()==0&&s.length()!=0){
                     categoryProductsList.clear();;
                     emptyDataTxt.setVisibility(View.VISIBLE);
+                    storeProductAdapter.notifyDataSetChanged();
+                }else if(newlist.size()==0&&s.length()==0){
+                    Log.v("TAG","aaa  size  are"+newWatches.size());
+                    categoryProductsList.addAll(newWatches);
+                    storeProductAdapter.notifyDataSetChanged();
+                }else if(newlist.size()>0&&s.length()==0){
+                    categoryProductsList.addAll(newWatches);
+                    storeProductAdapter.notifyDataSetChanged();
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+
+            }
+        });
+
+    }
+
+
+    private void searchOnBracletProduct(List<DataArrayModel> categoryProductsList){
+        searchView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newText = s.toString();
+                emptyDataTxt.setVisibility(View.GONE);
+                ArrayList<DataArrayModel> newlist = new ArrayList<>();
+
+                for (DataArrayModel item : categoryProductsList) {
+                    if (item.getArName().contains(newText)) {
+                        newlist.add(item);
+                    }
+                }
+                categoryProductsList.clear();
+                if(newlist.size()>0) {
+                    for (int i = 0; i < newlist.size(); i++) {
+                        categoryProductsList.add(newlist.get(i));
+                        storeProductAdapter.notifyDataSetChanged();
+                    }
+                }else if(newlist.size()==0&&s.length()!=0){
+                    categoryProductsList.clear();;
+                    emptyDataTxt.setVisibility(View.VISIBLE);
+                    storeProductAdapter.notifyDataSetChanged();
+                }else if(newlist.size()==0&&s.length()==0){
+                   // Log.v("TAG","aaaaa "+newBracletes.size());
+                        categoryProductsList.addAll(newWatches);
+                        storeProductAdapter.notifyDataSetChanged();
+
+                }else if(newlist.size()>0&&s.length()==0){
+                    categoryProductsList.addAll(newWatches);
                     storeProductAdapter.notifyDataSetChanged();
                 }
             }
@@ -788,11 +927,18 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                         Log.v("TAG","ffffff ounded ");
 
                     }
-                }else {
+                }else if(newlist.size()==0&&s.length()!=0){
                     storesList.clear();
                     emptyDataTxt.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
                     Log.v("TAG","ffffff not ounded ");
+                }else if(newlist.size()==0&&s.length()==0){
+                    Log.v("TAG","ssssss   qqq"+newStoresList.size());
+                    storesList.addAll(newStoresList);
+                    adapter.notifyDataSetChanged();
+                }else if(newlist.size()>0&&s.length()==0){
+                    storesList.addAll(newStoresList);
+                    adapter.notifyDataSetChanged();
                 }
             }
 
@@ -998,7 +1144,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
         mDialog.setContentView(R.layout.logout_layout);
         MaterialButton logout=mDialog.findViewById(R.id.delete_btn_id);
         MaterialButton cancel=mDialog.findViewById(R.id.cancel_btn_id);
-        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.show();
 
@@ -1087,6 +1233,18 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
 
 
     }
+
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout_id);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
 
 
 }

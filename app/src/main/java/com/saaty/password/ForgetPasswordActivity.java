@@ -30,7 +30,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
     private static final String TAG = ForgetPasswordActivity.class.getSimpleName();
     @BindView(R.id.phone_number_input_id)
-    TextInputEditText phoneNumberInput;
+    TextInputEditText emailInput;
     @BindView(R.id.confirm_btn_id) MaterialButton confirmBtn;
     NetworkAvailable available;
     ApiServiceInterface apiServiceInterface;
@@ -44,7 +44,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         available=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
 
-        Log.v(TAG,"edit ttt"+phoneNumberInput.getText().toString());
+        Log.v(TAG,"edit ttt"+emailInput.getText().toString());
         confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -65,14 +65,15 @@ public class ForgetPasswordActivity extends AppCompatActivity {
 
     private void sendCodeToMobile() {
         if(available.isNetworkAvailable()){
-            if(!FUtilsValidation.isEmpty(phoneNumberInput,getString(R.string.field_required))){
+            if(!FUtilsValidation.isEmpty(emailInput,getString(R.string.field_required))
+            && FUtilsValidation.isValidEmail(emailInput,getString(R.string.error_email_msg))){
              apiServiceInterface= ApiClient.getClientService();
-          String name=   phoneNumberInput.getText().toString().trim();
+          String name=   emailInput.getText().toString().trim();
 
                // Log.v(TAG,"edit ttt"+phoneNumberInput.toString());
                 Log.v(TAG,"name is"+name);
                 ProgressDialog progressDialog= dailogUtil.showProgressDialog(ForgetPasswordActivity.this,getString(R.string.logging),false);
-             Call<SendCodeModel> codeModelCall=apiServiceInterface.sendMobileCode(phoneNumberInput.getText().toString());
+             Call<SendCodeModel> codeModelCall=apiServiceInterface.sendMobileCode(emailInput.getText().toString());
              codeModelCall.enqueue(new Callback<SendCodeModel>() {
                  @Override
                  public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
@@ -82,7 +83,7 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                          Log.v(TAG,"sucess1");
                          Toast.makeText(ForgetPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                          Intent intent=new Intent(getApplicationContext(),VerificationCodeActivity.class);
-                         intent.putExtra("phone",phoneNumberInput.getText().toString());
+                         intent.putExtra("phone",emailInput.getText().toString());
                          startActivity(intent);
                          progressDialog.dismiss();
                      }else {
@@ -108,5 +109,16 @@ public class ForgetPasswordActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_SHORT).show();
         }
 
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void  backClick(){
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

@@ -168,6 +168,7 @@ public class EditAdsActivity extends AppCompatActivity {
                 //getFile(selectedUriList);
                 addAdsProducts();
             }else if(intent.hasExtra(EDIT_ADS_PRODUCT)){
+                Log.v("TAG","city editttt"+cityId);
                 editAdsProducts();
 
             }
@@ -342,6 +343,7 @@ public class EditAdsActivity extends AppCompatActivity {
                     if(response.body().isSuccess()){
                         Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
                       finish();
+                        startActivity(new Intent(getApplicationContext(),AdsActivity.class));
                         progressDialog.dismiss();
                     }else {
                         Toast.makeText(EditAdsActivity.this, response.body().getMessage().toString(), Toast.LENGTH_LONG).show();
@@ -384,6 +386,7 @@ public class EditAdsActivity extends AppCompatActivity {
             map.put("contact_mobile",phone);
             map.put("contact_email",email);
             map.put("city_id",cityId);
+            Log.v("TAG","city editttt"+cityId);
 
             MultipartBody.Part[] parts = new MultipartBody.Part
                     [selectedUriList.size()];
@@ -542,7 +545,7 @@ public class EditAdsActivity extends AppCompatActivity {
     void onItemSelected(int index) {
         cityName = (String) spinnerAdapter.getItem(index);
         cityId=index+1;
-        Log.v("TAG","cityyy  "+cityId);
+        Log.v("TAG","cityyy  "+cityId +"   "+cityName);
     }
 
 }

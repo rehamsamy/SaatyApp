@@ -28,6 +28,7 @@ import android.text.Layout;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
@@ -52,6 +53,7 @@ import com.saaty.home.HomeActivity;
 import com.saaty.home.StoresActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.CheckWishlistModel;
+import com.saaty.models.CityModel;
 import com.saaty.models.Data;
 import com.saaty.models.DataArrayModel;
 import com.saaty.models.DeleteAdsModel;
@@ -97,6 +99,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     public static final String WISHLIST_PRODUCTS_DETAILS = "wishlist_product_details";
     public static final String ADS_PRODUCTS_DETAILS = "ads_product_details";
     private static final String TAG = ProductDetailsActivity.class.getSimpleName();
+    int city_id;
+    String city_name;
+    List<String> cityNames=new ArrayList<>();
+    @BindView(R.id.product_city_value_id) TextView productCityTxt;
     DealingWithWishList dealingWithWishList;
     @BindView(R.id.recycler_view_id)
     RecyclerView recyclerView;
@@ -142,6 +148,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     //@BindView(R.id.view_pager_id) ViewPager viewPager;
     int position;
     ViewPager viewPager;
+    int flag;
 
     DataArrayModel dataArrayModel;
     ProductDataItem item;
@@ -150,6 +157,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     List<ProductimagesItem> productimagesItems = new ArrayList<>();
 
     Dialog mDailog;
+
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -171,6 +179,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         if (intent.hasExtra(WISHLIST_PRODUCTS_DETAILS)) {
 
             getProductDetailsFromWishlist();
+
 
         } else if (intent.hasExtra("myads_model")) {
             toolbarEditImg.setVisibility(VISIBLE);
@@ -197,7 +206,6 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
             item = intent.getParcelableExtra("store_product_details");
             inializeFieldsFormStoresProductDetails(item);
         } else if (intent.hasExtra(CATEGORY_PRODUCTS_DETAILS)) {
-
             getProductDetailsFromCategoryStores();
         } else if (intent.hasExtra(ADS_PRODUCTS_DETAILS)) {
             getProductDetailsFromAdsProducts();
@@ -212,6 +220,8 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         } else {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
+
+
 
 
 
@@ -291,6 +301,10 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromWishlist() {
         dataArrayModel = intent.getParcelableExtra(WISHLIST_PRODUCTS_DETAILS);
+
+        getCityList(dataArrayModel.getCityId());
+        Log.v("TAG","aaa  xxx"+dataArrayModel.getCityId()+"   x  "+city_name);
+        productCityTxt.setText(city_name);
         toolbarHomeImg.setVisibility(VISIBLE);
         toolbarHomeImg.setImageResource(R.drawable.nav_delete);
         getProductDetailsFromDataArrayModel(dataArrayModel);
@@ -358,6 +372,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromCategoryStores() {
         dataArrayModel = intent.getParcelableExtra(CATEGORY_PRODUCTS_DETAILS);
+        Log.v("TAG","cat cityyy"+dataArrayModel.getCityArName());
         getProductDetailsFromDataArrayModel(dataArrayModel);
     }
 
@@ -411,11 +426,13 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
                 if (response.body().isSuccess()&&response.body().getMessage().equals("Products retrieved successfully.")) {
                    // Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     wishlistImg.setImageResource(R.drawable.wishlist_select);
+                    flag=1;
                     Log.v(TAG,"already added");
                 } else if(response.body().getMessage().equals("Product not found.")){
                     wishlistImg.setImageResource(R.drawable.wishlist_not_select);
                     //Toast.makeText(ProductDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     Log.v(TAG,"already not added");
+                    flag=0;
                 }
             }
 
@@ -433,6 +450,9 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
         toolbarEditImg.setVisibility(VISIBLE);
         toolbarHomeImg.setImageResource(R.drawable.nav_delete);
         toolbarHomeImg.setVisibility(VISIBLE);
+
+        //productCityTxt.setText(dataArrayModel.getCityArName());
+        Log.v("TAG","dddd  "+dataArrayModel.getCityArName());
 
         toolbarHomeImg.setOnClickListener(new OnClickListener() {
             @Override
@@ -554,23 +574,31 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
 
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.O)
     private void getProductDetailsFromDataArrayModel(DataArrayModel dataArrayModel) {
-        if (PreferenceHelper.getValue(this).equals("ar")) {
+        if (PreferenceHelper.getValue(this).equals("ar")){
             toolbarTxt.setText(dataArrayModel.getArName());
             productNameTxt.setText(dataArrayModel.getArName());
+            productCityTxt.setText(dataArrayModel.getCityArName());
             productDescTxt.setText(dataArrayModel.getArDescription());
-        } else if (PreferenceHelper.getValue(this).equals("en")) {
+            productPriceTxt.setText(String.valueOf(dataArrayModel.getPrice())+" "+getString(R.string.price_type));
+        } else if (PreferenceHelper.getValue(this).equals("en")){
             toolbarTxt.setText(dataArrayModel.getEnName());
             productNameTxt.setText(dataArrayModel.getEnName());
             productDescTxt.setText(dataArrayModel.getEnDescription());
+            productCityTxt.setText(dataArrayModel.getCityEnName());
+            productPriceTxt.setText(String.valueOf(dataArrayModel.getPrice())+" "+getString(R.string.price_type));
         }
-        productPriceTxt.setText(String.valueOf(dataArrayModel.getPrice())+" "+getString(R.string.price_type));
+
+        Log.v("TAG","xxxxxxxxx"+dataArrayModel.getProductId()+"      "+dataArrayModel.getCityId());
+
         position = intent.getIntExtra(POSITION, 0);
         selected_product_id = dataArrayModel.getProductId();
         producerPhoneTxt.setText(dataArrayModel.getContactMobile());
         companyEmailTxt.setText(dataArrayModel.getContactEmail());
         producerNameTxt.setText(dataArrayModel.getContactName());
+
+
+        city_id=dataArrayModel.getCityId();
 
         String x=dataArrayModel.getUpdatedAt();
         x.substring(10);
@@ -579,18 +607,7 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     }
 
 
-    @OnClick(R.id.wish_list_img)
-    void setWishlistClick(){
-      if(wishlistImg.getDrawable().getConstantState()==getResources().getDrawable(R.drawable.wishlist_select).getConstantState()){
-          Log.v("TAG","accccccc");
-          deleteFormWishList();
-          wishlistImg.setImageResource(R.drawable.wishlist_not_select);
-      }else if(wishlistImg.getDrawable().getConstantState()==getResources().getDrawable(R.drawable.wishlist_not_select).getConstantState()){
-          Log.v("TAG","rejjjjj");
-         addToWishList();
-          wishlistImg.setImageResource(R.drawable.wishlist_select);
-      }
-    }
+
 
     private void deleteFormWishList() {
         dealingWithWishList.deleteWishList(dataArrayModel,progressBar,wishlistImg);
@@ -599,6 +616,81 @@ public class ProductDetailsActivity extends AppCompatActivity implements BaseSli
     private void addToWishList() {
         dealingWithWishList.addToWishList(dataArrayModel,progressBar,wishlistImg);
     }
+
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+    }
+
+
+    @OnClick(R.id.wish_list_img)
+    void setWishlistImg(){
+        if(HomeActivity.user_id !=0){
+        Log.v("TAG","cliok  "+flag);
+        if(flag==1){
+            deleteFormWishList();
+            wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+            Log.v("TAG","cliok  1 added"+flag);
+            flag=0;
+        }else if(flag==0){
+            addToWishList();
+            wishlistImg.setImageResource(R.drawable.wishlist_select);
+            Log.v("TAG","cliok  1 deleted"+flag);
+            flag=1;
+        }
+
+    }else{
+          wishlistImg.setEnabled(false);
+          wishlistImg.setImageResource(R.drawable.wishlist_not_select);
+    }
+
+    }
+
+
+
+    private  void getCityList(int id){
+        apiServiceInterface=ApiClient.getClientService();
+        Call<CityModel> call=apiServiceInterface.getCityList();
+
+        call.enqueue(new Callback<CityModel>() {
+            @Override
+            public void onResponse(Call<CityModel> call, Response<CityModel> response) {
+                if(response.body().isSuccess()){
+                    if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            if(id==response.body().getCitydatamodel().get(i).getCityId()){
+                                city_name=response.body().getCitydatamodel().get(i).getCityNameAr();
+                                productCityTxt.setText(city_name);
+                                Log.v("TAG","aaaa xxxx"+city_name);
+                            }
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameAr());
+                        }
+
+                    }else  if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
+                        for(int i=0;i<response.body().getCitydatamodel().size();i++){
+                            if(id==response.body().getCitydatamodel().get(i).getCityId()){
+                                city_name=response.body().getCitydatamodel().get(i).getCityNameEn();
+                                productCityTxt.setText(city_name);
+                                Log.v("TAG","aaaa xxxx"+city_name);
+                            }
+                            cityNames.add(response.body().getCitydatamodel().get(i).getCityNameEn());
+                        }
+                    }
+                    Log.v("TAG","cityes"+response.body().getCitydatamodel().get(0).getCityNameAr());
+
+
+                }
+            }
+
+            @Override
+            public void onFailure(Call<CityModel> call, Throwable t) {
+
+            }
+        });
+    }
+
 
 }
 

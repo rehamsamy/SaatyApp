@@ -150,4 +150,8 @@ public class SendMessageActivity extends AppCompatActivity {
         });
 
     }
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backClick(){
+        finish();
+    }
 }

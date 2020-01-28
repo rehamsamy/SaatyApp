@@ -62,12 +62,12 @@ public class ChangePasswordActivity extends AppCompatActivity {
         //Log.v("TAG","type  xxx  "+type);
 
 
-        if(type.equals("store")){
-         Picasso.with(getApplicationContext()).load(urls.base_url +"/"+HomeActivity.store_logo).error(R.drawable.sidemenu_photo2).into(profileImg);
-
-        }else if(type.equals("user")){
-         profileImg.setImageResource(R.drawable.sidemenu_photo2);
-        }
+//        if(type.equals("store")){
+//         Picasso.with(getApplicationContext()).load(urls.base_url +"/"+HomeActivity.store_logo).error(R.drawable.sidemenu_photo2).into(profileImg);
+//
+//        }else if(type.equals("user")){
+//         profileImg.setImageResource(R.drawable.sidemenu_photo2);
+//        }
     }
 
     @OnClick(R.id.change_password_btn)
@@ -117,5 +117,16 @@ public class ChangePasswordActivity extends AppCompatActivity {
                 }
             });
         }
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backXlick(){
+        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

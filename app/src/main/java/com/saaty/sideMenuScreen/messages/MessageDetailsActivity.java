@@ -1,6 +1,9 @@
 package com.saaty.sideMenuScreen.messages;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -26,11 +29,19 @@ import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.DeleteMessageModel;
 import com.saaty.models.MessageArrayModel;
+import com.saaty.models.MessageModel;
+import com.saaty.models.RebliesArrayItem;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
+import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static android.view.View.VISIBLE;
 
@@ -46,6 +57,10 @@ public class MessageDetailsActivity extends AppCompatActivity {
     @BindView(R.id.reply_with_message_id) MaterialButton replyWithMsg;
     @BindView(R.id.delete_btn_id) MaterialButton deleteId;
     @BindView(R.id.toolbar_txt_id) TextView toolarTxt;
+    @BindView(R.id.recycler_view) RecyclerView recyclerView;
+    @BindView(R.id.empty_data_txt_id)TextView emptyData;
+    List<RebliesArrayItem> messageRebliesList=new ArrayList<>();
+    RebliesAdapter rebliesAdapter;
     NetworkAvailable networkAvailable;
     ApiServiceInterface apiServiceInterface;
     DailogUtil dialogUtils;
@@ -53,6 +68,8 @@ public class MessageDetailsActivity extends AppCompatActivity {
    int user_message_id;
     Intent intent;
    Dialog mDailog;
+   int current_page=1;
+   @BindView(R.id.progress_id)ProgressBar progressBar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -74,8 +91,67 @@ public class MessageDetailsActivity extends AppCompatActivity {
             user_message_id=model.getUsmId();
 
         }
+
+        if (networkAvailable.isNetworkAvailable()) {
+            buildReceivedMessageRecycler();
+            getMessageReplies(current_page);
+        } else {
+            Toast.makeText(MessageDetailsActivity.this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
+
     }
-    
+
+    private void buildReceivedMessageRecycler() {
+        LinearLayoutManager layoutManager=new LinearLayoutManager(this);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        rebliesAdapter =new RebliesAdapter(messageRebliesList,MessageDetailsActivity.this,1);
+        recyclerView.setAdapter(rebliesAdapter);
+        recyclerView.addOnScrollListener(new EndlessRecyclerViewScrollListener(layoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                // if(tab_selected==0){
+                current_page++;
+                getMessageReplies(current_page);
+                // }
+            }
+        });
+
+    }
+
+    private void getMessageReplies(int current_page) {
+          Map<String,Object> map=new HashMap<>();
+          map.put("page",current_page);
+          map.put("limit",20);
+ progressBar.setVisibility(VISIBLE);
+        apiServiceInterface= ApiClient.getClientService();
+        String x=  HomeActivity.access_token;
+        Call<MessageModel> call=apiServiceInterface.getMessageReblies(user_message_id,"application/json",x,map);
+        call.enqueue(new Callback<MessageModel>() {
+            @Override
+            public void onResponse(Call<MessageModel> call, Response<MessageModel> response) {
+                if(response.body().isSuccess()){
+                    if(response.body().getMessageObjectModel().getRebliesModel().getRebliesArray().size()>0) {
+                        messageRebliesList.addAll(response.body().getMessageObjectModel().getRebliesModel().getRebliesArray());
+                        rebliesAdapter.notifyDataSetChanged();
+                        progressBar.setVisibility(View.GONE);
+                    }else if(response.body().getMessageObjectModel().getRebliesModel().getRebliesArray().size()==0&& current_page==1){
+                        progressBar.setVisibility(View.GONE);
+                        emptyData.setVisibility(VISIBLE);
+                    }
+                }else {
+                    Toast.makeText(MessageDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageModel> call, Throwable t) {
+
+            }
+        });
+
+    }
+
     @OnClick(R.id.reply_with_message_id)
     void setReplyWithMsgClick(){
         Intent intent=new Intent(getApplicationContext(),SendMessageActivity.class);
@@ -144,5 +220,16 @@ public class MessageDetailsActivity extends AppCompatActivity {
 
         }
     });
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void onBackClick(){
+        startActivity(new Intent(getApplicationContext(),MessageActivity.class));
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplicationContext(),MessageActivity.class));
     }
 }

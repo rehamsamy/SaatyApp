@@ -11,7 +11,11 @@ import retrofit2.http.Body;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.graphics.Paint;
 import android.os.Bundle;
+import android.text.util.Linkify;
+import android.util.Log;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,7 +23,9 @@ import android.widget.Toast;
 import com.fourhcode.forhutils.FUtilsValidation;
 import com.google.android.material.textfield.TextInputEditText;
 import com.saaty.R;
+import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.SendCodeModel;
+import com.saaty.sideMenuScreen.TermsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
@@ -42,6 +48,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
     NetworkAvailable networkAvailable;
     ApiServiceInterface apiServiceInterface;
     String token, phoneNumber;
+    @BindView(R.id.accept_terms_txt)TextView acceptTermsTxt;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +63,24 @@ public class ResetPasswordActivity extends AppCompatActivity {
         token = intent.getStringExtra("token");
         phoneNumber = intent.getStringExtra("phone");
         toolbarTxt.setText(getString(R.string.reset_password));
+
+
+
+        acceptTermsTxt.setClickable(true);
+        // acceptTermsTxt.setText("");
+        acceptTermsTxt.setPaintFlags(acceptTermsTxt.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+        Linkify.addLinks(acceptTermsTxt, Linkify.ALL);
+        acceptTermsTxt.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("LoginActivity", "Sign Up Activity activated.");
+                // this is where you should start the new Activity
+                Intent intent = new Intent(getApplicationContext(), TermsActivity.class);
+                startActivity(intent);
+
+            }
+        });
+
 
     }
 
@@ -79,7 +106,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                 apiServiceInterface = ApiClient.getClientService();
                 Map<String, Object> map = new HashMap<>();
                 map.put("token", token);
-                map.put("mobile", phoneNumber);
+                map.put("email", phoneNumber);
                 map.put("password", newPasswordInput.getText().toString());
                 map.put("password_confirmation", confirmPasswordInput.getText().toString());
                 Call<SendCodeModel> call = apiServiceInterface.resetPassword(map);
@@ -89,7 +116,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
                         if (response.body().isSuccess()) {
                             Toast.makeText(ResetPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                             progressDialog.dismiss();
-                            finish();
+                            startActivity(new Intent(getApplicationContext(), LoginTraderUserActivity.class));
                         } else {
                             Toast.makeText(ResetPasswordActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                         }
@@ -107,5 +134,10 @@ public class ResetPasswordActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backClick(){
+        finish();
     }
 }

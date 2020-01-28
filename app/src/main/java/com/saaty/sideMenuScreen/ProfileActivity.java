@@ -104,7 +104,7 @@ public class ProfileActivity extends AppCompatActivity {
                         storeDesc=dataArrayModel.getStoreArDescription();
                         if(dataArrayModel.getStoreLogo()!=null)
                         Picasso.with(getApplicationContext()).load(urls.base_url+"/"+dataArrayModel.getStoreLogo())
-                               .error(R.drawable.sidemenu_photo2).into(profileImg);
+                               .error(R.drawable.sidemenu_photo).into(profileImg);
                    storeNameTxtValue.setVisibility(View.VISIBLE);
                    storeNameTxtValue.setText((CharSequence) dataArrayModel.getStoreArName());
                    storeNameTxt.setVisibility(View.VISIBLE);

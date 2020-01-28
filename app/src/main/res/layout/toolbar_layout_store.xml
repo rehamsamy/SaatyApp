@@ -28,7 +28,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:text="@string/forget_pass"
-            android:textColor="@android:color/darker_gray"
+            android:textColor="@color/ggray"
             android:textSize="18sp"
             android:textStyle="bold" />
 

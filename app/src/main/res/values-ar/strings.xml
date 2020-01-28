@@ -16,7 +16,7 @@
 <string name="enter_phone_number" translatable="false">من فضلك ادخل رقم الهاتف</string>
 <string name="phone_number_input" translatable="false">رقم الهاتف</string>
 <string name="confirm" translatable="false">تاكيد</string>
-<string name="verify_code_txt" translatable="false">من فضلك تاكد من فحص الهاتف </string>
+<string name="verify_code_txt" translatable="false">من فضلك تاكد من فحص الايميل </string>
 <string name="enter_code" translatable="false">ادخل الكود</string>
 <string name="resend_code_txt" translatable="false">اعاده ارسال الكود</string>
 <string name="change_password_txt" translatable="false">من فضلك ادخل كلمه مرور جديده</string>
@@ -27,8 +27,8 @@
 <string name="user_name_input" translatable="false">اسم المستخدم</string>
 <string name="confirm_password_input" translatable="false">تاكيد كلمه المرور</string>
 <string name="trader_name_input" translatable="false">اسم التاجر</string>
-<string name="store" translatable="false">المتاجر</string>
-<string name="user_name" translatable="false">اسم المستخم</string>
+<string name="store" translatable="false">متاجر</string>
+<string name="user_name" translatable="false">اسم المستخدم</string>
 <string name="home_page" translatable="false">الصفحة الرئيسية</string>
 <string name="my_account" translatable="false">حسابي</string>
 <string name="wishlist" translatable="false">المفضلة</string>
@@ -100,7 +100,7 @@
 <string name="type" translatable="false">النوع:</string>
 <string name="status" translatable="false">الحالة:</string>
 <string name="producer_price" translatable="false">سعر المنتج:</string>
-<string name="price_type" translatable="false">ريال سعودي</string>
+<string name="price_type" translatable="false">ر.س</string>
 <string name="phone_number_contact" translatable="false">رقم الهاتف :</string>
 <string name="email_contact" translatable="false">البريد الالكتروني:</string>
 <string name="contact_way" translatable="false">طريقه الاتصال:</string>
@@ -118,7 +118,7 @@
 <string name="category" translatable="false">Category:</string>
 <string name="message_name" translatable="false">Ahmed Mohamed</string>
 <string name="received" translatable="false">الواردة</string>
-<string name="reply_with_message" translatable="false">رد برسالة</string>
+<string name="reply_with_message" translatable="false">رد</string>
 <string name="message_text" translatable="false">نص الرسالة</string>
 <string name="send_message" translatable="false">ارسل رسالة</string>
 
@@ -131,6 +131,21 @@
     <string name="show_Ads" translatable="false">مشاهدة الاعلان</string>
     <string name="skip_ads" translatable="false">تخطي الاعلان</string>
     <string name="terms_conditions" translatable="false">الشروط والاحكام</string>
+
+    <string name="logout_msg">الخروج من التطبيق</string>
+    <string name="english">english</string>
+    <string name="arabic">arabic</string>
+
+    <string name="log_out">الخروج</string>
+    <string name="yes">موافق</string>
+    <string name="dismiss">الغاء</string>
+    <string name="enter_image_please">ادخل صور المنتج:</string>
+    <string name="city">المدينة:</string>
+    <string name="enter_email">ادخل الايميل</string>
+    <string name="send_email_verify">ارسال كود التفعيل لبريدك الالكتروني</string>
+    <string name="verify_code_toolbar">رمز التفعيل</string>
+    <string name="replies">الردود</string>
+    <string name="done_choose_photo">تم اختيار الصورة</string>
 
 
 </resources>

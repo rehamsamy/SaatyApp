@@ -58,11 +58,6 @@ public class SplashLanguageActivity extends AppCompatActivity {
 
             Toast.makeText(this, getString(R.string.choose_lang), Toast.LENGTH_SHORT).show();
 
-//                    Intent intent = new Intent(SplashLanguageActivity.this, LoginTraderUserActivity.class);
-//                    startActivity(intent);
-
-
-           //overridePendingTransition(R.anim.enter_from_right, R.anim.exit_out_left);
         }
 
 
@@ -77,6 +72,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
         Intent intent=new Intent(getApplicationContext(), LoginTraderUserActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Log.v("TAG","sssss"+lang_selected);
+        Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
         startActivity(intent);
           }
 
@@ -88,6 +84,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
        Intent intent=new Intent(getApplicationContext(), LoginTraderUserActivity.class);
        // Intent intent=getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
         Log.v("TAG","sssss"+lang_selected);
         startActivity(intent);
 
@@ -100,5 +97,11 @@ public class SplashLanguageActivity extends AppCompatActivity {
         Configuration configuration=new Configuration();
         configuration.locale=locale;
         context.getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity( new Intent(getApplicationContext(),SplashActivity.class));
     }
 }

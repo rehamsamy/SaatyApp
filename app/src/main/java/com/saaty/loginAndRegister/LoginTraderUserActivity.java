@@ -16,6 +16,7 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
 import android.util.Log;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,6 +27,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.gson.Gson;
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
+import com.saaty.models.Data;
 import com.saaty.models.LoginModel;
 import com.saaty.models.UserDataRegisterObject;
 import com.saaty.models.UserModel;
@@ -51,9 +53,12 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     ApiServiceInterface apiServiceInterface;
     DailogUtil dailogUtil;
     SharedPreferences sharedPreferences;
+    SharedPreferences sharedPreferences2;
     SharedPreferences.Editor editor;
+    SharedPreferences.Editor editor2;
     UserModel userModel;
     LoginModel loginModel;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,9 +68,14 @@ public class LoginTraderUserActivity extends AppCompatActivity {
         networkAvailable=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
 
-            sharedPreferences=getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
+       getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+
+
+        sharedPreferences=getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
             passwordInput.setText(sharedPreferences.getString("password",""));
             emailInput.setText(sharedPreferences.getString("email",""));
+
+
 
 
 
@@ -82,6 +92,11 @@ public class LoginTraderUserActivity extends AppCompatActivity {
 
     @OnClick(R.id.login_visitor_btn_id)
     void loginVistor(){
+        sharedPreferences2=getSharedPreferences("vistor",MODE_PRIVATE);
+        editor2 = sharedPreferences2.edit();
+        editor2.putString("loginVistor","vistor");
+        editor2.commit();
+        editor2.apply();
         Intent intent=new Intent(getApplicationContext(), HomeActivity.class);
         intent.putExtra("login_visitor","visitor");
         startActivity(intent);

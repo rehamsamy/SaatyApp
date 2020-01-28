@@ -17,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -32,6 +33,8 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.models.Data;
 import com.saaty.models.RegisterModel;
+import com.saaty.models.SendCodeModel;
+import com.saaty.password.VerificationCodeActivity;
 import com.saaty.sideMenuScreen.TermsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
@@ -63,7 +66,7 @@ import static androidx.constraintlayout.widget.Constraints.TAG;
 public class TraderRegisterFragment extends Fragment {
 
     ApiServiceInterface serviceInterface;
-    public static final String MY_PREFS_NAME ="my_data" ;
+    public static final String MY_PREFS_NAME ="my_data2" ;
     NetworkAvailable networkAvailable;
     TextInputEditText nameInput, phoneInput, emailInput, shopType, password, confirmPssword;
     ImageView uploadImg;
@@ -74,13 +77,16 @@ public class TraderRegisterFragment extends Fragment {
     CheckBox acceptTerms;
     MultipartBody.Part body=null;
     SharedPreferences.Editor editor;
-    TextView acceptTermsTxt;
-    Data data;
+    SharedPreferences sharedPreferences;
+    TextView acceptTermsTxt,choosePhotoDone;
+   public static Data data;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = LayoutInflater.from(getContext()).inflate(R.layout.register_trader_fragment_layout, container, false);
+
+      getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         nameInput = view.findViewById(R.id.user_name_input_id);
         phoneInput = view.findViewById(R.id.phone_input_id);
@@ -91,6 +97,9 @@ public class TraderRegisterFragment extends Fragment {
         uploadImg=view.findViewById(R.id.upload_store_img);
         acceptTerms=view.findViewById(R.id.accept_terms_id);
         acceptTermsTxt=view.findViewById(R.id.accept_terms_txt);
+        choosePhotoDone=view.findViewById(R.id.choose_photo);
+
+        sharedPreferences=getContext().getSharedPreferences(MY_PREFS_NAME,MODE_PRIVATE);
 
         storage_permission = new String[]{Manifest.permission.READ_EXTERNAL_STORAGE};
 
@@ -171,6 +180,7 @@ public class TraderRegisterFragment extends Fragment {
                 }
 
 
+
                 Map<String, Object> map = new HashMap<>();
                 map.put("fullname", nameInput.getText().toString());
                 map.put("email", emailInput.getText().toString());
@@ -194,28 +204,25 @@ public class TraderRegisterFragment extends Fragment {
                         Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_SHORT).show();
                         data=response.body().getData();
                          data.setToken(response.body().getData().getToken());
-                         data.getStoreDataRegisterObject().setStoreLogo(data.getStoreDataRegisterObject().getStoreLogo());
-                         data.getUserDataRegisterObject().setEmail(data.getUserDataRegisterObject().getEmail());
-                         data.getUserDataRegisterObject().setFullname(data.getUserDataRegisterObject().getFullname());
-                         data.getUserDataRegisterObject().setMobile(data.getUserDataRegisterObject().getMobile());
-                         data.getUserDataRegisterObject().setId(data.getUserDataRegisterObject().getId());
+                         data.getStoreDataRegisterObject().setStoreLogo(response.body().getData().getStoreDataRegisterObject().getStoreLogo());
+                         data.getUserDataRegisterObject().setEmail(response.body().getData().getUserDataRegisterObject().getEmail());
+                         data.getUserDataRegisterObject().setFullname(response.body().getData().getUserDataRegisterObject().getFullname());
+                         data.getUserDataRegisterObject().setMobile(response.body().getData().getUserDataRegisterObject().getMobile());
+                         data.getUserDataRegisterObject().setId(response.body().getData().getUserDataRegisterObject().getId());
+                         data.getUserDataRegisterObject().setType(response.body().getData().getUserDataRegisterObject().getType());
+                         data.setUserDataRegisterObject(response.body().getData().getUserDataRegisterObject());
                          Log.v("TAg","store logooo"+data.getStoreDataRegisterObject().getStoreLogo());
                          String logo=data.getStoreDataRegisterObject().getStoreLogo();
                          String storeName=data.getStoreDataRegisterObject().getStoreArName();
                         Gson gson = new Gson();
                         String user_data = gson.toJson(data);
-                        editor = getContext().getSharedPreferences(LoginTraderUserActivity.MY_PREFS_NAME, MODE_PRIVATE).edit();
+                        editor = getContext().getSharedPreferences(TraderRegisterFragment.MY_PREFS_NAME, MODE_PRIVATE).edit();
                         editor.putString("register_data", user_data);
                         Log.v("TAG","regggg"+gson.toString());
                         editor.commit();
-                        Intent intent=new Intent(getActivity(), HomeActivity.class);
-                        intent.putExtra("register_store_model",data);
-                        intent.putExtra("logo",logo);
-                        intent.putExtra("store_name",storeName);
-                        startActivity(intent);
+                        editor.apply();
                         progressDialog.dismiss();
-
-
+                       sendEmailVerificationCode(response.body().getData().getToken());
 
                     }
                     else if(response.body().getSuccess()==false){
@@ -249,6 +256,8 @@ public class TraderRegisterFragment extends Fragment {
                 }
             }
 
+        }else {
+            Toast.makeText(getContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
         }
 
     }
@@ -279,6 +288,7 @@ public class TraderRegisterFragment extends Fragment {
                    // user_image.setImageBitmap(bitmap);
                     InputStream is = getActivity().getContentResolver().openInputStream(data.getData());
                     createMultiPartFile(getBytes(is));
+                    choosePhotoDone.setVisibility(View.VISIBLE);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -302,5 +312,40 @@ public class TraderRegisterFragment extends Fragment {
     private void createMultiPartFile(byte[] imageBytes) {
         RequestBody requestFile = RequestBody.create(MediaType.parse("image/jpeg"), imageBytes);
         body = MultipartBody.Part.createFormData("store_logo", "image.jpg", requestFile);
+    }
+
+
+
+    private void sendEmailVerificationCode(String token) {
+        if (networkAvailable.isNetworkAvailable()) {
+
+            ProgressDialog progressDialog=DailogUtil.showProgressDialog(getContext(),getString(R.string.send_email_verify),false);
+            serviceInterface = ApiClient.getClientService();
+            Call<SendCodeModel> call=serviceInterface.sendCodeToEmail("application/json","Bearer "+token);
+            call.enqueue(new Callback<SendCodeModel>() {
+                @Override
+                public void onResponse(Call<SendCodeModel> call, Response<SendCodeModel> response) {
+                    if(response.body().isSuccess()){
+                        Toast.makeText(getContext(), response.body().getMessage(), Toast.LENGTH_LONG).show();
+                        Intent intent=new Intent(getActivity(), VerificationCodeActivity.class);
+                       intent.putExtra("register_store_model",data);
+//                        intent.putExtra("logo",logo);
+//                        intent.putExtra("store_name",storeName);
+                        progressDialog.dismiss();
+                        startActivity(intent);
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<SendCodeModel> call, Throwable t) {
+
+                }
+            });
+        }else {
+
+
+            Toast.makeText(getContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+        }
     }
 }

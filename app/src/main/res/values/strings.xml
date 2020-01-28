@@ -14,7 +14,7 @@
     <string name="enter_phone_number">Please Enter Phone Number</string>
     <string name="phone_number_input">Phone Number</string>
     <string name="confirm">Confirm</string>
-    <string name="verify_code_txt">Please check your phone messages and get the confirmation code</string>
+    <string name="verify_code_txt">Please check your email and get the confirmation code</string>
     <string name="enter_code">Enter Code</string>
     <string name="resend_code_txt">Again Resend Code</string>
     <string name="change_password_txt">Please enter new password</string>
@@ -98,7 +98,7 @@
     <string name="type">Type:</string>
     <string name="status">Status:</string>
     <string name="producer_price">Product Price:</string>
-    <string name="price_type">reyal seody</string>
+    <string name="price_type">SAR</string>
     <string name="phone_number_contact">Phone Number To Contact:</string>
     <string name="email_contact">Email To Contact:</string>
     <string name="contact_way">Contact Way:</string>
@@ -116,14 +116,14 @@
     <string name="category">Category:</string>
     <string name="message_name">Ahmed Mohamed</string>
     <string name="received">Received</string>
-    <string name="reply_with_message">Reply with message</string>
+    <string name="reply_with_message">Reply</string>
     <string name="message_text">Message Text</string>
     <string name="send_message">Send Message</string>
     <string name="message_to">Message to:</string>
     <string name="upload_store_img">You must upload image for store:</string>
     <string name="create_new_account">Create New Account</string>
     <string name="product_imges">Product Images:</string>
-    <string name="log_out">Log out of saaty</string>
+    <string name="log_out">Log out</string>
     <string name="yes">Yes</string>
     <string name="dismiss">Cancel</string>
     <string name="enter_image_please">Please enter image of store</string>
@@ -131,9 +131,15 @@
     <string name="english">english</string>
     <string name="arabic">arabic</string>
     <string name="select_city">Select City:</string>
-    <string name="sending" translatable="false">ارسل رسالة</string>
+    <string name="sending" translatable="false">Sending</string>
     <string name="show_Ads">Show Ads</string>
     <string name="skip_ads">Skip Ads</string>
     <string name="terms_conditions">Termis And Conditions</string>
+    <string name="city">City:</string>
+    <string name="enter_email">Please enter email</string>
+    <string name="send_email_verify">send verify code to your email</string>
+    <string name="verify_code_toolbar">Verification Code</string>
+    <string name="replies">Reblies</string>
+    <string name="done_choose_photo">The photo was chosen.</string>
 
 </resources>

@@ -4,12 +4,10 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.cardview.widget.CardView;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.constraintlayout.widget.ConstraintSet;
 import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.viewpager.widget.ViewPager;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -19,12 +17,11 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 import android.annotation.SuppressLint;
-import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
@@ -35,7 +32,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,9 +45,7 @@ import com.daimajia.slider.library.Tricks.ViewPagerEx;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.gson.Gson;
-import com.saaty.MainActivity;
 import com.saaty.R;
-import com.saaty.home.StoresProduct.StoresProductsActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.AdvsModel;
 import com.saaty.models.CategoryModel;
@@ -60,6 +54,7 @@ import com.saaty.models.DataItem;
 import com.saaty.models.LoginModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.ProductDataModel;
+import com.saaty.models.UserDataRegisterObject;
 import com.saaty.models.UserModel;
 import com.saaty.sideMenuScreen.AboutAppActivity;
 import com.saaty.sideMenuScreen.AboutUsActivity;
@@ -67,13 +62,9 @@ import com.saaty.sideMenuScreen.ContactUsActivity;
 import com.saaty.sideMenuScreen.ProfileActivity;
 import com.saaty.sideMenuScreen.SettingActivity;
 import com.saaty.sideMenuScreen.messages.MessageActivity;
-import com.saaty.sideMenuScreen.messages.MessageActivity2;
 import com.saaty.sideMenuScreen.myAds.AdsActivity;
 import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
-import com.saaty.sideMenuScreen.myAds.MyAdsActivity;
-import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
-import com.saaty.splash.SplashActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.NetworkAvailable;
@@ -84,10 +75,9 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
-import static androidx.constraintlayout.widget.ConstraintSet.*;
-import static androidx.constraintlayout.widget.ConstraintSet.BOTTOM;
 import static com.saaty.loginAndRegister.LoginTraderUserActivity.MY_PREFS_NAME;
 
 public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,BaseSliderView.OnSliderClickListener ,  ViewPagerEx.OnPageChangeListener {
@@ -101,7 +91,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
      @BindView(R.id.toolbar_txt_id) TextView toolbarText;
      @BindView(R.id.slider_layout_id) SliderLayout sliderLayout;
      @BindView(R.id.constraint_root) ConstraintLayout root;
-      @BindView(R.id.english_arrow_id) ImageView englishArrowId;
+     @BindView(R.id.english_arrow_id) ImageView englishArrowId;
     @BindView(R.id.english_arrow_id1) ImageView englishArrowId1;
     @BindView(R.id.english_arrow_id2) ImageView englishArrowId2;
     @BindView(R.id.arabic_arrow_id) ImageView arabicArrowId;
@@ -122,12 +112,13 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     public static  String mobile;
     public static  String store_name;
     public static  String store_desc;
+    int flag;
     Dialog mDialog;
     Data data;
    LoginModel loginModel;
    ApiServiceInterface apiServiceInterface;
    NetworkAvailable networkAvailable;
-   UserModel userModel;
+ public static   UserModel userModel;
 public static int user_id;
  List<DataItem> categoryItem=new ArrayList<>();
  List<ProductDataItem> sliderImages=new ArrayList<>();
@@ -139,10 +130,12 @@ public static int user_id;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
         mDialog=new Dialog(this);
 
+        Log.v("TAG","langgg "+PreferenceHelper.getValue(getApplicationContext()));
         setAds();
         setSupportActionBar(toolbar);
        getSupportActionBar().setTitle("");
@@ -173,23 +166,23 @@ public static int user_id;
            type=userModel.getType();
            email=userModel.getEmail();
            mobile=userModel.getMobile();
+
            if(userModel.getType().equals("store")){
               store_logo=userModel.getStoreLogo();
                store_name= (String) userModel.getStoreArName();
                store_desc= (String) userModel.getStoreArDescription();
                if(userModel.getStoreLogo()!=null){
                    Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
-                           .error(R.drawable.sidemenu_photo2).into(userImg);
+                           .error(R.drawable.sidemenu_photo).into(userImg);
                    Log.v("TAG","logo store");
                }
            }else if(userModel.getType().equals("user")){
                userImg.setImageResource(R.drawable.sidemenu_photo);
                Log.v("TAG","logo user");
+
            }
 
-
-
-
+           flag=1;
        }else if(intent.hasExtra("login_visitor")){
            user_id=0;
            hideNavigationItems();
@@ -207,8 +200,8 @@ public static int user_id;
 
            ConstraintLayout layout=(ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.visitor_header_layout,null);
            navigationView.addHeaderView(layout);
+           flag=3;
        }else if(intent.hasExtra("register_user_model")){
-           //userModel=intent.getParcelableExtra("register_user_model");
            data=intent.getParcelableExtra("register_user_model");
           userImg= navigationView.getHeaderView(0).findViewById(R.id.user_img_id);
           userImg.setImageResource(R.drawable.sidemenu_photo);
@@ -219,7 +212,7 @@ public static int user_id;
            full_name=data.getUserDataRegisterObject().getFullname();
            mobile=data.getUserDataRegisterObject().getMobile();
            email=data.getUserDataRegisterObject().getEmail();
-
+            flag=4;
        }else if(intent.hasExtra("register_store_model")){
            data=intent.getParcelableExtra("register_store_model");
            access_token="Bearer "+data.getToken();
@@ -237,14 +230,14 @@ public static int user_id;
            store_desc= "";
            if(store_logo!=null){
                Picasso.with(getApplicationContext()).load(urls.base_url+"/"+store_logo)
-                       .error(R.drawable.sidemenu_photo2).into(userImg);
+                       .error(R.drawable.sidemenu_photo).into(userImg);
            }
 
-           userImg.setImageResource(R.drawable.sidemenu_photo2);
+           //userImg.setImageResource(R.drawable.sidemenu_photo2);
           // Log.v("TAG","type  xxx  "+type);
+           flag=5;
        }
        else {
-
             if(prefs.contains("user_data")){
                Log.v("TAG","uuuuuuuuu");
                String user_data = prefs.getString("user_data", "");
@@ -262,6 +255,7 @@ public static int user_id;
                     Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
                             .error(R.drawable.sidemenu_photo).into(userImg);
                 }else if(type.equals("store")){
+                    Log.v("TAG","type   xxx "+type+"  " +urls.base_url+"/"+userModel.getStoreLogo());
                     Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
                             .error(R.drawable.sidemenu_photo).into(userImg);
                 }
@@ -278,8 +272,6 @@ public static int user_id;
            @Override
            public void onClick(View v) {
                Intent intent1=new Intent(new Intent(HomeActivity.this, EditAdsActivity.class));
-               //intent1.putExtra("ads_model",da)
-              // intent1.setAction("add_new_ads");
                intent1.putExtra(EditAdsActivity.ADD_NEW_AD,"add_new_ads");
                startActivity(intent1);
            }
@@ -357,6 +349,28 @@ public static int user_id;
 
     }
 
+
+
+    public static void setConfig(Context context,String lang){
+            Locale locale = new Locale(lang);
+            Locale.setDefault(locale);
+            Configuration config = new Configuration();
+            config.locale = locale;
+            context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
+    }
 
     private void checkLanguage() {
         if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
@@ -507,6 +521,10 @@ public static int user_id;
             drawer.closeDrawer(GravityCompat.START);
         } else {
             super.onBackPressed();
+            Intent startMain = new Intent(Intent.ACTION_MAIN);
+            startMain.addCategory(Intent.CATEGORY_HOME);
+            startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(startMain);
         }
     }
 
@@ -515,6 +533,7 @@ public static int user_id;
     void watchesClick() {
         Intent intent1=new Intent(getApplicationContext(), StoresActivity.class);
         intent1.putExtra("category_id1",1);
+        intent1.putExtra("flag",flag);
         startActivity(intent1);
     }
 
@@ -522,6 +541,7 @@ public static int user_id;
     void bracletesClick() {
         Intent intent1=new Intent(getApplicationContext(),StoresActivity.class);
         intent1.putExtra("category_id2",2);
+        intent1.putExtra("flag",flag);
         startActivity(intent1);
     }
 
@@ -529,6 +549,7 @@ public static int user_id;
     void storesClick(){
         Intent intent1=new Intent(getApplicationContext(),StoresActivity.class);
         intent1.putExtra("store",1);
+        intent1.putExtra("flag",flag);
         startActivity(intent1);
     }
 
@@ -540,7 +561,7 @@ public static int user_id;
         mDialog.setContentView(R.layout.logout_layout);
         MaterialButton logout=mDialog.findViewById(R.id.delete_btn_id);
         MaterialButton cancel=mDialog.findViewById(R.id.cancel_btn_id);
-        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        mDialog.getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.show();
 
@@ -607,22 +628,18 @@ public static int user_id;
                         }
                     });
 
-                    showAdsBtn.setOnClickListener(new View.OnClickListener() {
+                    adsImg.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View view) {
                             mDialog.dismiss();
-                            Intent intent = new Intent(Intent.ACTION_VIEW);
+                           Intent intent = new Intent(Intent.ACTION_VIEW,Uri.parse(model.getAdvData().get(0).getValue2()));
+
                             Uri uri=Uri.parse(model.getAdvData().get(0).getValue1());
-                            intent.setData(uri);
-                       // intent.setPackage(model.getAdvData().get(0).getValue2());
+                            Log.v("TAG","uriiii"+uri);
                             startActivity(intent);
 
                         }
                     });
-
-
-
-
          }
      }
 
@@ -634,5 +651,10 @@ public static int user_id;
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
+    }
 }
 

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".sideMenuScreen.myAds.MyAdsActivity"
+    tools:context=".sideMenuScreen.myAds.AdsActivity"
     android:background="@color/white">
 
 
@@ -129,6 +129,18 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/add_ads_btn_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/add_pic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginEnd="15dp"
+        android:backgroundTint="@color/blue"
+        android:elevation="32dp"
+        android:layout_marginBottom="15dp"/>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

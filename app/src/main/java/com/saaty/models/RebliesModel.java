@@ -1,19 +1,11 @@
 package com.saaty.models;
 
+import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
 
-import java.util.List;
 
-
-public class MessageObjectModel{
-
-	@SerializedName("data")
-	List<MessageArrayModel> messageArrayModelList;
-
-	@SerializedName("message_replies")
-	RebliesModel rebliesModel;
-
+public class RebliesModel{
 
 	@SerializedName("first_page_url")
 	private String firstPageUrl;
@@ -27,6 +19,9 @@ public class MessageObjectModel{
 	@SerializedName("total")
 	private int total;
 
+	@SerializedName("data")
+	private List<RebliesArrayItem> rebliesArray;
+
 	@SerializedName("last_page")
 	private int lastPage;
 
@@ -34,7 +29,7 @@ public class MessageObjectModel{
 	private String lastPageUrl;
 
 	@SerializedName("next_page_url")
-	private String nextPageUrl;
+	private Object nextPageUrl;
 
 	@SerializedName("from")
 	private int from;
@@ -47,22 +42,6 @@ public class MessageObjectModel{
 
 	@SerializedName("current_page")
 	private int currentPage;
-
-	public void setMessageArrayModelList(List<MessageArrayModel> messageArrayModelList) {
-		this.messageArrayModelList = messageArrayModelList;
-	}
-
-	public RebliesModel getRebliesModel() {
-		return rebliesModel;
-	}
-
-	public void setRebliesModel(RebliesModel rebliesModel) {
-		this.rebliesModel = rebliesModel;
-	}
-
-	public List<MessageArrayModel> getMessageArrayModelList() {
-		return messageArrayModelList;
-	}
 
 	public void setFirstPageUrl(String firstPageUrl){
 		this.firstPageUrl = firstPageUrl;
@@ -96,6 +75,14 @@ public class MessageObjectModel{
 		return total;
 	}
 
+	public void setRebliesArray(List<RebliesArrayItem> rebliesArray){
+		this.rebliesArray = rebliesArray;
+	}
+
+	public List<RebliesArrayItem> getRebliesArray(){
+		return rebliesArray;
+	}
+
 	public void setLastPage(int lastPage){
 		this.lastPage = lastPage;
 	}
@@ -112,11 +99,11 @@ public class MessageObjectModel{
 		return lastPageUrl;
 	}
 
-	public void setNextPageUrl(String nextPageUrl){
+	public void setNextPageUrl(Object nextPageUrl){
 		this.nextPageUrl = nextPageUrl;
 	}
 
-	public String getNextPageUrl(){
+	public Object getNextPageUrl(){
 		return nextPageUrl;
 	}
 
@@ -155,11 +142,12 @@ public class MessageObjectModel{
 	@Override
  	public String toString(){
 		return 
-			"MessageObjectModel{" + 
+			"RebliesModel{" + 
 			"first_page_url = '" + firstPageUrl + '\'' + 
 			",path = '" + path + '\'' + 
 			",per_page = '" + perPage + '\'' + 
 			",total = '" + total + '\'' + 
+			",rebliesArray = '" + rebliesArray + '\'' + 
 			",last_page = '" + lastPage + '\'' + 
 			",last_page_url = '" + lastPageUrl + '\'' + 
 			",next_page_url = '" + nextPageUrl + '\'' + 

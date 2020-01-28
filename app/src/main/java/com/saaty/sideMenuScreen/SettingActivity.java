@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.saaty.R;
+import com.saaty.home.HomeActivity;
 import com.saaty.util.PreferenceHelper;
 
 import java.util.Locale;
@@ -37,9 +38,11 @@ public class SettingActivity extends AppCompatActivity {
         if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")){
             arrowArabic.setVisibility(View.VISIBLE);
             arrowEnglish.setVisibility(View.GONE);
+            languageSelected.setText("العربية");
         }else  if(PreferenceHelper.getValue(getApplicationContext()).equals("en")){
             arrowArabic.setVisibility(View.GONE);
             arrowEnglish.setVisibility(View.VISIBLE);
+            languageSelected.setText("English");
         }
 
         toolbarTxt.setText(getString(R.string.setting));
@@ -63,6 +66,7 @@ public class SettingActivity extends AppCompatActivity {
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
                     setConfig( SettingActivity.this,lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
+                    languageSelected.setText("English");
 
                 } else if (which == 1) {
                     // Arabic Item is Selected vvffrer
@@ -70,9 +74,11 @@ public class SettingActivity extends AppCompatActivity {
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
                     setConfig( SettingActivity.this,lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
+                    languageSelected.setText("العربية");
                 }
 
-                Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
+                Intent i=new Intent(getApplicationContext(), HomeActivity.class);
+                //Intent i = getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
                 i.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                 startActivity(i);
             }
@@ -89,5 +95,21 @@ public class SettingActivity extends AppCompatActivity {
         Configuration config = new Configuration();
         config.locale = locale;
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+    }
+
+
+    @OnClick(R.id.toolbar_back_left_btn_id)
+    void backClick(){
+        finish();
+    }
+
+    @OnClick(R.id.toolbar_home_id)
+    void homeClick(){
+        startActivity(new Intent(getApplicationContext(),HomeActivity.class));
+    }
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        finish();
     }
 }

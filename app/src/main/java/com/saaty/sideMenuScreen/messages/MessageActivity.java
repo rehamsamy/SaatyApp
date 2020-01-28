@@ -100,15 +100,24 @@ public class MessageActivity extends AppCompatActivity {
                    sendMessage.clear();
                    receivedMessage.clear();
                    current_page=1;
-                   buildReceivedMessageRecycler();
-                   getReceivedMessage(current_page);
+                   if(networkAvailable.isNetworkAvailable()) {
+                       buildReceivedMessageRecycler();
+                       getReceivedMessage(current_page);
+                   } else {
+                           Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+                       }
                    Log.v("TAG","pos"+tab.getPosition());
+
               }else if(tab.getPosition()==1){
                    receivedMessage.clear();
                    sendMessage.clear();
                    current_page=1;
-                   buildSendMessageRecycler();
-                   getSendMessage(current_page);
+                   if(networkAvailable.isNetworkAvailable()) {
+                       buildSendMessageRecycler();
+                       getSendMessage(current_page);
+                   } else {
+                       // Toast.makeText(getApplicationContext(), getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+                   }
                    Log.v("TAG","pos"+tab.getPosition());
 
                }
