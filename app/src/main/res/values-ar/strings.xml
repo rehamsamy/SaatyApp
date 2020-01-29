@@ -72,7 +72,7 @@
 <string name="edit_profile" translatable="false">تعديل الحساب</string>
 <string name="old_password" translatable="false">كلمه المرور القديمة</string>
 <string name="new_password" translatable="false">كلمه المرور الجديدة</string>
-<string name="confirm_new_password" translatable="false">تاكي كلمه المرور</string>
+<string name="confirm_new_password" translatable="false">تاكيد كلمه المرور</string>
 <string name="change_password" translatable="false">تغيير كلمه المرور</string>
 <string name="language" translatable="false">اللغة</string>
 <string name="sort_by" translatable="false">ترتيب حسب:</string>

@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -62,6 +63,8 @@ int flag;
         networkAvailable=new NetworkAvailable(this);
 
        //prefs= getSharedPreferences(VerificationCodeActivity.VERIFY_CHECK,MODE_PRIVATE);
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         if(getIntent().hasExtra("phone")){
             phoneNumber=getIntent().getStringExtra("phone");

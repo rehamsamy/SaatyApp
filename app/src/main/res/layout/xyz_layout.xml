@@ -30,6 +30,7 @@
         android:textStyle="italic"
         android:textColor="@color/black"
         android:text="@string/email_input"
+        android:textAlignment="center"
         android:visibility="gone"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

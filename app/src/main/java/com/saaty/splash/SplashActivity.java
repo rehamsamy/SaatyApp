@@ -10,9 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -156,6 +158,7 @@ public class SplashActivity extends AppCompatActivity {
         else {
               Log.v("TAG","exper  first ");
             Log.v("TAG", "splahhhh 5" );
+            setConfig(getApplicationContext(),PreferenceHelper.getValue(SplashActivity.this));
             List<Integer> x = new ArrayList<>();
             x.add(R.drawable.splash_photo_1);
             x.add(R.drawable.splash_photo_2);
@@ -242,70 +245,40 @@ public class SplashActivity extends AppCompatActivity {
             int min = newWishlist.get(pos);
             newWishlist.set(pos, newWishlist.get(i));
             newWishlist.set(i, min);
-
-//            int min = newWishlist.get(pos).getPrice();
-//            newWishlist.set(pos, newWishlist.get(i));
-//            //newWishlist.set(i, newWishlist.get(min));
-//            newSortedList.add(newWishlist.get(i));
-
-        }
+       }
 
         for(int x=0;x<newWishlist.size();x++){
             Log.v("TAG","new sort "+newWishlist.get(x)+"  ");
         }
 
 
-
-
-
-
-
-
     }
 
 
-    public void setConfig(String language, Context context) {
-        Locale locale = new Locale(language);
-        Locale.setDefault(locale);
-        Configuration config = new Configuration();
-        config.locale = locale;
-       // context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
-//        boolean previouslyStarted = prefs.getBoolean(getString(R.string.pref_previously_started), false);
-//        if(!previouslyStarted) {
-//            SharedPreferences.Editor edit = prefs.edit();
-//            edit.putBoolean(getString(R.string.pref_previously_started), Boolean.TRUE);
-//            edit.commit();
-
-        }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-//        isFirstRun = getSharedPreferences("PREFERENCE", MODE_PRIVATE)
-//                .getBoolean("isFirstRun", true);
-//        if (isFirstRun) {
-//            //show start activity
-//            startActivity(new Intent(getApplicationContext(), SplashActivity.class));
-//            Log.v("TAG","first ttt"+isFirstRun);
-//            Toast.makeText(SplashActivity.this, "First Run", Toast.LENGTH_LONG)
-//                    .show();
-////            getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-////                    .putBoolean("isFirstRun", false).commit();
-//
-//        }else {
-//            startActivity(new Intent(SplashActivity.this, HomeActivity.class));
-//            Log.v("TAG","first ttt"+isFirstRun);
-//        }
-//        getSharedPreferences("PREFERENCE", MODE_PRIVATE).edit()
-//                   .putBoolean("isFirstRun", false).commit();
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
+        Log.v("TAG","langgg "+PreferenceHelper.getValue(getApplicationContext()));
 
     }
+
+
+    public static void setConfig(Context context, String lang){
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+
+    }
+
+
+
+
+
+
 }
 

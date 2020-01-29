@@ -70,7 +70,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
         PreferenceHelper.setValue(getApplicationContext(),lang_selected);
         setConfig(getApplicationContext(),lang_selected);
         Intent intent=new Intent(getApplicationContext(), LoginTraderUserActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Log.v("TAG","sssss"+lang_selected);
         Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
         startActivity(intent);
@@ -83,7 +83,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
         setConfig(getApplicationContext(),lang_selected);
        Intent intent=new Intent(getApplicationContext(), LoginTraderUserActivity.class);
        // Intent intent=getBaseContext().getPackageManager().getLaunchIntentForPackage(getBaseContext().getPackageName());
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+       // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
         Log.v("TAG","sssss"+lang_selected);
         startActivity(intent);

@@ -62,14 +62,7 @@ public class RebliesAdapter  extends RecyclerView.Adapter<RebliesAdapter.ViewHol
 
 
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                mInterface.OnItemClick(position);
-            }
-        });
-        //emptyBox.setOnClickListener(this);
 
     }
 

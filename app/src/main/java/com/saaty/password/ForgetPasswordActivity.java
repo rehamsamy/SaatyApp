@@ -13,6 +13,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -43,6 +44,8 @@ public class ForgetPasswordActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         available=new NetworkAvailable(this);
         dailogUtil=new DailogUtil();
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
         Log.v(TAG,"edit ttt"+emailInput.getText().toString());
         confirmBtn.setOnClickListener(new View.OnClickListener() {
@@ -93,7 +96,8 @@ public class ForgetPasswordActivity extends AppCompatActivity {
                          progressDialog.dismiss();
                      }
                  }else if(response.code()==404){
-                         Toast.makeText(ForgetPasswordActivity.this, "Mobile Not Found", Toast.LENGTH_LONG).show();
+                         Toast.makeText(ForgetPasswordActivity.this, getString(R.string.error_email_msg), Toast.LENGTH_LONG).show();
+                         progressDialog.dismiss();
 
                      }
                  }

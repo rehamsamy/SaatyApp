@@ -299,62 +299,7 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
             ConstraintLayout layout=(ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.visitor_header_layout,null);
             navigationView.addHeaderView(layout);
         }
-//        tabLayout.setOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-//            @Override
-//            public void onTabSelected(TabLayout.Tab tab) {
-//               tab_category_pos=tab.getPosition();
-//               if(tab_category_pos==0){
-//                   Log.v(TAG,"position"+tab_category_pos);
-//                   storesList.clear();
-//                   categoryProductsList.clear();
-//                   buildRecyclerViewForCategory();
-//                   getCateogryProductsList(current_page,1);
-//                   searchOnProduct(categoryProductsList);
-//                   navFilterImg.setVisibility(View.VISIBLE);
-//                   navFilterImg.setOnClickListener(new View.OnClickListener() {
-//                       @Override
-//                       public void onClick(View v) {
-//                           showFilterDialog();
-//                       }
-//                   });
-//
-//               }else if(tab_category_pos==1){
-//                   Log.v(TAG,"position"+tab_category_pos);
-//
-//                   storesList.clear();
-//                   categoryProductsList.clear();
-//                   buildRecyclerViewForStoreList();
-//                   getStoreList(current_page);
-//                   searchOnStore(storesList);
-//               }else if(tab_category_pos==2){
-//                   Log.v(TAG,"position"+tab_category_pos);
-//                   storesList.clear();
-//                   categoryProductsList.clear();
-//                   buildRecyclerViewForCategory();
-//                   getCateogryProductsList(current_page,2);
-//                   searchOnProduct(categoryProductsList);
-//                   navFilterImg.setVisibility(View.VISIBLE);
-//                   navFilterImg.setOnClickListener(new View.OnClickListener() {
-//                       @Override
-//                       public void onClick(View v) {
-//                           showFilterDialog();
-//                       }
-//                   });
-//
-//               }
-//
-//            }
-//
-//            @Override
-//            public void onTabUnselected(TabLayout.Tab tab) {
-//
-//            }
-//
-//            @Override
-//            public void onTabReselected(TabLayout.Tab tab) {
-//
-//            }
-//        });
+
 
     }
 
@@ -549,12 +494,11 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                    if(response.body().isSuccess()){
                        storesList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                        adapter.notifyDataSetChanged();
-                           //Toast.makeText(StoresActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                            progressBar.setVisibility(View.GONE);
                         if(response.body().getDataObjectModel().getDataArrayModelList().size()>0&& current_page==1){
                               newStoresList=response.body().getDataObjectModel().getDataArrayModelList();
                        }
-                       else {
+                       else if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&& current_page==1){
                            emptyDataTxt.setVisibility(View.VISIBLE);
                            progressBar.setVisibility(View.GONE);
                        }
@@ -661,17 +605,12 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                             newWatches=response.body().getDataObjectModel().getDataArrayModelList();
                             Log.v("TAG","aaa   size  is  "+newWatches.size());
                         }
-
-
-                       // }else if(position==2){
-                            //newBracletes=response.body().getDataObjectModel().getDataArrayModelList();
-                        //}
                         categoryProductsList.addAll(response.body().getDataObjectModel().getDataArrayModelList());
                         storeProductAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
                        // Toast.makeText(StoresActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     }else {
-                            if(response.body().getDataObjectModel().getDataArrayModelList().size()==0){
+                            if(response.body().getDataObjectModel().getDataArrayModelList().size()==0&&current_page==1){
                                 progressBar.setVisibility(View.GONE);
                                 emptyDataTxt.setVisibility(View.VISIBLE);
                             }

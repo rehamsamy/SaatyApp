@@ -68,9 +68,6 @@
             android:name=".sideMenuScreen.ProfileActivity"
             android:screenOrientation="portrait" />
         <activity
-            android:name=".productDetails.SendMessageActivity"
-            android:screenOrientation="portrait" />
-        <activity
             android:name=".productDetails.ProductDetailsActivity"
             android:screenOrientation="portrait" />
         <activity

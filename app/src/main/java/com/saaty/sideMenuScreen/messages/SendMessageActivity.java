@@ -20,6 +20,7 @@ import com.saaty.R;
 import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.DeleteMessageModel;
+import com.saaty.models.MessageArrayModel;
 import com.saaty.models.ReplyMessageModel;
 import com.saaty.models.SendMessageProductModel;
 import com.saaty.util.ApiClient;
@@ -38,6 +39,8 @@ public class SendMessageActivity extends AppCompatActivity {
   int user_message_id;
   DailogUtil dailogUtil;
   Intent intent;
+  MessageArrayModel model;
+  int flag=1;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -49,6 +52,7 @@ public class SendMessageActivity extends AppCompatActivity {
          intent=getIntent();
         if(intent.hasExtra("id")){
             user_message_id=intent.getIntExtra("id",1);
+
         }else if(intent.hasExtra("product_id")){
             if(networkAvailable.isNetworkAvailable()){
                 if(!FUtilsValidation.isEmpty(messageInput,getString(R.string.field_required))){
@@ -57,6 +61,10 @@ public class SendMessageActivity extends AppCompatActivity {
             }else {
                 Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
             }
+        }else if(intent.hasExtra("receive_model")){
+            model=intent.getParcelableExtra("receive_model");
+            user_message_id=model.getUsmId();
+            flag=1;
         }
 
 
@@ -85,6 +93,17 @@ public class SendMessageActivity extends AppCompatActivity {
             }else {
                 Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
             }
+        }else if(intent.hasExtra("receive_model")){
+
+            if(networkAvailable.isNetworkAvailable()){
+                if(!FUtilsValidation.isEmpty(messageInput,getString(R.string.field_required))){
+                    sendReplyMessage();
+                }
+            }else {
+                Toast.makeText(this, getString(R.string.error_connection), Toast.LENGTH_LONG).show();
+            }
+            flag=1;
+
         }
 
 
@@ -104,7 +123,12 @@ public class SendMessageActivity extends AppCompatActivity {
                 if(response.body().isSuccess()){
                     Toast.makeText(SendMessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                     progressDialog.dismiss();
-                    finish();
+                    if(flag==1){
+                        Intent intent=new Intent(SendMessageActivity.this,MessageDetailsActivity.class);
+                        intent.putExtra("receive_model",model);
+                        startActivity(intent);
+                    }
+
                 }else {
                     Toast.makeText(SendMessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                    progressDialog.dismiss();

@@ -118,6 +118,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
    LoginModel loginModel;
    ApiServiceInterface apiServiceInterface;
    NetworkAvailable networkAvailable;
+   int vFlag=0;
  public static   UserModel userModel;
 public static int user_id;
  List<DataItem> categoryItem=new ArrayList<>();
@@ -152,8 +153,6 @@ public static int user_id;
             toggle.syncState();
             toolbarText.setText(R.string.home_page);
 
-
-
        addAdsBtn=navigationView.getHeaderView(0).findViewById(R.id.confirm_btn_id);
        Intent intent=getIntent();
        if(intent.hasExtra("user_model")){
@@ -166,16 +165,15 @@ public static int user_id;
            type=userModel.getType();
            email=userModel.getEmail();
            mobile=userModel.getMobile();
-
            if(userModel.getType().equals("store")){
-              store_logo=userModel.getStoreLogo();
+               String x=intent.getStringExtra("logo");
+              store_logo=x;
                store_name= (String) userModel.getStoreArName();
                store_desc= (String) userModel.getStoreArDescription();
-               if(userModel.getStoreLogo()!=null){
-                   Picasso.with(getApplicationContext()).load(urls.base_url+"/"+userModel.getStoreLogo())
-                           .error(R.drawable.sidemenu_photo).into(userImg);
-                   Log.v("TAG","logo store");
-               }
+               Picasso.with(getApplicationContext()).load(urls.base_url+"/"+x)
+                       .error(R.drawable.sidemenu_photo).into(userImg);
+               Log.v("TAG","logo store"+x);
+
            }else if(userModel.getType().equals("user")){
                userImg.setImageResource(R.drawable.sidemenu_photo);
                Log.v("TAG","logo user");
@@ -184,6 +182,7 @@ public static int user_id;
 
            flag=1;
        }else if(intent.hasExtra("login_visitor")){
+           Log.v("TAG","xxx vvv"+vFlag);
            user_id=0;
            hideNavigationItems();
            if (user_id == 0) {
@@ -196,6 +195,8 @@ public static int user_id;
                        return false;
                    }
                });
+
+
            }
 
            ConstraintLayout layout=(ConstraintLayout) LayoutInflater.from(this).inflate(R.layout.visitor_header_layout,null);
@@ -232,6 +233,8 @@ public static int user_id;
                Picasso.with(getApplicationContext()).load(urls.base_url+"/"+store_logo)
                        .error(R.drawable.sidemenu_photo).into(userImg);
            }
+
+
 
            //userImg.setImageResource(R.drawable.sidemenu_photo2);
           // Log.v("TAG","type  xxx  "+type);
@@ -565,17 +568,22 @@ public static int user_id;
         mDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
         mDialog.show();
 
+
         logout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
-                editor = prefs.edit();
-                editor.clear().commit();
-                startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
-                finish();
-                mDialog.dismiss();
+                    prefs = getSharedPreferences(MY_PREFS_NAME, Context.MODE_PRIVATE);
+                    editor = prefs.edit();
+                    editor.clear().commit();
+                    startActivity(new Intent(HomeActivity.this, LoginTraderUserActivity.class));
+                    finish();
+                    mDialog.dismiss();
+
             }
+
         });
+
+
 
         cancel.setOnClickListener(new View.OnClickListener() {
             @Override

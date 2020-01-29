@@ -62,13 +62,15 @@
         android:id="@+id/message_body"
         android:layout_width="260dp"
         android:layout_height="wrap_content"
+        android:padding="8dp"
         android:maxLines="1"
         android:scrollHorizontally="true"
         android:ellipsize="end"
         android:text="@string/product_desc"
         app:layout_constraintTop_toBottomOf="@id/message_sent_receive_name"
         app:layout_constraintStart_toStartOf="@id/message_sent_receive_name"
-        app:layout_constraintBottom_toBottomOf="@id/store_img_id"/>
+        app:layout_constraintBottom_toBottomOf="@id/store_img_id"
+        android:textAlignment="viewStart"/>
 
 
     <TextView

@@ -123,7 +123,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
           Map<String,Object> map=new HashMap<>();
           map.put("page",current_page);
           map.put("limit",20);
- progressBar.setVisibility(VISIBLE);
+          progressBar.setVisibility(VISIBLE);
         apiServiceInterface= ApiClient.getClientService();
         String x=  HomeActivity.access_token;
         Call<MessageModel> call=apiServiceInterface.getMessageReblies(user_message_id,"application/json",x,map);
@@ -135,18 +135,22 @@ public class MessageDetailsActivity extends AppCompatActivity {
                         messageRebliesList.addAll(response.body().getMessageObjectModel().getRebliesModel().getRebliesArray());
                         rebliesAdapter.notifyDataSetChanged();
                         progressBar.setVisibility(View.GONE);
+                        Log.v("TAG","sss xxx 1");
                     }else if(response.body().getMessageObjectModel().getRebliesModel().getRebliesArray().size()==0&& current_page==1){
                         progressBar.setVisibility(View.GONE);
                         emptyData.setVisibility(VISIBLE);
+                        Log.v("TAG","sss xxx 2");
                     }
                 }else {
+                    progressBar.setVisibility(View.GONE);
                     Toast.makeText(MessageDetailsActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.v("TAG","sss xxx 3");
                 }
             }
 
             @Override
             public void onFailure(Call<MessageModel> call, Throwable t) {
-
+                progressBar.setVisibility(View.GONE);
             }
         });
 
@@ -155,7 +159,7 @@ public class MessageDetailsActivity extends AppCompatActivity {
     @OnClick(R.id.reply_with_message_id)
     void setReplyWithMsgClick(){
         Intent intent=new Intent(getApplicationContext(),SendMessageActivity.class);
-        intent.putExtra("id",user_message_id);
+        intent.putExtra("receive_model",model);
         startActivity(intent);
     }
 

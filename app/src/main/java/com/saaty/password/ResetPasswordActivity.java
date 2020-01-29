@@ -12,10 +12,12 @@ import retrofit2.http.Body;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Paint;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.util.Linkify;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -64,6 +66,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         phoneNumber = intent.getStringExtra("phone");
         toolbarTxt.setText(getString(R.string.reset_password));
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
 
 
         acceptTermsTxt.setClickable(true);
@@ -101,6 +104,9 @@ public class ResetPasswordActivity extends AppCompatActivity {
             if (!FUtilsValidation.isEmpty(newPasswordInput, getString(R.string.field_required)) &&
                     !FUtilsValidation.isEmpty(confirmPasswordInput, getString(R.string.field_required))
                     && FUtilsValidation.isPasswordEqual(confirmPasswordInput, newPasswordInput, getString(R.string.password_equal_error))) {
+
+                Drawable drawable=getResources().getDrawable(R.drawable.signup_confirm_password);
+                confirmPasswordInput.setCompoundDrawables(drawable,null,null,null);
 
                 ProgressDialog progressDialog = dailogUtil.showProgressDialog(ResetPasswordActivity.this, getString(R.string.logging), false);
                 apiServiceInterface = ApiClient.getClientService();

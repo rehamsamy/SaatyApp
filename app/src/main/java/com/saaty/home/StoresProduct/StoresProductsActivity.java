@@ -43,7 +43,7 @@ import com.saaty.models.DataArrayModel;
 import com.saaty.models.ProductDataItem;
 import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
-import com.saaty.productDetails.SendMessageActivity;
+import com.saaty.sideMenuScreen.messages.SendMessageActivity;
 import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
@@ -78,6 +78,7 @@ public class StoresProductsActivity extends AppCompatActivity {
     @BindView(R.id.send_img_id) ImageView sendImg;
    // @BindView(R.id.view_pager_id) ViewPager viewPager;
    List<DataArrayModel> newList=new ArrayList<>();
+    List<DataArrayModel> newSearchList=new ArrayList<>();
     FilterMethods filterMethods;
     int tab_selected;
 
@@ -114,7 +115,7 @@ public class StoresProductsActivity extends AppCompatActivity {
 
         if(HomeActivity.user_id==0){
             sendImg.setImageResource(R.drawable.send_message_not_active);
-            sendImg.setEnabled(true);
+            sendImg.setEnabled(false);
         }else {
             sendImg.setEnabled(true);
             sendImg.setImageResource(R.drawable.send_message);
@@ -147,14 +148,12 @@ public class StoresProductsActivity extends AppCompatActivity {
            progressBar.setVisibility(View.GONE);
            String newProd=getString(R.string.new_products);
            tabLayout.addTab(tabLayout.newTab().setText("      "+newProd+"     "),0);
-          // newProducts.clear();
            nWProducts.clear();
            Log.v("TAG","passsss");
            emptyData.setVisibility(View.GONE);
            shape_type="New";
            buildRecyclerViewForCategory();
            getStoreProducts(current_page,"New");
-
            tabLayout.addTab(tabLayout.newTab().setText("        "+getString(R.string.old_products)+"        "),1);
 
 
@@ -198,8 +197,6 @@ public class StoresProductsActivity extends AppCompatActivity {
            }
        });
 
-
-
         searchView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -211,8 +208,6 @@ public class StoresProductsActivity extends AppCompatActivity {
                 String newText = s.toString();
                 Log.v("TAG", "sssssssssss" + count +"   "+storeProductsList.size() + s.toString().toLowerCase());
                 ArrayList<DataArrayModel> newlist = new ArrayList<>();
-
-
 
                 for (DataArrayModel item : storeProductsList) {
                     Log.v("TAG", "ar name" + item.getArName().contains(newText));
@@ -233,33 +228,12 @@ public class StoresProductsActivity extends AppCompatActivity {
                     emptyData.setVisibility(View.VISIBLE);
                     adapter.notifyDataSetChanged();
                     Log.v("TAG","expp1");
-                }else if(s.length()==0&&newlist.size()==0){
+                }else if(s.length()==0&&newlist.size()==0) {
+                    emptyData.setVisibility(View.GONE);
+                    storeProductsList.addAll(newSearchList);
+                    adapter.notifyDataSetChanged();
 
-//                    if(tabLayout.getS){
-//                        buildRecyclerViewForCategory();
-//                        getStoreProducts(current_page,"New");
-//                    }else{
-//                        buildRecyclerViewForCategory();
-//                        getStoreProducts(current_page,"Used");
-//                    }
-//                    storeProductsList.addAll(newProducts);
-//                    adapter.notifyDataSetChanged();
-                    Log.v("TAG","expp2");
                 }
-//                storeProductsList.clear();
-//                if(newlist.size()>0) {
-//                    for (int i = 0; i < newlist.size(); i++) {
-//                        storeProductsList.add(newlist.get(i));
-//                        adapter.notifyDataSetChanged();
-//
-//                    }
-//                }else if(count==0){
-//                    //storeProductsList.clear();
-//                    //emptyData.setVisibility(View.VISIBLE);
-//
-//                    Log.v("TAG","sxxxxx"+storeProductsList.size());
-//                    //adapter.notifyDataSetChanged();
-//                }
             }
 
             @Override
@@ -270,9 +244,11 @@ public class StoresProductsActivity extends AppCompatActivity {
         });
 
 
-
-
     }
+
+
+
+
 
 
 
@@ -296,8 +272,10 @@ public class StoresProductsActivity extends AppCompatActivity {
                             for(int i=0;i<x.size();i++){
                                if(x.get(i).getShape().equals("New")&&shape_type.equals("New")){
                                    nWProducts.add(x.get(i));
+                                   newSearchList=nWProducts;
                                }else if(x.get(i).getShape().equals("Used")&&shape_type.equals("Used")){
                                    nWProducts.add(x.get(i));
+                                   newSearchList=nWProducts;
                                }
                             }
                             Log.v("TAG","xxxccc"+nWProducts.size()+"   "+id+"   ");

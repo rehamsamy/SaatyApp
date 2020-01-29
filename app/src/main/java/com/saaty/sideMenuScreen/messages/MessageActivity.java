@@ -216,11 +216,12 @@ public class MessageActivity extends AppCompatActivity {
                         receivedMessage.addAll(response.body().getMessageObjectModel().getMessageArrayModelList());
                         Log.v("TAG","receive mess"+receivedMessage.size());
                         messageAdapter.notifyDataSetChanged();
-                          // Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                             progressBar.setVisibility(View.GONE);
 
-                    } else if(current_page==1&&receivedMessage.size()==0){
-                        //recyclerView.setVisibility(View.GONE);
+                    } else if(current_page==1&&response.body().getMessageObjectModel().getMessageArrayModelList().size()==0){
+                        emptyData.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                    }else if(current_page>1&&response.body().getMessageObjectModel().getMessageArrayModelList().size()==0){
                         emptyData.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
                     }

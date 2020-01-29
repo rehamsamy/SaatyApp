@@ -10,8 +10,10 @@ import retrofit2.Response;
 import retrofit2.http.Body;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
 import android.text.Html;
 import android.text.method.LinkMovementMethod;
@@ -36,8 +38,10 @@ import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
+import com.saaty.util.PreferenceHelper;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class LoginTraderUserActivity extends AppCompatActivity {
@@ -75,7 +79,7 @@ public class LoginTraderUserActivity extends AppCompatActivity {
             passwordInput.setText(sharedPreferences.getString("password",""));
             emailInput.setText(sharedPreferences.getString("email",""));
 
-
+        Log.v("TAG","langgg"+ PreferenceHelper.getValue(getApplicationContext()));
 
 
 
@@ -160,6 +164,8 @@ public class LoginTraderUserActivity extends AppCompatActivity {
 
                                 Intent intent = new Intent(getApplicationContext(), HomeActivity.class);
                                 intent.putExtra("user_model", loginModel);
+                                intent.putExtra("logo",loginModel.getUserModel().get(0).getStoreLogo());
+                                Log.v("TAG" ,"logo store"+loginModel.getUserModel().get(0).getStoreLogo());
                                 startActivity(intent);
                                 Toast.makeText(LoginTraderUserActivity.this, "loging sucess", Toast.LENGTH_LONG).show();
                                 progressDialog.dismiss();
@@ -211,4 +217,20 @@ public class LoginTraderUserActivity extends AppCompatActivity {
     }
 
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        setConfig(getApplicationContext(),PreferenceHelper.getValue(getApplicationContext()));
+
+    }
+
+
+    public static void setConfig(Context context, String lang){
+        Locale locale = new Locale(lang);
+        Locale.setDefault(locale);
+        Configuration config = new Configuration();
+        config.locale = locale;
+        context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
+
+    }
 }
