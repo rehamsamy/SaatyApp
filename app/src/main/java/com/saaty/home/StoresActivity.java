@@ -773,6 +773,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.addAll(newWatches);
                     storeProductAdapter.notifyDataSetChanged();
                 }else if(newlist.size()>0&&s.length()==0){
+                    categoryProductsList.clear();
+                    newWatches.clear();
                     categoryProductsList.addAll(newWatches);
                     storeProductAdapter.notifyDataSetChanged();
                 }
@@ -876,8 +878,10 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     storesList.addAll(newStoresList);
                     adapter.notifyDataSetChanged();
                 }else if(newlist.size()>0&&s.length()==0){
+                    newStoresList.clear();
                     storesList.addAll(newStoresList);
                     adapter.notifyDataSetChanged();
+                    Log.v("TAG","xxx ccc");
                 }
             }
 

@@ -338,4 +338,10 @@ Intent intent;
         }
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        startActivity(new Intent(getApplicationContext(),ProfileActivity.class));
+    }
 }

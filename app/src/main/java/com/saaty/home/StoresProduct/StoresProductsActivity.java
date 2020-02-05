@@ -84,7 +84,6 @@ public class StoresProductsActivity extends AppCompatActivity {
 
     String shape_type="New";
     int current_page=1;
-    StoreProductsPagerAdaper pagerAdaper;
     DealingWithWishList dealingWithWishList;
     ApiServiceInterface apiServiceInterface;
     List<DataArrayModel> storeProductsList=new ArrayList<>();
@@ -110,7 +109,6 @@ public class StoresProductsActivity extends AppCompatActivity {
         networkAvailable=new NetworkAvailable(this);
         dealingWithWishList=new DealingWithWishList(this);
         mDialog=new Dialog(this);
-        pagerAdaper=new StoreProductsPagerAdaper(getSupportFragmentManager());
 
 
         if(HomeActivity.user_id==0){
@@ -481,7 +479,9 @@ public class StoresProductsActivity extends AppCompatActivity {
 
     @OnClick(R.id.send_img_id)
     void sendMessage(){
-           startActivity(new Intent(getApplicationContext(), SendMessageActivity.class));
+        Intent intent=new Intent(getApplicationContext(), SendMessageActivity.class);
+        intent.putExtra("product_id",   1);
+           startActivity(intent);
 
           // startActivity(new Intent(getApplicationContext(), LoginTraderUserActivity.class));
 
