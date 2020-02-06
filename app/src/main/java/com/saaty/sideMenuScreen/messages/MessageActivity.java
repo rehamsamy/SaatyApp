@@ -175,6 +175,7 @@ public class MessageActivity extends AppCompatActivity {
                         messageAdapter.notifyDataSetChanged();
                        // Toast.makeText(MessageActivity.this, response.body().getMessage(), Toast.LENGTH_LONG).show();
                         progressBar.setVisibility(View.GONE);
+                        emptyData.setVisibility(View.GONE);
 
                     } else if(current_page==1&&sendMessage.size()==0){
                         ////recyclerView.setVisibility(View.GONE);
