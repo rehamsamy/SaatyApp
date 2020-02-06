@@ -67,7 +67,7 @@ public class SettingActivity extends BaseActivity {
                     // English Item is Slected
                     lang_selected = "en";
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
-                    setConfig( SettingActivity.this,lang_selected);
+                   // setConfig( SettingActivity.this,lang_selected);
                     setNewLocale(SettingActivity.this, lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
                     languageSelected.setText("English");
@@ -76,7 +76,7 @@ public class SettingActivity extends BaseActivity {
                     // Arabic Item is Selected vvffrer
                     lang_selected = "ar";
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
-                    setConfig( SettingActivity.this,lang_selected);
+                    //setConfig( SettingActivity.this,lang_selected);
                     setNewLocale(SettingActivity.this, lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
                     languageSelected.setText("العربية");

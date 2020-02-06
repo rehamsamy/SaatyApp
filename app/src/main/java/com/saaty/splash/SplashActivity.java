@@ -162,35 +162,35 @@ public class SplashActivity extends BaseActivity {
 
                 }
             });
-        } else if (user_data != null && !user_data.equals("")) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&user_data != null && !user_data.equals("")) {
             Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
             intent.putExtra("user_data", userModel);
             Log.v("TAG", "splahhhh 1" + userModel.getUserModel().get(0).getEmail());
             startActivity(intent);
             finish();
 
-        } else if (registerDataUser != null && !registerDataUser.equals("") && v != 0) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&registerDataUser != null && !registerDataUser.equals("") && v != 0) {
             Intent intent = new Intent(SplashActivity.this, LoginTraderUserActivity.class);
             Log.v("TAG", "splahhhh 2" + userDataRegisterObject1.getUserDataRegisterObject().getType());
             startActivity(intent);
             finish();
-        } else if (registerDataUser != null && !registerDataUser.equals("") && v == 0) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&registerDataUser != null && !registerDataUser.equals("") && v == 0) {
             Intent intent = new Intent(SplashActivity.this, VerificationCodeActivity.class);
             intent.putExtra("register_user", userDataRegisterObject1);
             Log.v("TAG", "splahhhh 3" + userDataRegisterObject1.getUserDataRegisterObject().getFullname());
             startActivity(intent);
 
-        } else if (registerDataTrader != null && !registerDataTrader.equals("") && v2 != 0) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&registerDataTrader != null && !registerDataTrader.equals("") && v2 != 0) {
             Intent intent = new Intent(SplashActivity.this, LoginTraderUserActivity.class);
             Log.v("TAG", "splahhhh 3 " + userDataRegisterObject2.getUserDataRegisterObject().getFullname());
             startActivity(intent);
             finish();
-        } else if (registerDataTrader != null && !registerDataTrader.equals("") && v2 == 0) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&registerDataTrader != null && !registerDataTrader.equals("") && v2 == 0) {
             Intent intent = new Intent(SplashActivity.this, VerificationCodeActivity.class);
             Log.v("TAG", "splahhhh 4" + userDataRegisterObject2.getUserDataRegisterObject().getType());
             intent.putExtra("register_trader", userDataRegisterObject2);
             startActivity(intent);
-        } else if (value != null && !value.equals("")) {
+        } else if (!PreferenceHelper.getFirstTimeValue(this)&&value != null && !value.equals("")) {
             Intent intent = new Intent(SplashActivity.this, HomeActivity.class);
             intent.putExtra("login_visitor", userModel);
             Log.v("TAG", "exper visitor" + value);
@@ -222,9 +222,6 @@ public class SplashActivity extends BaseActivity {
         context.getResources().updateConfiguration(config, context.getResources().getDisplayMetrics());
 
     }
-
-
-
 
 
 

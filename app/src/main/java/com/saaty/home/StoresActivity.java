@@ -1236,10 +1236,16 @@ public class StoresActivity extends BaseActivity  implements OnItemClickInterfac
     void filterStore(String text,List<DataArrayModel> storesList){
         List<DataArrayModel> temp = new ArrayList();
         for(DataArrayModel d: storesList){
-            //or use .equal(text) with you want equal match
-            //use .toLowerCase() for better matches
-            if(d.getStoreArName().toLowerCase().contains(text.toLowerCase())){
-                temp.add(d);
+            if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")) {
+                //or use .equal(text) with you want equal match
+                //use .toLowerCase() for better matches
+                if (d.getStoreArName().toLowerCase().contains(text.toLowerCase())) {
+                    temp.add(d);
+                }
+            }else {
+                if (d.getStoreEnName().toLowerCase().contains(text.toLowerCase())) {
+                    temp.add(d);
+                }
             }
         }
         //update recyclerview
@@ -1252,8 +1258,14 @@ public class StoresActivity extends BaseActivity  implements OnItemClickInterfac
         for(DataArrayModel d: newProducts){
             //or use .equal(text) with you want equal match
             //use .toLowerCase() for better matches
-            if(d.getArName().toLowerCase().contains(text.toLowerCase())){
-                temp.add(d);
+            if(PreferenceHelper.getValue(getApplicationContext()).equals("ar")) {
+                if (d.getArName().toLowerCase().contains(text.toLowerCase())) {
+                    temp.add(d);
+                }
+            }else {
+                if (d.getEnName().toLowerCase().contains(text.toLowerCase())) {
+                    temp.add(d);
+                }
             }
         }
         //update recyclerview
