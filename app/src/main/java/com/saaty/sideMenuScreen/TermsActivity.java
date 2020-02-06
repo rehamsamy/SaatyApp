@@ -20,6 +20,7 @@ import com.saaty.R;
 import com.saaty.models.AdvsModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.NetworkAvailable;
 import com.squareup.picasso.Picasso;
 
@@ -33,7 +34,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class TermsActivity extends AppCompatActivity {
+public class TermsActivity extends BaseActivity {
 
     @BindView(R.id.about_app_txt) TextView aboutAppTxt;
     @BindView(R.id.progress_id)

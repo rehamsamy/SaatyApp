@@ -18,12 +18,13 @@ import com.saaty.R;
 import com.saaty.models.ProductDataModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.NetworkAvailable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class AboutUsActivity extends AppCompatActivity {
+public class AboutUsActivity extends BaseActivity {
 
     @BindView(R.id.about_us_txt) TextView aboutUsTxt;
     @BindView(R.id.progress_id) ProgressBar progressBar;

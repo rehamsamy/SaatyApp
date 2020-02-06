@@ -34,6 +34,7 @@ import com.saaty.models.RebliesArrayItem;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
@@ -45,7 +46,7 @@ import java.util.Map;
 
 import static android.view.View.VISIBLE;
 
-public class MessageDetailsActivity extends AppCompatActivity {
+public class MessageDetailsActivity extends BaseActivity {
 
     public static final String MESSAGE_MODEL_RECEIVE = "message_model_receive";
     public static final String MESSAGE_MODEL_SEND= "message_model_send";

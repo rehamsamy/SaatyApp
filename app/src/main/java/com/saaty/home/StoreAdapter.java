@@ -78,6 +78,11 @@ public class StoreAdapter extends RecyclerView.Adapter<StoreAdapter.Holder> {
 
     }
 
+    public void updateList(List<DataArrayModel> list){
+        this.storesList = list;
+        notifyDataSetChanged();
+    }
+
     public class Holder  extends RecyclerView.ViewHolder {
         public Holder(@NonNull View itemView) {
             super(itemView);

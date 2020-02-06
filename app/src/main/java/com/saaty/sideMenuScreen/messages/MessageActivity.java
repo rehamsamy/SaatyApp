@@ -34,6 +34,7 @@ import com.saaty.sideMenuScreen.myAds.MyAdsActivity;
 import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickRecyclerViewInterface;
@@ -43,7 +44,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class MessageActivity extends AppCompatActivity {
+public class MessageActivity extends BaseActivity {
     @BindView(R.id.tab_layout_id) TabLayout tabLayout;
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.progress_id) ProgressBar progressBar;

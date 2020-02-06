@@ -25,13 +25,14 @@ import com.saaty.models.ReplyMessageModel;
 import com.saaty.models.SendMessageProductModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class SendMessageActivity extends AppCompatActivity {
+public class SendMessageActivity extends BaseActivity {
   @BindView(R.id.message_text_input_id) TextInputEditText messageInput;
   @BindView(R.id.toolbar_txt_id) TextView toolarTxt;
   NetworkAvailable networkAvailable;

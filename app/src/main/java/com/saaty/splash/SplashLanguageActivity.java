@@ -21,11 +21,12 @@ import com.saaty.home.HomeActivity;
 import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.Data;
 import com.saaty.models.UserModel;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.PreferenceHelper;
 
 import java.util.Locale;
 
-public class SplashLanguageActivity extends AppCompatActivity {
+public class SplashLanguageActivity extends BaseActivity {
 
     @BindView(R.id.arabic_btn_id) MaterialButton arabicBtn;
     @BindView(R.id.english_btn_id) MaterialButton englishBtn;
@@ -73,6 +74,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
         //intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Log.v("TAG","sssss"+lang_selected);
         Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
+        PreferenceHelper.setFirstTimeValue(this,false);
         startActivity(intent);
           }
 
@@ -86,6 +88,7 @@ public class SplashLanguageActivity extends AppCompatActivity {
        // intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         Log.v("TAG","langgg"+PreferenceHelper.getValue(getApplicationContext()));
         Log.v("TAG","sssss"+lang_selected);
+        PreferenceHelper.setFirstTimeValue(this,false);
         startActivity(intent);
 
     }

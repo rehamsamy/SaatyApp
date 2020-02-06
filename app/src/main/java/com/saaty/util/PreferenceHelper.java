@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 public class PreferenceHelper {
 
     private static final String APP_Language = "APP_Language";
+    public static final String first_time = "firstTime";
 
 
     // properties
@@ -31,6 +32,14 @@ public class PreferenceHelper {
         editor.commit();
     }
 
+    public static Boolean getFirstTimeValue(Context context){
+        return getSharedPreference(context).getBoolean(first_time,true);
+    }
+    public static  void setFirstTimeValue(Context context,Boolean firstTime){
+        SharedPreferences.Editor editor=getSharedPreference(context).edit();
+        editor.putBoolean(first_time,firstTime);
+        editor.commit();
+    }
 
 
 }

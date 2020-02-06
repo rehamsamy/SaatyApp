@@ -32,6 +32,7 @@ import com.saaty.models.MessageModel;
 import com.saaty.models.RebliesArrayItem;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
@@ -43,7 +44,7 @@ import java.util.Map;
 
 import static android.view.View.VISIBLE;
 
-public class MessageSendDetailsActivity extends AppCompatActivity {
+public class MessageSendDetailsActivity extends BaseActivity {
     public static final String MESSAGE_MODEL_SEND = "message_model_send";
     @BindView(R.id.user_name_id)
     TextView userName;

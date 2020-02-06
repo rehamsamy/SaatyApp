@@ -79,6 +79,7 @@ import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.sideMenuScreen.wishlist.WishlistAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.FilterMethods;
@@ -97,7 +98,7 @@ import java.util.Map;
 import static com.saaty.home.HomeActivity.user_id;
 import static com.saaty.loginAndRegister.LoginTraderUserActivity.MY_PREFS_NAME;
 
-public class StoresActivity extends AppCompatActivity implements OnItemClickInterface {
+public class StoresActivity extends BaseActivity  implements OnItemClickInterface {
 
     private static final String TAG = StoresActivity.class.getSimpleName();
     private String spinnerValue;
@@ -327,7 +328,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.clear();
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page,1);
-                    searchOnWatchProduct(categoryProductsList);
+                    //searchOnWatchProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }else if(tab_category_pos==1){
@@ -348,7 +350,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     emptyDataTxt.setVisibility(View.GONE);
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page, 2);
-                    searchOnWatchProduct(categoryProductsList);
+                    //searchOnWatchProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -381,7 +384,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     buildRecyclerViewForCategory();
                     current_page=1;
                     getCateogryProductsList(current_page,2);
-                    searchOnBracletProduct(categoryProductsList);
+                    //searchOnBracletProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }else if(tab_category_pos==1){
@@ -402,7 +406,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     emptyDataTxt.setVisibility(View.GONE);
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page, 1);
-                    searchOnBracletProduct(categoryProductsList);
+                    //searchOnBracletProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -446,7 +451,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     categoryProductsList.clear();
                     buildRecyclerViewForCategory();
                     getCateogryProductsList(current_page,1);
-                    searchOnWatchProduct(categoryProductsList);
+                    //searchOnWatchProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
 
@@ -458,7 +464,8 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
                     buildRecyclerViewForCategory();
                     current_page=1;
                     getCateogryProductsList(current_page, 2);
-                    searchOnBracletProduct(categoryProductsList);
+                    //searchOnBracletProduct(categoryProductsList);
+                    searchOnProduct(categoryProductsList);
                     navFilterImg.setVisibility(View.VISIBLE);
 
                 }
@@ -849,50 +856,87 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                String newText = s.toString();
+//                String newText = s.toString();
+//                filterStore(s.toString(),storesList);
                 Log.v("TAG", "sssssssssss" + storesList.size() + s.toString().toLowerCase());
-                emptyDataTxt.setVisibility(View.GONE);
-                ArrayList<DataArrayModel> newlist = new ArrayList<>();
-
-                for (DataArrayModel item : storesList) {
-                    Log.v("TAG", "ar name" + item.getStoreArName().contains(newText));
-                    if (item.getStoreArName().contains(newText)) {
-                        newlist.add(item);
-                    }
-                }
-                storesList.clear();
-                if(newlist.size()>0) {
-                    for (int i = 0; i < newlist.size(); i++) {
-                        storesList.add(newlist.get(i));
-                        adapter.notifyDataSetChanged();
-                        Log.v("TAG","ffffff ounded ");
-
-                    }
-                }else if(newlist.size()==0&&s.length()!=0){
-                    storesList.clear();
-                    emptyDataTxt.setVisibility(View.VISIBLE);
-                    adapter.notifyDataSetChanged();
-                    Log.v("TAG","ffffff not ounded ");
-                }else if(newlist.size()==0&&s.length()==0){
-                    Log.v("TAG","ssssss   qqq"+newStoresList.size());
-                    storesList.addAll(newStoresList);
-                    adapter.notifyDataSetChanged();
-                }else if(newlist.size()>0&&s.length()==0){
-                    newStoresList.clear();
-                    storesList.addAll(newStoresList);
-                    adapter.notifyDataSetChanged();
-                    Log.v("TAG","xxx ccc");
-                }
+//                ArrayList<DataArrayModel> newlist = new ArrayList<>();
+//
+//                for (DataArrayModel item : storesList) {
+//                    Log.v("TAG", "ar name" + item.getStoreArName().contains(newText));
+//                    if (item.getStoreArName().contains(newText)) {
+//                        newlist.add(item);
+//                    }
+//                }
+//                storesList.clear();
+//                if(newlist.size()>0) {
+//                    for (int i = 0; i < newlist.size(); i++) {
+//                        storesList.add(newlist.get(i));
+//                        adapter.notifyDataSetChanged();
+//
+//                    }
+//                }else {
+//                    storesList.clear();
+//                    emptyDataTxt.setVisibility(View.VISIBLE);
+//                    adapter.notifyDataSetChanged();
+//                }
             }
 
             @Override
             public void afterTextChanged(Editable s) {
-
+                filterStore(s.toString(),storesList);
 
             }
         });
     }
 
+
+    private void searchOnProduct(List<DataArrayModel> newProducts){
+        searchView.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String newText = s.toString();
+                // Log.v("TAG", "sssssssssss" + newProducts.size() + s.toString().toLowerCase());
+//                ArrayList<DataArrayModel> newlist = new ArrayList<>();
+//
+//                for (DataArrayModel item : categoryProductsList) {
+//                   // Log.v("TAG", "ar name" + item.getArName().contains(newText));
+//                    if (item.getArName().contains(newText)) {
+//                        newlist.add(item);
+//                    }
+//                }
+//               categoryProductsList.clear();
+//                if(newlist.size()>0) {
+//                    for (int i = 0; i < newlist.size(); i++) {
+//                        categoryProductsList.add(newlist.get(i));
+//                        //categoryProductsList=newProducts;
+//                        storeProductAdapter.notifyDataSetChanged();
+////                        GridLayoutManager layoutManager=new GridLayoutManager(StoresActivity.this,2);
+////                        storeProductAdapter =new StoreProductAdapter(StoresActivity.this,categoryProductsList);
+////                        recyclerView.setHasFixedSize(true);
+////                        recyclerView.setLayoutManager(layoutManager);
+////                        recyclerView.setAdapter(storeProductAdapter);
+//                    }
+//                   // buildOnClickListener();
+//                }else {
+//                    categoryProductsList.clear();;
+//                    emptyDataTxt.setVisibility(View.VISIBLE);
+//                    storeProductAdapter.notifyDataSetChanged();
+//                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                filterStoreProducts(s.toString(), newProducts);
+
+            }
+        });
+
+    }
 
 
 
@@ -1189,5 +1233,30 @@ public class StoresActivity extends AppCompatActivity implements OnItemClickInte
     }
 
 
+    void filterStore(String text,List<DataArrayModel> storesList){
+        List<DataArrayModel> temp = new ArrayList();
+        for(DataArrayModel d: storesList){
+            //or use .equal(text) with you want equal match
+            //use .toLowerCase() for better matches
+            if(d.getStoreArName().toLowerCase().contains(text.toLowerCase())){
+                temp.add(d);
+            }
+        }
+        //update recyclerview
+        adapter.updateList(temp);
+    }
 
+
+    void filterStoreProducts(String text,List<DataArrayModel> newProducts){
+        List<DataArrayModel> temp = new ArrayList();
+        for(DataArrayModel d: newProducts){
+            //or use .equal(text) with you want equal match
+            //use .toLowerCase() for better matches
+            if(d.getArName().toLowerCase().contains(text.toLowerCase())){
+                temp.add(d);
+            }
+        }
+        //update recyclerview
+        storeProductAdapter.updateList(temp);
+    }
 }

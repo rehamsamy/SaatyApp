@@ -26,6 +26,7 @@ import com.saaty.models.UpdateProfileDataArrayModel;
 import com.saaty.models.UpdateProfileModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.urls;
@@ -34,7 +35,7 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ProfileActivity extends AppCompatActivity {
+public class ProfileActivity extends BaseActivity {
 
     @BindView(R.id.edit_profile_back) ImageView editProfile;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;

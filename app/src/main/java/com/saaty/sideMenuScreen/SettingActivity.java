@@ -19,11 +19,14 @@ import android.widget.TextView;
 
 import com.saaty.R;
 import com.saaty.home.HomeActivity;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.PreferenceHelper;
 
 import java.util.Locale;
 
-public class SettingActivity extends AppCompatActivity {
+import static com.saaty.util.LocaleManager.setNewLocale;
+
+public class SettingActivity extends BaseActivity {
 
     String lang_selected;
     @BindView(R.id.language_value_id) TextView languageSelected;
@@ -65,6 +68,7 @@ public class SettingActivity extends AppCompatActivity {
                     lang_selected = "en";
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
                     setConfig( SettingActivity.this,lang_selected);
+                    setNewLocale(SettingActivity.this, lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
                     languageSelected.setText("English");
 
@@ -73,6 +77,7 @@ public class SettingActivity extends AppCompatActivity {
                     lang_selected = "ar";
                     PreferenceHelper.setValue(SettingActivity.this, lang_selected);
                     setConfig( SettingActivity.this,lang_selected);
+                    setNewLocale(SettingActivity.this, lang_selected);
                     Log.v("TAG","lang_selceted"+lang_selected);
                     languageSelected.setText("العربية");
                 }

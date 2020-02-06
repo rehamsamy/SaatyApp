@@ -44,6 +44,7 @@ import com.saaty.models.UpdateProfileModel;
 import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
@@ -57,7 +58,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class EditProfileActivity extends AppCompatActivity {
+public class EditProfileActivity extends BaseActivity {
 
     private static final String TAG =EditProfileActivity.class.getSimpleName() ;
     @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;

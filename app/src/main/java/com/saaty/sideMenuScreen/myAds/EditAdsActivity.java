@@ -61,6 +61,7 @@ import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.productDetails.ProductImagesListAdapter;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
@@ -75,7 +76,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-public class EditAdsActivity extends AppCompatActivity {
+public class EditAdsActivity extends BaseActivity {
 
     public static final String EDIT_ADS_PRODUCT ="edit_ads_product";
     public static final String ADD_NEW_AD ="add_new_ad";

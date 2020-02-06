@@ -12,8 +12,9 @@ import android.widget.TextView;
 import com.google.android.material.tabs.TabItem;
 import com.google.android.material.tabs.TabLayout;
 import com.saaty.R;
+import com.saaty.util.BaseActivity;
 
-public class RegisterActivity extends AppCompatActivity {
+public class RegisterActivity extends BaseActivity {
 @BindView(R.id.tab_layout_id) TabLayout tabLayout;
 @BindView(R.id.view_pager_id) ViewPager viewPager;
 @BindView(R.id.toolbar_txt_id) TextView toolbarTxt;

@@ -48,6 +48,7 @@ import com.saaty.sideMenuScreen.wishlist.DealingWithWishList;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.FilterMethods;
 import com.saaty.util.NetworkAvailable;
@@ -63,7 +64,7 @@ import java.util.Map;
 
 import static androidx.constraintlayout.widget.Constraints.TAG;
 
-public class StoresProductsActivity extends AppCompatActivity {
+public class StoresProductsActivity extends BaseActivity {
 
     private static final String TAG = StoresProductsActivity.class.getSimpleName();
     @BindView(R.id.tab_layout_id) TabLayout tabLayout;

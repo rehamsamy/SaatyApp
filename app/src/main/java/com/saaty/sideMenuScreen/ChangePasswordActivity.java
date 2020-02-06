@@ -24,6 +24,7 @@ import com.saaty.loginAndRegister.LoginTraderUserActivity;
 import com.saaty.models.SendCodeModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.urls;
@@ -32,7 +33,7 @@ import com.squareup.picasso.Picasso;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChangePasswordActivity extends AppCompatActivity {
+public class ChangePasswordActivity  extends BaseActivity {
 
     private static final String TAG =ChangePasswordActivity.class.getSimpleName() ;
     @BindView(R.id.toolbar_txt_id)

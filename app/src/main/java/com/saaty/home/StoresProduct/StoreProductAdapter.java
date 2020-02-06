@@ -123,6 +123,11 @@ public class StoreProductAdapter extends RecyclerView.Adapter<StoreProductAdapte
 
 
 
+    public void updateList(List<DataArrayModel>list){
+        storeProductsList = list;
+        notifyDataSetChanged();
+    }
+
     public class Holder  extends RecyclerView.ViewHolder {
         ImageView wishlistImg;
         public Holder(@NonNull View itemView,OnItemClickRecyclerViewInterface mInterface) {

@@ -56,6 +56,7 @@ import com.saaty.models.StoreListModel;
 import com.saaty.productDetails.ProductDetailsActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.EndlessRecyclerViewScrollListener;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.OnItemClickInterface;
@@ -67,7 +68,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class WishlistActivity extends AppCompatActivity  {
+public class WishlistActivity extends BaseActivity {
 
     @BindView(R.id.recycler_view) RecyclerView recyclerView;
     @BindView(R.id.progress_id) ProgressBar progressBar;

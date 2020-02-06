@@ -36,6 +36,7 @@ import com.saaty.models.UserModel;
 import com.saaty.password.ForgetPasswordActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.DailogUtil;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
@@ -44,7 +45,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-public class LoginTraderUserActivity extends AppCompatActivity {
+public class LoginTraderUserActivity extends BaseActivity {
 
     private static final String TAG =LoginTraderUserActivity.class.getSimpleName() ;
     public static final String MY_PREFS_NAME ="my_data" ;

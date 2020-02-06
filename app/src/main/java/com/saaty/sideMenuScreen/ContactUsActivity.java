@@ -17,12 +17,13 @@ import com.saaty.R;
 import com.saaty.models.ProductDataModel;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.NetworkAvailable;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContactUsActivity extends AppCompatActivity {
+public class ContactUsActivity  extends BaseActivity {
 
     ApiServiceInterface apiServiceInterface;
     NetworkAvailable networkAvailable;

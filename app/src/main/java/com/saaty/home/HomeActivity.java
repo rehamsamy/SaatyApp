@@ -67,6 +67,7 @@ import com.saaty.sideMenuScreen.myAds.EditAdsActivity;
 import com.saaty.sideMenuScreen.wishlist.WishlistActivity;
 import com.saaty.util.ApiClient;
 import com.saaty.util.ApiServiceInterface;
+import com.saaty.util.BaseActivity;
 import com.saaty.util.NetworkAvailable;
 import com.saaty.util.PreferenceHelper;
 import com.saaty.util.urls;
@@ -80,7 +81,7 @@ import java.util.Map;
 
 import static com.saaty.loginAndRegister.LoginTraderUserActivity.MY_PREFS_NAME;
 
-public class HomeActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener,BaseSliderView.OnSliderClickListener ,  ViewPagerEx.OnPageChangeListener {
+public class HomeActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener,BaseSliderView.OnSliderClickListener ,  ViewPagerEx.OnPageChangeListener {
 
     private static final String TAG =HomeActivity.class.getSimpleName() ;
     int id;
